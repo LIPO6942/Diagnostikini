@@ -27,7 +27,7 @@ export const UserProfileSchema = z.object({
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
 export type HealthDocument = {
-  id: string; // Unique ID for IndexedDB
+  id: string; // Unique ID for localStorage key
   name: string;
   mimeType: string;
 };

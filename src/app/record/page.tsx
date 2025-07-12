@@ -4,15 +4,14 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import type { HealthRecord } from '@/lib/types';
+import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
-import { getFile } from '@/services/db-service';
+import { getHealthRecords, deleteHealthRecord, getDocumentDataUrl } from '@/services/health-record-service';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { AddDocumentDialog } from '@/components/record/add-document-dialog';
@@ -75,41 +74,39 @@ const categoryIcons = {
     'Autre': <FileText className="h-5 w-5 text-gray-500" />,
 }
 
-function DocumentPreview({ doc }: { doc: {id: string, name: string, mimeType: string} }) {
+function DocumentPreview({ doc }: { doc: HealthDocument }) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     useEffect(() => {
-        let objectUrl: string;
-        async function loadFile() {
-            if (!doc.id) return; // Safety check
-            const file = await getFile(doc.id);
-            if(file) {
-                objectUrl = URL.createObjectURL(file);
-                setPreviewUrl(objectUrl);
+        if (doc.mimeType.startsWith('image/')) {
+            // For images, we can use the dataUrl directly for a small preview
+            const dataUrl = getDocumentDataUrl(doc.id);
+            setPreviewUrl(dataUrl);
+        }
+    }, [doc.id, doc.mimeType]);
+
+    const handleOpenDocument = () => {
+        const dataUrl = getDocumentDataUrl(doc.id);
+        if (dataUrl) {
+            const newWindow = window.open();
+            if (newWindow) {
+                if(doc.mimeType.startsWith('image/')){
+                     newWindow.document.write(`<img src="${dataUrl}" style="max-width: 100%;">`);
+                } else if(doc.mimeType === 'application/pdf') {
+                     newWindow.document.write(`<iframe src="${dataUrl}" style="width:100%; height:100%;" frameborder="0"></iframe>`);
+                } else {
+                     newWindow.location.href = dataUrl;
+                }
             }
         }
-        loadFile();
-        
-        return () => {
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
-            }
-        }
-    }, [doc.id]);
-
-
-    if (!previewUrl) {
-        return <div className="size-20 rounded-md bg-muted animate-pulse" />;
-    }
+    };
 
     return (
-        <a 
-            href={previewUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-20 group"
+        <button 
+            onClick={handleOpenDocument}
+            className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-20 group text-left"
         >
-            {doc.mimeType.startsWith('image/') ? (
+            {doc.mimeType.startsWith('image/') && previewUrl ? (
                 <Image
                     src={previewUrl}
                     alt={doc.name}
@@ -125,7 +122,7 @@ function DocumentPreview({ doc }: { doc: {id: string, name: string, mimeType: st
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <Eye className="text-white size-6" />
             </div>
-        </a>
+        </button>
     )
 }
 

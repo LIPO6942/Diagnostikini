@@ -1,11 +1,13 @@
 /**
- * @fileoverview Service for managing health records in localStorage and files in IndexedDB.
+ * @fileoverview Service for managing health records and document data in localStorage.
  */
 'use client';
 import type { HealthRecord } from '@/lib/types';
-import { deleteFile } from '@/services/db-service';
 
 const HEALTH_RECORDS_KEY = 'healthRecords';
+const DOC_STORAGE_PREFIX = 'doc_';
+
+// Health Record Management
 
 export function getHealthRecords(): HealthRecord[] {
   if (typeof window === 'undefined') {
@@ -62,13 +64,36 @@ export async function deleteHealthRecord(id: string): Promise<void> {
   const existingRecords = getHealthRecords();
   const recordToDelete = existingRecords.find(record => record.id === id);
 
-  // Delete associated files from IndexedDB
+  // Delete associated document data from localStorage
   if (recordToDelete?.documents) {
     for (const doc of recordToDelete.documents) {
-      await deleteFile(doc.id);
+      deleteDocumentDataUrl(doc.id);
     }
   }
   
   const updatedRecords = existingRecords.filter(record => record.id !== id);
   localStorage.setItem(HEALTH_RECORDS_KEY, JSON.stringify(updatedRecords));
+}
+
+
+// Document Data Management
+
+export function saveDocumentDataUrl(id: string, dataUrl: string) {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.setItem(`${DOC_STORAGE_PREFIX}${id}`, dataUrl);
+    } catch (e) {
+        console.error("Failed to save document to localStorage. It might be too large.", e);
+        // Optionally, inform the user about the storage limit.
+    }
+}
+
+export function getDocumentDataUrl(id: string): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(`${DOC_STORAGE_PREFIX}${id}`);
+}
+
+export function deleteDocumentDataUrl(id: string) {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(`${DOC_STORAGE_PREFIX}${id}`);
 }

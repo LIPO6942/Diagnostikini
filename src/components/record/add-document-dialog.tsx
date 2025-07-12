@@ -35,8 +35,7 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText } from "lucide-react";
 import type { HealthRecord, HealthDocument } from "@/lib/types";
-import { saveHealthRecord, updateHealthRecord } from "@/services/health-record-service";
-import { saveFile } from "@/services/db-service";
+import { saveHealthRecord, updateHealthRecord, saveDocumentDataUrl, getDocumentDataUrl, deleteDocumentDataUrl } from "@/services/health-record-service";
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 
@@ -47,8 +46,14 @@ const addDocumentSchema = z.object({
 
 type AddDocumentForm = z.infer<typeof addDocumentSchema>;
 
-// Helper to create a temporary preview URL from a File object
-const getPreviewUrl = (file: File) => URL.createObjectURL(file);
+const fileToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
 
 interface AddDocumentDialogProps {
     onRecordUpdate: () => void;
@@ -58,86 +63,90 @@ interface AddDocumentDialogProps {
 
 export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButton }: AddDocumentDialogProps) {
   const [open, setOpen] = useState(false);
-  const [documentFiles, setDocumentFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [newFilePreviews, setNewFilePreviews] = useState<string[]>([]);
+  const [existingDocuments, setExistingDocuments] = useState<HealthDocument[]>([]);
+  const [docsToDelete, setDocsToDelete] = useState<string[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const isEditing = !!existingRecord;
 
   const form = useForm<AddDocumentForm>({
     resolver: zodResolver(addDocumentSchema),
-    defaultValues: {
-      title: "",
-      category: "Bilan",
-    },
+    defaultValues: { title: "", category: "Bilan" },
   });
   
-  const resetAndClose = () => {
-    form.reset({
-      title: "",
-      category: "Bilan",
-    });
-    setDocumentFiles([]);
-    setPreviewUrls([]);
+  const resetState = () => {
+    form.reset({ title: "", category: "Bilan" });
+    setNewFiles([]);
+    newFilePreviews.forEach(url => URL.revokeObjectURL(url));
+    setNewFilePreviews([]);
+    setExistingDocuments([]);
+    setDocsToDelete([]);
     setOpen(false);
   };
   
   useEffect(() => {
-    if (!open) {
-        // Clean up preview URLs when dialog closes
-        previewUrls.forEach(url => URL.revokeObjectURL(url));
-        setPreviewUrls([]);
-        setDocumentFiles([]);
-        form.reset({ title: "", category: "Bilan" });
-    } else if (existingRecord) {
+    if (open && isEditing) {
         form.reset({
             title: existingRecord.title,
             category: existingRecord.category,
         });
-        // Note: We don't load existing files for preview/editing to keep it simple.
-        // The logic will append new files to the existing ones.
+        setExistingDocuments(existingRecord.documents || []);
     }
-  }, [open, existingRecord, form]);
+  }, [open, existingRecord, isEditing, form]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setIsUploading(true);
       const filesArray = Array.from(e.target.files);
-      setDocumentFiles(prev => [...prev, ...filesArray]);
+      setNewFiles(prev => [...prev, ...filesArray]);
       
-      const newPreviewUrls = filesArray.map(getPreviewUrl);
-      setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
-      
-      setIsUploading(false);
+      const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+      setNewFilePreviews(prev => [...prev, ...newPreviews]);
     }
   };
 
-  const removeDocument = (index: number) => {
-      setDocumentFiles(prev => prev.filter((_, i) => i !== index));
-      setPreviewUrls(prev => {
-          const newPreviews = prev.filter((_, i) => i !== index);
-          URL.revokeObjectURL(prev[index]); // Clean up memory
-          return newPreviews;
-      });
+  const removeNewFile = (index: number) => {
+    URL.revokeObjectURL(newFilePreviews[index]); // Clean up memory
+    setNewFiles(prev => prev.filter((_, i) => i !== index));
+    setNewFilePreviews(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const removeExistingDoc = (docId: string) => {
+    setExistingDocuments(prev => prev.filter(doc => doc.id !== docId));
+    setDocsToDelete(prev => [...prev, docId]);
   }
 
   const onSubmit = async (values: AddDocumentForm) => {
-    if (documentFiles.length === 0 && !isEditing) {
+    if (newFiles.length === 0 && !isEditing) {
         toast({ variant: "destructive", title: "Veuillez ajouter au moins un document." });
         return;
     }
     
-    // Create document metadata and save files to IndexedDB
+    setIsProcessing(true);
+
+    // Delete documents marked for deletion
+    docsToDelete.forEach(docId => deleteDocumentDataUrl(docId));
+
+    // Process and save new files
     const newDocuments: HealthDocument[] = [];
-    for (const file of documentFiles) {
-        const docId = crypto.randomUUID();
-        await saveFile(docId, file);
-        newDocuments.push({
-            id: docId,
-            name: file.name,
-            mimeType: file.type,
-        });
+    for (const file of newFiles) {
+        try {
+            const dataUrl = await fileToDataUrl(file);
+            const docId = crypto.randomUUID();
+            saveDocumentDataUrl(docId, dataUrl);
+            newDocuments.push({
+                id: docId,
+                name: file.name,
+                mimeType: file.type,
+            });
+        } catch (error) {
+            console.error("Error processing file:", file.name, error);
+            toast({ variant: "destructive", title: `Erreur lors du traitement du fichier ${file.name}` });
+            setIsProcessing(false);
+            return;
+        }
     }
     
     if (isEditing) {
@@ -145,7 +154,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
           ...existingRecord,
           title: values.title,
           category: values.category,
-          documents: [...(existingRecord.documents || []), ...newDocuments],
+          documents: [...existingDocuments, ...newDocuments],
         };
         updateHealthRecord(updatedRecord);
         toast({ title: "Document mis à jour", description: "Votre document a été modifié avec succès." });
@@ -162,17 +171,20 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
     }
     
+    setIsProcessing(false);
     onRecordUpdate();
-    resetAndClose();
+    resetState();
   };
 
   const dialogTitle = isEditing ? "Modifier le document" : "Ajouter un nouveau document";
   const dialogDescription = isEditing 
-    ? "Modifiez les informations ou ajoutez de nouveaux fichiers à ce dossier."
+    ? "Modifiez les informations ou ajoutez/supprimez des fichiers pour ce dossier."
     : "Importez des bilans, des ordonnances ou d'autres documents (images ou PDF).";
 
+  const allDocs = [...existingDocuments, ...newFiles];
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} onExited={resetState}>
       <DialogTrigger asChild>
         {triggerButton ? triggerButton : (
           <Button>
@@ -182,9 +194,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => {
-        if(form.formState.isDirty || documentFiles.length > 0) {
-          e.preventDefault();
-        }
+        if(form.formState.isDirty || newFiles.length > 0) e.preventDefault();
       }}>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
@@ -236,23 +246,46 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                     <div className="space-y-1 text-center">
                         <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
                         <div className="flex text-sm text-muted-foreground">
-                            <span>{isUploading ? "Chargement..." : "Téléchargez un ou plusieurs fichiers"}</span>
-                            <input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*,application/pdf" onChange={handleFileChange} disabled={isUploading} />
+                            <span>{isProcessing ? "Traitement..." : "Téléchargez un ou plusieurs fichiers"}</span>
+                            <input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*,application/pdf" onChange={handleFileChange} disabled={isProcessing} />
                         </div>
-                        <p className="text-xs text-muted-foreground">PNG, JPG, PDF jusqu'à 10MB</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, PDF jusqu'à 5MB</p>
                     </div>
                   </label>
-                  {isUploading && <LoaderCircle className="animate-spin mt-2" />}
+                  {isProcessing && <LoaderCircle className="animate-spin mt-2" />}
                 </div>
               </FormControl>
             </FormItem>
 
-            {documentFiles.length > 0 && (
+            {allDocs.length > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                    {documentFiles.map((file, index) => (
-                        <div key={index} className="relative group">
+                    {/* Existing Docs */}
+                    {existingDocuments.map((doc) => (
+                         <div key={doc.id} className="relative group">
+                            {doc.mimeType.startsWith('image/') ? (
+                                <Image src={getDocumentDataUrl(doc.id) || ''} alt={doc.name} width={150} height={150} className="rounded-md object-cover aspect-square border" />
+                            ) : (
+                                <div className="rounded-md object-cover aspect-square border bg-secondary flex flex-col items-center justify-center p-2">
+                                    <FileText className="size-8 text-secondary-foreground"/>
+                                    <span className="text-xs text-secondary-foreground text-center truncate w-full mt-1">{doc.name}</span>
+                                </div>
+                            )}
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                onClick={() => removeExistingDoc(doc.id)}
+                            >
+                                <X className="h-4 w-4"/>
+                            </Button>
+                        </div>
+                    ))}
+                    {/* New Files */}
+                    {newFiles.map((file, index) => (
+                        <div key={file.name + index} className="relative group">
                             {file.type.startsWith('image/') ? (
-                                <Image src={previewUrls[index]} alt={`preview ${index}`} width={150} height={150} className="rounded-md object-cover aspect-square border" />
+                                <Image src={newFilePreviews[index]} alt={`preview ${index}`} width={150} height={150} className="rounded-md object-cover aspect-square border" />
                             ) : (
                                 <div className="rounded-md object-cover aspect-square border bg-secondary flex flex-col items-center justify-center p-2">
                                     <FileText className="size-8 text-secondary-foreground"/>
@@ -264,7 +297,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                                 variant="destructive"
                                 size="icon"
                                 className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                onClick={() => removeDocument(index)}
+                                onClick={() => removeNewFile(index)}
                             >
                                 <X className="h-4 w-4"/>
                             </Button>
@@ -274,8 +307,8 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
             )}
 
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={resetAndClose}>Annuler</Button>
-                <Button type="submit">{isEditing ? "Mettre à jour" : "Sauvegarder"}</Button>
+                <Button type="button" variant="outline" onClick={resetState}>Annuler</Button>
+                <Button type="submit" disabled={isProcessing}>{isProcessing ? "Sauvegarde..." : isEditing ? "Mettre à jour" : "Sauvegarder"}</Button>
             </DialogFooter>
           </form>
         </Form>
