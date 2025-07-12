@@ -1,9 +1,9 @@
 /**
- * @fileoverview Dialog component for adding a new document to the health record.
+ * @fileoverview Dialog component for adding or editing a document in the health record.
  */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText } from "lucide-react";
 import type { HealthRecord, HealthDocument } from "@/lib/types";
-import { saveHealthRecord } from "@/services/health-record-service";
+import { saveHealthRecord, updateHealthRecord } from "@/services/health-record-service";
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 
@@ -47,14 +47,17 @@ const addDocumentSchema = z.object({
 type AddDocumentForm = z.infer<typeof addDocumentSchema>;
 
 interface AddDocumentDialogProps {
-    onRecordAdded: () => void;
+    onRecordUpdate: () => void;
+    existingRecord?: HealthRecord;
+    triggerButton?: React.ReactNode;
 }
 
-export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
+export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButton }: AddDocumentDialogProps) {
   const [open, setOpen] = useState(false);
   const [documents, setDocuments] = useState<HealthDocument[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const isEditing = !!existingRecord;
 
   const form = useForm<AddDocumentForm>({
     resolver: zodResolver(addDocumentSchema),
@@ -63,6 +66,17 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
       category: "Bilan",
     },
   });
+
+  useEffect(() => {
+    if (existingRecord) {
+        form.reset({
+            title: existingRecord.title,
+            category: existingRecord.category,
+        });
+        setDocuments(existingRecord.documents || []);
+    }
+  }, [existingRecord, form]);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -104,40 +118,66 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
         return;
     }
     
-    const newRecord: HealthRecord = {
-      id: new Date().toISOString(),
-      date: new Date().toLocaleDateString('fr-FR'),
-      title: values.title,
-      category: values.category,
-      documents: documents,
-    };
+    if (isEditing) {
+        const updatedRecord: HealthRecord = {
+          ...existingRecord,
+          title: values.title,
+          category: values.category,
+          documents: documents,
+        };
+        updateHealthRecord(updatedRecord);
+        toast({ title: "Document mis à jour", description: "Votre document a été modifié avec succès." });
+
+    } else {
+        const newRecord: HealthRecord = {
+            id: new Date().toISOString(),
+            date: new Date().toLocaleDateString('fr-FR'),
+            title: values.title,
+            category: values.category,
+            documents: documents,
+        };
+        saveHealthRecord(newRecord);
+        toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
+    }
     
-    saveHealthRecord(newRecord);
-    toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
-    onRecordAdded();
+    onRecordUpdate();
     resetAndClose();
   };
 
   const resetAndClose = () => {
-    form.reset();
-    setDocuments([]);
+    if (!isEditing) {
+      form.reset();
+      setDocuments([]);
+    }
     setOpen(false);
   };
+
+  const dialogTitle = isEditing ? "Modifier le document" : "Ajouter un nouveau document";
+  const dialogDescription = isEditing 
+    ? "Modifiez le titre, la catégorie ou ajoutez/supprimez des fichiers pour ce dossier."
+    : "Importez des bilans, des ordonnances ou d'autres documents importants (images ou PDF).";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusCircle className="mr-2" />
-          Ajouter un document
-        </Button>
+        {triggerButton ? triggerButton : (
+          <Button>
+            <PlusCircle className="mr-2" />
+            Ajouter un document
+          </Button>
+        )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => {
+        // Allow closing if not editing or form is not dirty
+        if(!isEditing || !form.formState.isDirty) {
+          resetAndClose();
+        } else {
+          e.preventDefault();
+        }
+      }}>
         <DialogHeader>
-          <DialogTitle>Ajouter un nouveau document</DialogTitle>
-          <DialogDescription>
-            Importez des bilans, des ordonnances ou d'autres documents importants (images ou PDF).
-          </DialogDescription>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -160,7 +200,7 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Catégorie</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionnez une catégorie" />
@@ -224,7 +264,7 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
 
             <DialogFooter>
                 <Button type="button" variant="outline" onClick={resetAndClose}>Annuler</Button>
-                <Button type="submit">Sauvegarder</Button>
+                <Button type="submit">{isEditing ? "Mettre à jour" : "Sauvegarder"}</Button>
             </DialogFooter>
           </form>
         </Form>

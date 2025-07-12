@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileImage, FileKey2 } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileImage, FileKey2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
@@ -46,7 +46,7 @@ function EmptyState() {
             <h3 className="text-xl font-semibold">Aucun dossier trouvé</h3>
             <p className="text-muted-foreground mt-2">L'historique de vos consultations et documents apparaîtra ici.</p>
             <div className="flex justify-center gap-2 mt-4">
-                <AddDocumentDialog onRecordAdded={() => { /* This will be handled by the parent component's refresh logic */ }} />
+                <AddDocumentDialog onRecordUpdate={() => { /* This will be handled by the parent component's refresh logic */ }} />
                 <Button asChild variant="outline">
                     <Link href="/">Démarrer une consultation IA</Link>
                 </Button>
@@ -138,7 +138,7 @@ export default function HealthRecordPage() {
           <h1 className="text-3xl font-bold font-headline">Dossier de santé</h1>
           <p className="text-muted-foreground">Un journal de vos consultations et documents.</p>
         </div>
-        <AddDocumentDialog onRecordAdded={refreshRecords} />
+        <AddDocumentDialog onRecordUpdate={refreshRecords} />
       </div>
 
       {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
@@ -184,7 +184,17 @@ export default function HealthRecordPage() {
                                     </>
                                 )}
                             </CardContent>
-                            <CardFooter className="justify-end">
+                            <CardFooter className="justify-end gap-2">
+                                <AddDocumentDialog 
+                                  existingRecord={record}
+                                  onRecordUpdate={refreshRecords} 
+                                  triggerButton={
+                                    <Button variant="outline" size="sm">
+                                      <Pencil className="mr-2 h-4 w-4" />
+                                      Modifier
+                                    </Button>
+                                  }
+                                />
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">

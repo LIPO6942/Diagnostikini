@@ -35,6 +35,26 @@ export function saveHealthRecord(newRecord: HealthRecord): void {
   );
 }
 
+export function updateHealthRecord(updatedRecord: HealthRecord): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const existingRecords = getHealthRecords();
+    const recordIndex = existingRecords.findIndex(record => record.id === updatedRecord.id);
+  
+    if (recordIndex === -1) {
+      // If for some reason the record doesn't exist, add it as a new one.
+      saveHealthRecord(updatedRecord);
+      return;
+    }
+  
+    const updatedRecords = [...existingRecords];
+    updatedRecords[recordIndex] = updatedRecord;
+  
+    localStorage.setItem(HEALTH_RECORDS_KEY, JSON.stringify(updatedRecords));
+}
+  
+
 export function deleteHealthRecord(id: string): void {
   if (typeof window === 'undefined') {
     return;

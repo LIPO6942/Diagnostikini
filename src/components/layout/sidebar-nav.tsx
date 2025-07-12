@@ -49,6 +49,7 @@ export function SidebarNav() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
+              size="lg"
               isActive={isActive("/")}
               tooltip="Assistant IA"
             >
@@ -61,6 +62,7 @@ export function SidebarNav() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
+              size="lg"
               isActive={isActive("/record")}
               tooltip="Dossier de Santé"
             >
@@ -73,6 +75,7 @@ export function SidebarNav() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
+              size="lg"
               isActive={isActive("/wellness")}
               tooltip="Bien-être"
             >
