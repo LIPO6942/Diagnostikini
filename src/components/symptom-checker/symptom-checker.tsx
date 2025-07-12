@@ -75,6 +75,7 @@ export default function SymptomChecker() {
           alt="Bannière de santé"
           layout="fill"
           objectFit="cover"
+          objectPosition="top"
           data-ai-hint="santé bien-être"
         />
       </div>
