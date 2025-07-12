@@ -22,7 +22,7 @@ export const wellnessTips = [
     category: "Activité",
     icon: Dumbbell,
     image: {
-      src: "https://placehold.co/600x400.png",
+      src: "https://images.unsplash.com/photo-1715333148720-78ac998f06e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxOHx8U3BvcnRzJTIwbWVuJTIwd29tYW58ZW58MHx8fHwxNzUyMzIzMDY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
       hint: "course parc"
     },
     tips: [
