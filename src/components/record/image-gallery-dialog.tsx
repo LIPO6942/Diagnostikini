@@ -33,9 +33,6 @@ export function ImageGalleryDialog({ record }: ImageGalleryDialogProps) {
     return null;
   }
 
-  const imageDocuments = record.documents.filter(doc => doc.mimeType.startsWith('image/'));
-  const otherDocuments = record.documents.filter(doc => !doc.mimeType.startsWith('image/'));
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -63,41 +60,44 @@ export function ImageGalleryDialog({ record }: ImageGalleryDialogProps) {
             ))}
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl w-full h-[90vh]">
+      <DialogContent className="max-w-3xl w-full h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{record.title}</DialogTitle>
         </DialogHeader>
-        <div className="p-4 h-full flex flex-col">
-             <Carousel className="w-full h-full flex-grow">
+        <div className="flex-grow flex-shrink min-h-0">
+             <Carousel className="w-full h-full">
                 <CarouselContent className="h-full">
                     {record.documents.map((doc, index) => (
-                      <CarouselItem key={index} className="h-full">
-                        <div className="w-full h-full flex flex-col items-center justify-center">
-                          <div className="w-full h-full flex-grow relative">
-                            {doc.mimeType.startsWith('image/') ? (
-                              <Image
-                                src={doc.dataUrl}
-                                alt={`Document page ${index + 1}`}
-                                fill
-                                className="object-contain"
-                              />
-                            ) : (
-                              <iframe 
-                                src={doc.dataUrl} 
-                                className="w-full h-full border-0" 
-                                title={doc.name} 
-                              />
-                            )}
-                          </div>
-                          <p className="text-center text-sm text-muted-foreground mt-2">
-                            Page {index + 1} / {record.documents?.length} - {doc.name}
-                          </p>
+                      <CarouselItem key={index} className="h-full flex flex-col">
+                        <div className="relative flex-grow w-full h-full">
+                          {doc.mimeType.startsWith('image/') ? (
+                            <Image
+                              src={doc.dataUrl}
+                              alt={`Document page ${index + 1}: ${doc.name}`}
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              className="object-contain"
+                            />
+                          ) : (
+                            <iframe 
+                              src={doc.dataUrl} 
+                              className="w-full h-full border-0" 
+                              title={doc.name} 
+                            />
+                          )}
                         </div>
+                        <p className="text-center text-sm text-muted-foreground mt-2 flex-shrink-0">
+                          Page {index + 1} / {record.documents?.length} - {doc.name}
+                        </p>
                       </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
+                {record.documents.length > 1 && (
+                  <>
+                    <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2" />
+                  </>
+                )}
             </Carousel>
         </div>
       </DialogContent>
