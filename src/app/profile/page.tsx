@@ -31,6 +31,20 @@ import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/contexts/profile-context";
 import { UserProfileSchema, type UserProfile } from "@/lib/types";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  medicalHistoryOptions,
+  allergyOptions,
+  treatmentOptions,
+  additionalSymptomOptions,
+} from "@/constants/profile-options";
+
+const formFields = [
+  { name: 'medicalHistory', label: 'Antécédents médicaux', options: medicalHistoryOptions, formKey: 'conditions' },
+  { name: 'allergies', label: 'Allergies', options: allergyOptions, formKey: 'items' },
+  { name: 'currentTreatments', label: 'Traitements en cours', options: treatmentOptions, formKey: 'medications' },
+  { name: 'additionalSymptoms', label: 'Symptômes généraux supplémentaires', options: additionalSymptomOptions, formKey: 'symptoms' }
+] as const;
 
 export default function ProfilePage() {
   const { profile, saveProfile } = useProfile();
@@ -43,10 +57,10 @@ export default function ProfilePage() {
       age: '',
       sex: 'ne-specifie-pas',
       weight: '',
-      medicalHistory: '',
-      allergies: '',
-      currentTreatments: '',
-      additionalSymptoms: ''
+      medicalHistory: { conditions: [], other: '' },
+      allergies: { items: [], other: '' },
+      currentTreatments: { medications: [], other: '' },
+      additionalSymptoms: { symptoms: [], other: '' }
     },
   });
 
@@ -128,80 +142,73 @@ export default function ProfilePage() {
                     )}
                     />
                  </div>
-                <FormField
-                  control={form.control}
-                  name="medicalHistory"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Antécédents médicaux</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Listez vos conditions médicales connues (ex: Diabète, hypertension...)"
-                          {...field}
-                          value={field.value ?? ''}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="allergies"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Allergies</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Listez vos allergies connues (ex: Pénicilline, arachides...)"
-                          {...field}
-                           value={field.value ?? ''}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="currentTreatments"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Traitements en cours</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Listez les médicaments que vous prenez actuellement"
-                          {...field}
-                           value={field.value ?? ''}
-                        />
-                      </FormControl>
-                       <FormDescription>
-                        Cela aide à éviter les suggestions de remèdes contradictoires.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="additionalSymptoms"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Symptômes généraux supplémentaires</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Décrivez ici tout autre symptôme ou information pertinente (ex: perte d'appétit, déshydratation, insomnie...)"
-                          {...field}
-                           value={field.value ?? ''}
-                        />
-                      </FormControl>
-                       <FormDescription>
-                        Ces informations aideront à affiner l'analyse de l'IA.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                 {formFields.map((section) => (
+                   <FormField
+                    key={section.name}
+                    control={form.control}
+                    name={section.name}
+                    render={() => (
+                        <FormItem>
+                            <FormLabel className="text-base">{section.label}</FormLabel>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
+                                {section.options.map((item) => (
+                                    <FormField
+                                        key={item}
+                                        control={form.control}
+                                        name={`${section.name}.${section.formKey}`}
+                                        render={({ field }) => {
+                                        return (
+                                            <FormItem
+                                                key={item}
+                                                className="flex flex-row items-start space-x-3 space-y-0"
+                                            >
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value?.includes(item)}
+                                                        onCheckedChange={(checked) => {
+                                                        return checked
+                                                            ? field.onChange([...(field.value || []), item])
+                                                            : field.onChange(
+                                                                field.value?.filter(
+                                                                (value) => value !== item
+                                                                )
+                                                            )
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    {item}
+                                                </FormLabel>
+                                            </FormItem>
+                                        )
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name={`${section.name}.other`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-normal">Autre (veuillez préciser)</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Si autre, décrivez ici..."
+                                                {...field}
+                                                value={field.value ?? ''}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                  />
+                 ))}
+                
                 <Button type="submit">Sauvegarder et continuer</Button>
               </form>
             </Form>

@@ -61,10 +61,46 @@ const prompt = ai.definePrompt({
   - Âge : {{#if userProfile.age}}{{userProfile.age}}{{else}}Non spécifié{{/if}}
   - Sexe : {{#if userProfile.sex}}{{userProfile.sex}}{{else}}Non spécifié{{/if}}
   - Poids : {{#if userProfile.weight}}{{userProfile.weight}} kg{{else}}Non spécifié{{/if}}
-  {{#if userProfile.medicalHistory}}- Antécédents médicaux : {{userProfile.medicalHistory}}{{/if}}
-  {{#if userProfile.allergies}}- Allergies : {{userProfile.allergies}}{{/if}}
-  {{#if userProfile.currentTreatments}}- Traitements actuels : {{userProfile.currentTreatments}}{{/if}}
-  {{#if userProfile.additionalSymptoms}}- Symptômes supplémentaires décrits par l'utilisateur : {{userProfile.additionalSymptoms}}{{/if}}
+
+  {{#if userProfile.medicalHistory.conditions}}
+  - Antécédents médicaux (sélection) : 
+    {{#each userProfile.medicalHistory.conditions}}
+    - {{this}}
+    {{/each}}
+  {{/if}}
+  {{#if userProfile.medicalHistory.other}}
+  - Antécédents médicaux (autre) : {{userProfile.medicalHistory.other}}
+  {{/if}}
+
+  {{#if userProfile.allergies.items}}
+  - Allergies (sélection) : 
+    {{#each userProfile.allergies.items}}
+    - {{this}}
+    {{/each}}
+  {{/if}}
+  {{#if userProfile.allergies.other}}
+  - Allergies (autre) : {{userProfile.allergies.other}}
+  {{/if}}
+
+  {{#if userProfile.currentTreatments.medications}}
+  - Traitements actuels (sélection) :
+    {{#each userProfile.currentTreatments.medications}}
+    - {{this}}
+    {{/each}}
+  {{/if}}
+  {{#if userProfile.currentTreatments.other}}
+  - Traitements actuels (autre) : {{userProfile.currentTreatments.other}}
+  {{/if}}
+
+  {{#if userProfile.additionalSymptoms.symptoms}}
+  - Symptômes supplémentaires (sélection) :
+    {{#each userProfile.additionalSymptoms.symptoms}}
+    - {{this}}
+    {{/each}}
+  {{/if}}
+  {{#if userProfile.additionalSymptoms.other}}
+  - Symptômes supplémentaires (autre) : {{userProfile.additionalSymptoms.other}}
+  {{/if}}
   {{/if}}`,
 });
 
