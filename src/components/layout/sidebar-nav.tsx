@@ -45,11 +45,11 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               isActive={isActive("/")}
-              tooltip="AI Assistant"
+              tooltip="Assistant IA"
             >
               <Link href="/">
                 <Sparkles />
-                <span>AI Assistant</span>
+                <span>Assistant IA</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -57,11 +57,11 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               isActive={isActive("/record")}
-              tooltip="Health Record"
+              tooltip="Dossier de Santé"
             >
               <Link href="/record">
                 <BookHeart />
-                <span>Health Record</span>
+                <span>Dossier Santé</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -69,11 +69,11 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               isActive={isActive("/wellness")}
-              tooltip="Wellness"
+              tooltip="Bien-être"
             >
               <Link href="/wellness">
                 <HeartPulse />
-                <span>Wellness</span>
+                <span>Bien-être</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -81,11 +81,11 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               isActive={isActive("/emergency")}
-              tooltip="Emergency"
+              tooltip="Urgence"
             >
               <Link href="/emergency">
                 <Siren />
-                <span>Emergency</span>
+                <span>Urgence</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

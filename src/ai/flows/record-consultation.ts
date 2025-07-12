@@ -13,15 +13,15 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const RecordConsultationInputSchema = z.object({
-  symptoms: z.string().describe('The symptoms described by the user.'),
-  differentialDiagnosis: z.string().describe('The differential diagnosis suggested by the AI.'),
-  remedyRecommendations: z.string().describe('The practical advice and recommendations provided.'),
+  symptoms: z.string().describe("Les symptômes décrits par l'utilisateur."),
+  differentialDiagnosis: z.string().describe("Le diagnostic différentiel suggéré par l'IA."),
+  remedyRecommendations: z.string().describe("Les conseils pratiques et les recommandations fournis."),
 });
 export type RecordConsultationInput = z.infer<typeof RecordConsultationInputSchema>;
 
 const RecordConsultationOutputSchema = z.object({
-  recordId: z.string().describe('The ID of the health record entry.'),
-  summary: z.string().describe('A summary of the consultation recorded in the health record.'),
+  recordId: z.string().describe("L'ID de l'entrée du dossier de santé."),
+  summary: z.string().describe("Un résumé de la consultation enregistrée dans le dossier de santé."),
 });
 export type RecordConsultationOutput = z.infer<typeof RecordConsultationOutputSchema>;
 
@@ -33,13 +33,13 @@ const prompt = ai.definePrompt({
   name: 'recordConsultationPrompt',
   input: {schema: RecordConsultationInputSchema},
   output: {schema: RecordConsultationOutputSchema},
-  prompt: `You are an AI health record assistant. Your task is to record the details of a consultation with the AI Symptom Assistant in the user's health record.
+  prompt: `Vous êtes un assistant de dossier de santé IA. Votre tâche est d'enregistrer les détails d'une consultation avec l'Assistant de Symptômes IA dans le dossier de santé de l'utilisateur, en français.
 
-  Symptoms: {{{symptoms}}}
-  Differential Diagnosis: {{{differentialDiagnosis}}}
-  Remedy Recommendations: {{{remedyRecommendations}}}
+  Symptômes : {{{symptoms}}}
+  Diagnostic Différentiel : {{{differentialDiagnosis}}}
+  Recommandations de remèdes : {{{remedyRecommendations}}}
 
-  Generate a summary of the consultation and return a record ID for the health record entry.
+  Générez un résumé de la consultation en français et retournez un ID de dossier pour l'entrée du dossier de santé.
 `,
 });
 

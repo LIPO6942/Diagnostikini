@@ -1,5 +1,5 @@
 /**
- * @fileoverview This file contains wellness tips data.
+ * @fileoverview This file contains wellness tips data in French.
  */
 import { Apple, Bed, Dumbbell, Wind } from "lucide-react";
 
@@ -9,55 +9,55 @@ export const wellnessTips = [
     icon: Apple,
     image: {
       src: "https://placehold.co/600x400.png",
-      hint: "healthy food"
+      hint: "nourriture saine"
     },
     tips: [
-      "Eat a variety of fruits and vegetables daily.",
-      "Choose whole grains over refined grains.",
-      "Limit processed foods, sugar, and unhealthy fats.",
-      "Stay hydrated by drinking plenty of water.",
+      "Mangez une variété de fruits et de légumes chaque jour.",
+      "Choisissez des grains entiers plutôt que des grains raffinés.",
+      "Limitez les aliments transformés, le sucre et les graisses malsaines.",
+      "Restez hydraté en buvant beaucoup d'eau.",
     ],
   },
   {
-    category: "Activity",
+    category: "Activité",
     icon: Dumbbell,
     image: {
       src: "https://placehold.co/600x400.png",
-      hint: "running park"
+      hint: "course parc"
     },
     tips: [
-      "Aim for 30 minutes of moderate exercise most days.",
-      "Find an activity you enjoy to stay motivated.",
-      "Incorporate strength training 2-3 times a week.",
-      "Remember to stretch before and after workouts.",
+      "Visez 30 minutes d'exercice modéré la plupart des jours.",
+      "Trouvez une activité que vous aimez pour rester motivé.",
+      "Intégrez un entraînement de force 2 à 3 fois par semaine.",
+      "N'oubliez pas de vous étirer avant et après les entraînements.",
     ],
   },
   {
-    category: "Sleep",
+    category: "Sommeil",
     icon: Bed,
     image: {
       src: "https://placehold.co/600x400.png",
-      hint: "sleeping peaceful"
+      hint: "dormir paisible"
     },
     tips: [
-      "Get 7-9 hours of quality sleep per night.",
-      "Stick to a regular sleep schedule.",
-      "Create a relaxing bedtime routine.",
-      "Avoid screens an hour before bed.",
+      "Dormez de 7 à 9 heures de sommeil de qualité par nuit.",
+      "Respectez un horaire de sommeil régulier.",
+      "Créez une routine relaxante au coucher.",
+      "Évitez les écrans une heure avant de vous coucher.",
     ],
   },
   {
-    category: "Stress Management",
+    category: "Gestion du stress",
     icon: Wind,
     image: {
       src: "https://placehold.co/600x400.png",
-      hint: "yoga meditation"
+      hint: "yoga méditation"
     },
     tips: [
-      "Practice mindfulness or meditation.",
-      "Engage in hobbies to relax and unwind.",
-      "Connect with friends and family for support.",
-      "Take regular breaks throughout the day.",
+      "Pratiquez la pleine conscience ou la méditation.",
+      "Adonnez-vous à des passe-temps pour vous détendre.",
+      "Communiquez avec vos amis et votre famille pour obtenir du soutien.",
+      "Prenez des pauses régulières tout au long de la journée.",
     ],
   },
 ];

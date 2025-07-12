@@ -22,11 +22,11 @@ export function useGeolocation() {
           });
         },
         (err) => {
-          setError('Unable to retrieve location. Please enable location services.');
+          setError('Impossible de récupérer la position. Veuillez activer les services de localisation.');
         }
       );
     } else {
-      setError('Geolocation is not supported by this browser.');
+      setError('La géolocalisation n\'est pas prise en charge par ce navigateur.');
     }
   }, []);
 

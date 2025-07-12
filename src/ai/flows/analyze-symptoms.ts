@@ -14,17 +14,17 @@ import {z} from 'genkit';
 const AnalyzeSymptomsInputSchema = z.object({
   symptomsDescription: z
     .string()
-    .describe('The description of the symptoms that the user is experiencing.'),
+    .describe('La description des symptômes que l\'utilisateur éprouve.'),
 });
 export type AnalyzeSymptomsInput = z.infer<typeof AnalyzeSymptomsInputSchema>;
 
 const AnalyzeSymptomsOutputSchema = z.object({
   diagnosisSuggestions: z
     .array(z.string())
-    .describe('A list of potential diagnoses based on the symptoms.'),
+    .describe('Une liste de diagnostics potentiels basés sur les symptômes.'),
   clarifyingQuestions: z
     .array(z.string())
-    .describe('A list of clarifying questions to ask the user for more information.'),
+    .describe('Une liste de questions de clarification à poser à l\'utilisateur pour plus d\'informations.'),
 });
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
@@ -36,11 +36,11 @@ const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
-  prompt: `You are an AI Symptom Assistant.  A user will describe their symptoms to you.  You will ask clarifying questions to narrow down potential diagnoses.
+  prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Vous poserez des questions de clarification pour affiner les diagnostics potentiels.
 
-  Based on the user's description, suggest a few potential diagnoses.  Also, ask clarifying questions to help narrow down the possibilities.
+  En fonction de la description de l'utilisateur, suggérez quelques diagnostics potentiels. Posez également des questions de clarification pour aider à affiner les possibilités. Assurez-vous que toute votre sortie (suggestions de diagnostic et questions) est en français.
 
-  Symptoms Description: {{{symptomsDescription}}}`,
+  Description des symptômes : {{{symptomsDescription}}}`,
 });
 
 const analyzeSymptomsFlow = ai.defineFlow(

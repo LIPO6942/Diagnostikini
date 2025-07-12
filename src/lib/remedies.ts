@@ -3,61 +3,61 @@ import { Coffee, Droplets, Moon, Pilcrow, Waves, Wind } from "lucide-react";
 
 export const commonRemedies: DiagnosisRemedies[] = [
   {
-    keywords: ["flu", "influenza", "cold"],
+    keywords: ["grippe", "influenza", "rhume"],
     remedies: [
       {
-        title: "Rest",
-        description: "Get plenty of sleep to help your body fight the infection.",
+        title: "Repos",
+        description: "Dormez beaucoup pour aider votre corps à combattre l'infection.",
         icon: Moon,
       },
       {
-        title: "Hydration",
-        description: "Drink water, juice, or warm lemon water to prevent dehydration.",
+        title: "Hydratation",
+        description: "Buvez de l'eau, du jus ou de l'eau tiède citronnée pour éviter la déshydratation.",
         icon: Droplets,
       },
       {
-        title: "OTC Medication",
-        description: "Consider pain relievers like ibuprofen or acetaminophen.",
+        title: "Médicaments sans ordonnance",
+        description: "Envisagez des analgésiques comme l'ibuprofène ou l'acétaminophène.",
         icon: Pilcrow,
       }
     ],
   },
   {
-    keywords: ["migraine", "headache"],
+    keywords: ["migraine", "céphalée", "mal de tête"],
     remedies: [
       {
-        title: "Rest in a Dark, Quiet Room",
-        description: "Sensitivity to light and sound is common. Find a calm space.",
+        title: "Reposez-vous dans une pièce sombre et calme",
+        description: "La sensibilité à la lumière et au son est courante. Trouvez un endroit calme.",
         icon: Moon,
       },
       {
-        title: "Limit Caffeine",
-        description: "Avoid excessive coffee or tea, which can trigger migraines.",
+        title: "Limitez la caféine",
+        description: "Évitez l'excès de café ou de thé, qui peuvent déclencher des migraines.",
         icon: Coffee,
       },
       {
-        title: "Pain Relievers",
-        description: "Take over-the-counter pain medicine as soon as you feel a migraine.",
+        title: "Analgésiques",
+        description: "Prenez des analgésiques en vente libre dès que vous sentez une migraine arriver.",
         icon: Pilcrow,
       },
     ],
   },
   {
-    keywords: ["low blood pressure", "hypotension"],
+    keywords: ["hypotension", "pression artérielle basse"],
     remedies: [
       {
-        title: "Increase Salt Intake",
-        description: "Salty foods can help raise blood pressure, but consult a doctor.",
+        title: "Augmentez l'apport en sel",
+        description: "Les aliments salés peuvent aider à augmenter la tension artérielle, mais consultez un médecin.",
         icon: Waves,
       },
       {
-        title: "Drink More Water",
-        description: "Fluids increase blood volume and help prevent dehydration.",
+        title: "Buvez plus d'eau",
+        description: "Les liquides augmentent le volume sanguin et aident à prévenir la déshydratation.",
         icon: Droplets,
       },
       {
-        title: "Compression Stockings",
-        description: "These can help improve blood flow from your legs to your heart.",
+        title: "Bas de contention",
+        description: "Ils peuvent aider à améliorer le flux sanguin de vos jambes vers votre cœur.",
         icon: Wind,
       },
     ],

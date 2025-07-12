@@ -1,22 +1,22 @@
 /**
- * @fileoverview This file contains the first aid protocols data.
+ * @fileoverview This file contains the first aid protocols data in French.
  */
 
 export const firstAidProtocols = [
   {
-    title: "CPR (Cardiopulmonary Resuscitation)",
-    content: "1. Call emergency services. 2. Place the heel of one hand on the center of the chest. 3. Push hard and fast at a rate of 100-120 compressions per minute. 4. If trained, give 2 rescue breaths after 30 compressions."
+    title: "RCP (Réanimation Cardio-Pulmonaire)",
+    content: "1. Appelez les services d'urgence. 2. Placez le talon d'une main au centre de la poitrine. 3. Poussez fort et vite à un rythme de 100-120 compressions par minute. 4. Si vous êtes formé, donnez 2 insufflations de secours après 30 compressions."
   },
   {
-    title: "Choking",
-    content: "1. Encourage the person to cough. 2. Give 5 back blows between the shoulder blades. 3. Perform 5 abdominal thrusts (Heimlich maneuver). 4. Alternate between back blows and abdominal thrusts."
+    title: "Étouffement",
+    content: "1. Encouragez la personne à tousser. 2. Donnez 5 claques dans le dos entre les omoplates. 3. Effectuez 5 compressions abdominales (manœuvre de Heimlich). 4. Alternez entre les claques dans le dos et les compressions abdominales."
   },
   {
-    title: "Severe Bleeding",
-    content: "1. Call emergency services. 2. Apply direct pressure to the wound with a clean cloth. 3. If possible, elevate the limb above the heart. 4. Do not remove any objects from the wound."
+    title: "Hémorragie sévère",
+    content: "1. Appelez les services d'urgence. 2. Appliquez une pression directe sur la plaie avec un linge propre. 3. Si possible, élevez le membre au-dessus du cœur. 4. Ne retirez aucun objet de la plaie."
   },
   {
-    title: "Burn",
-    content: "1. Cool the burn with cool (not cold) running water for 10-20 minutes. 2. Cover the burn with a sterile, non-adhesive bandage. 3. Do not apply ice, butter, or ointments. 4. For severe burns, seek immediate medical attention."
+    title: "Brûlure",
+    content: "1. Refroidissez la brûlure à l'eau courante froide (pas glacée) pendant 10-20 minutes. 2. Couvrez la brûlure avec un pansement stérile non adhésif. 3. N'appliquez pas de glace, de beurre ou de pommades. 4. Pour les brûlures graves, consultez immédiatement un médecin."
   }
 ];

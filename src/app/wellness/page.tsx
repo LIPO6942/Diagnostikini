@@ -9,8 +9,8 @@ export default function WellnessPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold font-headline">Wellness Module</h1>
-        <p className="text-muted-foreground">Personalized tips for a healthier lifestyle.</p>
+        <h1 className="text-3xl font-bold font-headline">Module Bien-être</h1>
+        <p className="text-muted-foreground">Conseils personnalisés pour un mode de vie plus sain.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

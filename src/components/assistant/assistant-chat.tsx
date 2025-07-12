@@ -35,7 +35,7 @@ export default function AssistantChat() {
       const { output } = await recordConsultation({
         symptoms: symptoms,
         differentialDiagnosis: diagnosis,
-        remedyRecommendations: "User was shown standard remedies for the potential condition.",
+        remedyRecommendations: "L'utilisateur a vu des remèdes standards pour la condition potentielle.",
       });
 
       if (output) {
@@ -50,17 +50,17 @@ export default function AssistantChat() {
         saveHealthRecord(newRecord);
 
         toast({
-          title: "Health Record Saved",
-          description: "Your consultation has been saved successfully.",
+          title: "Dossier de santé sauvegardé",
+          description: "Votre consultation a été sauvegardée avec succès.",
           action: <CircleCheck className="text-green-500" />,
         });
       }
     } catch (error) {
-      console.error("Failed to save record:", error);
+      console.error("Échec de la sauvegarde du dossier :", error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Could not save health record.",
+        title: "Erreur",
+        description: "Impossible de sauvegarder le dossier de santé.",
       });
     }
   };
@@ -97,21 +97,21 @@ export default function AssistantChat() {
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
-        throw new Error("No output from AI");
+        throw new Error("Aucune réponse de l'IA");
       }
     } catch (error) {
-      console.error("Error analyzing symptoms:", error);
+      console.error("Erreur lors de l'analyse des symptômes :", error);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: <p>Sorry, I encountered an error. Please try again.</p>,
+        content: <p>Désolé, j'ai rencontré une erreur. Veuillez réessayer.</p>,
       };
       setMessages((prev) => [...prev, errorMessage]);
       toast({
         variant: "destructive",
-        title: "AI Error",
+        title: "Erreur de l'IA",
         description:
-          "The symptom analysis failed. Please check your connection and try again.",
+          "L'analyse des symptômes a échoué. Veuillez vérifier votre connexion et réessayer.",
       });
     } finally {
       setIsLoading(false);
@@ -144,7 +144,7 @@ export default function AssistantChat() {
                   content: (
                     <div className="flex items-center gap-2">
                       <LoaderCircle className="animate-spin w-5 h-5" />
-                      <span>Analyzing symptoms...</span>
+                      <span>Analyse des symptômes...</span>
                     </div>
                   ),
                 }}
@@ -161,7 +161,7 @@ export default function AssistantChat() {
               <Textarea
                 value={symptoms}
                 onChange={(e) => setSymptoms(e.target.value)}
-                placeholder="Describe your symptoms... (e.g., 'I have a headache and feel tired.')"
+                placeholder="Décrivez vos symptômes... (ex : 'J'ai mal à la tête et je me sens fatigué.')"
                 className="flex-1 resize-none border-0 shadow-none focus-visible:ring-0"
                 rows={2}
                 disabled={isLoading}

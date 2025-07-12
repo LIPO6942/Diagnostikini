@@ -37,10 +37,10 @@ function EmptyState() {
             <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-secondary text-secondary-foreground">
                 <BookHeart className="size-8" />
             </div>
-            <h3 className="text-xl font-semibold">No Records Found</h3>
-            <p className="text-muted-foreground mt-2">Your consultation history will appear here.</p>
+            <h3 className="text-xl font-semibold">Aucun dossier trouvé</h3>
+            <p className="text-muted-foreground mt-2">L'historique de vos consultations apparaîtra ici.</p>
             <Button asChild className="mt-4">
-                <Link href="/">Start a New Consultation</Link>
+                <Link href="/">Démarrer une nouvelle consultation</Link>
             </Button>
         </Card>
     );
@@ -63,8 +63,8 @@ export default function HealthRecordPage() {
     <div className="space-y-6">
        <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold font-headline">Health Record</h1>
-          <p className="text-muted-foreground">A log of your past consultations.</p>
+          <h1 className="text-3xl font-bold font-headline">Dossier de santé</h1>
+          <p className="text-muted-foreground">Un journal de vos consultations passées.</p>
         </div>
       </div>
       
@@ -84,9 +84,9 @@ export default function HealthRecordPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="font-semibold text-sm">Symptoms Reported:</p>
+                <p className="font-semibold text-sm">Symptômes signalés :</p>
                 <p className="text-muted-foreground text-sm mb-4">{record.symptoms}</p>
-                <p className="font-semibold text-sm">AI-Generated Summary:</p>
+                <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
                 <p className="text-muted-foreground text-sm">{record.summary}</p>
               </CardContent>
             </Card>

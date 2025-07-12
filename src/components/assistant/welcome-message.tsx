@@ -9,11 +9,11 @@ export const WelcomeMessage = () => (
         <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-primary/10 text-primary">
             <Stethoscope className="size-8" />
         </div>
-        <h2 className="text-2xl font-headline font-bold mb-2">Welcome to Diagnostikini</h2>
+        <h2 className="text-2xl font-headline font-bold mb-2">Bienvenue sur Diagnostikini</h2>
         <p className="text-muted-foreground">
-            Your personal AI health assistant.
+            Votre assistant de santé personnel IA.
             <br />
-            Describe your symptoms below to get started.
+            Décrivez vos symptômes ci-dessous pour commencer.
         </p>
     </Card>
 );
