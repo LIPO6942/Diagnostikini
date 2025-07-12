@@ -1,57 +1,17 @@
+/**
+ * @fileoverview Emergency page component with first aid protocols and contacts.
+ */
 "use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { firstAidProtocols } from "@/constants/first-aid";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import { Phone, Siren } from "lucide-react";
-import { useEffect, useState } from "react";
-
-const firstAidProtocols = [
-  {
-    title: "CPR (Cardiopulmonary Resuscitation)",
-    content: "1. Call emergency services. 2. Place the heel of one hand on the center of the chest. 3. Push hard and fast at a rate of 100-120 compressions per minute. 4. If trained, give 2 rescue breaths after 30 compressions."
-  },
-  {
-    title: "Choking",
-    content: "1. Encourage the person to cough. 2. Give 5 back blows between the shoulder blades. 3. Perform 5 abdominal thrusts (Heimlich maneuver). 4. Alternate between back blows and abdominal thrusts."
-  },
-  {
-    title: "Severe Bleeding",
-    content: "1. Call emergency services. 2. Apply direct pressure to the wound with a clean cloth. 3. If possible, elevate the limb above the heart. 4. Do not remove any objects from the wound."
-  },
-  {
-    title: "Burn",
-    content: "1. Cool the burn with cool (not cold) running water for 10-20 minutes. 2. Cover the burn with a sterile, non-adhesive bandage. 3. Do not apply ice, butter, or ointments. 4. For severe burns, seek immediate medical attention."
-  }
-];
-
 
 export default function EmergencyPage() {
-    const [location, setLocation] = useState<{lat: number, lon: number} | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setLocation({
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude
-                    });
-                },
-                (err) => {
-                    setError("Unable to retrieve location. Please enable location services.");
-                }
-            );
-        } else {
-            setError("Geolocation is not supported by this browser.");
-        }
-    }, []);
+  const { location, error } = useGeolocation();
     
   return (
     <div className="space-y-6">

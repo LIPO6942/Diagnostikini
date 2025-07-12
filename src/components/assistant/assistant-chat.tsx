@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Main component for the AI assistant chat interface.
+ */
 "use client";
 
 import { analyzeSymptoms } from "@/ai/flows/analyze-symptoms";
@@ -7,21 +10,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { commonRemedies } from "@/lib/remedies";
-import type { ChatMessage, HealthRecord, Remedy } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import type { ChatMessage, HealthRecord } from "@/lib/types";
 import {
-  Bot,
   CircleCheck,
-  FilePlus2,
-  HeartPulse,
   LoaderCircle,
   Send,
-  Stethoscope,
-  User,
 } from "lucide-react";
 import React, { useRef, useState } from "react";
-import { RemedyCard } from "./remedy-card";
+import { saveHealthRecord } from "@/services/health-record-service";
+import { WelcomeMessage } from "./welcome-message";
+import { ChatMessageBubble } from "./chat-message-bubble";
+import { AssistantResponse } from "./assistant-response";
+
 
 export default function AssistantChat() {
   const { toast } = useToast();
@@ -47,13 +47,7 @@ export default function AssistantChat() {
           summary: output.summary,
         };
 
-        const existingRecords = JSON.parse(
-          localStorage.getItem("healthRecords") || "[]"
-        );
-        localStorage.setItem(
-          "healthRecords",
-          JSON.stringify([newRecord, ...existingRecords])
-        );
+        saveHealthRecord(newRecord);
 
         toast({
           title: "Health Record Saved",
@@ -182,120 +176,3 @@ export default function AssistantChat() {
     </div>
   );
 }
-
-const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
-  const isAssistant = message.role === "assistant";
-  return (
-    <div
-      className={cn(
-        "flex items-start gap-3",
-        !isAssistant && "justify-end"
-      )}
-    >
-      {isAssistant && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center">
-          <Bot className="w-5 h-5" />
-        </div>
-      )}
-      <div
-        className={cn(
-          "max-w-md rounded-xl px-4 py-3",
-          isAssistant
-            ? "bg-card border"
-            : "bg-primary text-primary-foreground"
-        )}
-      >
-        {message.content}
-      </div>
-      {!isAssistant && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center">
-          <User className="w-5 h-5" />
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-const AssistantResponse = ({
-  symptoms,
-  diagnosisSuggestions,
-  clarifyingQuestions,
-  onSaveRecord,
-}: {
-  symptoms: string;
-  diagnosisSuggestions: string[];
-  clarifyingQuestions: string[];
-  onSaveRecord: (symptoms: string, diagnosis: string) => void;
-}) => {
-  const [remedies, setRemedies] = useState<Remedy[] | null>(null);
-
-  const potentialDiagnosis = diagnosisSuggestions[0] || "Unknown";
-
-  const handleShowRemedies = () => {
-    const diagnosisText = potentialDiagnosis.toLowerCase();
-    const found = commonRemedies.find(item => item.keywords.some(kw => diagnosisText.includes(kw)));
-    setRemedies(found ? found.remedies : []);
-  };
-
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="font-bold mb-2">Potential Diagnosis</h3>
-        <ul className="list-disc list-inside space-y-1">
-          {diagnosisSuggestions.map((d, i) => (
-            <li key={i}>{d}</li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h3 className="font-bold mb-2">Clarifying Questions</h3>
-        <ul className="list-disc list-inside space-y-1">
-          {clarifyingQuestions.map((q, i) => (
-            <li key={i}>{q}</li>
-          ))}
-        </ul>
-      </div>
-
-      {remedies && (
-         <div>
-            <h3 className="font-bold mb-2">Remedy Recommendations</h3>
-            <div className="grid sm:grid-cols-2 gap-2">
-                {remedies.length > 0 ? remedies.map((remedy) => (
-                    <RemedyCard key={remedy.title} {...remedy} />
-                )) : <p>No specific remedies to suggest. Please consult a doctor.</p>}
-            </div>
-        </div>
-      )}
-
-      <div className="flex gap-2 pt-2 border-t">
-        <Button variant="outline" size="sm" onClick={handleShowRemedies} disabled={!!remedies}>
-          <HeartPulse className="mr-2 h-4 w-4" />
-          Show Remedies
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => onSaveRecord(symptoms, potentialDiagnosis)}>
-          <FilePlus2 className="mr-2 h-4 w-4" />
-          Save to Record
-        </Button>
-      </div>
-      <p className="text-xs text-muted-foreground pt-2">
-        Disclaimer: This is not medical advice. Consult a healthcare professional for any health concerns.
-      </p>
-    </div>
-  );
-};
-
-const WelcomeMessage = () => (
-    <Card className="p-6 text-center shadow-none border-none bg-transparent">
-        <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-primary/10 text-primary">
-            <Stethoscope className="size-8" />
-        </div>
-        <h2 className="text-2xl font-headline font-bold mb-2">Welcome to Diagnostikini</h2>
-        <p className="text-muted-foreground">
-            Your personal AI health assistant.
-            <br />
-            Describe your symptoms below to get started.
-        </p>
-    </Card>
-)
