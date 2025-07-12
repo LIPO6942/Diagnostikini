@@ -82,18 +82,6 @@ export function SidebarNav() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={isActive("/emergency")}
-              tooltip="Urgence"
-            >
-              <Link href="/emergency">
-                <Siren />
-                <span>Urgence</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
        <SidebarFooter>

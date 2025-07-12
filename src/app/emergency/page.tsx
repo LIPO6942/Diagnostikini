@@ -25,20 +25,26 @@ export default function EmergencyPage() {
 
       <Card className="border-destructive bg-destructive/5">
         <CardHeader>
-          <CardTitle>Contacts d'urgence</CardTitle>
-          <CardDescription>Appelez ces numéros en cas d'urgence.</CardDescription>
+          <CardTitle>Contacts d'urgence en Tunisie</CardTitle>
+          <CardDescription>Appelez immédiatement le numéro approprié en cas d'urgence.</CardDescription>
         </CardHeader>
-        <CardContent className="grid sm:grid-cols-2 gap-4">
+        <CardContent className="grid sm:grid-cols-3 gap-4">
             <Button size="lg" variant="destructive" asChild>
-                <a href="tel:112">
+                <a href="tel:190">
                     <Phone className="mr-2 h-5 w-5"/>
-                    Appeler le 112 (Urgence Locale)
+                    SAMU (190)
                 </a>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-                <a href="tel:0800595959">
+            <Button size="lg" variant="destructive" asChild>
+                <a href="tel:198">
                     <Phone className="mr-2 h-5 w-5"/>
-                     Centre Antipoison
+                     Protection Civile (198)
+                </a>
+            </Button>
+             <Button size="lg" variant="outline" asChild>
+                <a href="tel:197">
+                    <Phone className="mr-2 h-5 w-5"/>
+                     Police Secours (197)
                 </a>
             </Button>
         </CardContent>
