@@ -9,12 +9,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileImage, FileKey2, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { AddDocumentDialog } from '@/components/record/add-document-dialog';
-import { ImageGalleryDialog } from '@/components/record/image-gallery-dialog';
 import { Separator } from '@/components/ui/separator';
 
 function HealthRecordSkeleton() {
@@ -180,7 +180,34 @@ export default function HealthRecordPage() {
                                     <>
                                         <Separator className="my-4" />
                                         <p className="font-semibold text-sm mb-2">Documents ({record.documents.length}) :</p>
-                                        <ImageGalleryDialog record={record} />
+                                        <div className="flex flex-wrap gap-2">
+                                            {record.documents.map((doc, index) => (
+                                                <a 
+                                                    key={index}
+                                                    href={doc.dataUrl} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-20 group"
+                                                >
+                                                    {doc.mimeType.startsWith('image/') ? (
+                                                        <Image
+                                                            src={doc.dataUrl}
+                                                            alt={doc.name}
+                                                            fill
+                                                            className="rounded-md object-cover border"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full rounded-md border bg-secondary flex flex-col items-center justify-center p-2 text-center">
+                                                            <FileText className="size-8 text-secondary-foreground"/>
+                                                            <span className="text-xs text-secondary-foreground truncate w-full mt-1">{doc.name}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <span className="text-white text-xs font-bold">Ouvrir</span>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        </div>
                                     </>
                                 )}
                             </CardContent>
