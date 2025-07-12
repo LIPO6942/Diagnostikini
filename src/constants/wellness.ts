@@ -50,7 +50,7 @@ export const wellnessTips = [
     category: "Gestion du stress",
     icon: Wind,
     image: {
-      src: "https://placehold.co/600x400.png",
+      src: "https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxNZWRpdGF0aW9ufGVufDB8fHx8MTc1MjMyMzE2MXww&ixlib=rb-4.1.0&q=80&w=1080",
       hint: "yoga méditation"
     },
     tips: [
