@@ -1,5 +1,18 @@
-import type { DiagnosisRemedies } from "@/lib/types";
+import type { DiagnosisRemedies, Remedy } from "@/lib/types";
 import { Coffee, Droplets, Moon, Pilcrow, Waves, Wind } from "lucide-react";
+
+export const baseRemedies: Remedy[] = [
+    {
+      title: "Repos",
+      description: "Donnez à votre corps le temps de récupérer. Le repos est essentiel.",
+      icon: Moon,
+    },
+    {
+      title: "Hydratation",
+      description: "Buvez beaucoup de liquides comme de l'eau ou des tisanes pour rester bien hydraté.",
+      icon: Droplets,
+    },
+];
 
 export const commonRemedies: DiagnosisRemedies[] = [
   {
