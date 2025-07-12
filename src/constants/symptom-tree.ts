@@ -14,9 +14,30 @@ export const symptomTree: SymptomNode[] = [
         id: "tete",
         label: "Tête",
         children: [
-          { id: "pulsatile", label: "Pulsatile", description: "Douleur à la tête, de type pulsatile" },
-          { id: "sensation-pression", label: "Sensation de pression", description: "Douleur à la tête, comme une sensation de pression" },
-          { id: "un-cote", label: "D'un seul côté", description: "Douleur d'un seul côté de la tête" },
+          { 
+            id: "pulsatile", 
+            label: "Pulsatile",
+            children: [
+                { id: "tete-pulsatile-nausee", label: "Avec nausées", description: "Douleur à la tête pulsatile, avec nausées" },
+                { id: "tete-pulsatile-sans-nausee", label: "Sans nausées", description: "Douleur à la tête pulsatile, sans nausées" },
+            ]
+          },
+          { 
+            id: "sensation-pression", 
+            label: "Sensation de pression", 
+            children: [
+                { id: "tete-pression-stress", label: "Liée au stress", description: "Sensation de pression à la tête, liée au stress" },
+                { id: "tete-pression-continue", label: "Continue", description: "Sensation de pression à la tête, continue" },
+            ]
+          },
+          { 
+            id: "un-cote", 
+            label: "D'un seul côté", 
+            children: [
+                { id: "tete-un-cote-oeil", label: "Derrière l'œil", description: "Douleur d'un seul côté de la tête, derrière l'œil" },
+                { id: "tete-un-cote-tempe", label: "Au niveau de la tempe", description: "Douleur d'un seul côté de la tête, au niveau de la tempe" },
+            ]
+          },
         ],
       },
       {
@@ -54,8 +75,22 @@ export const symptomTree: SymptomNode[] = [
     icon: Wind,
     children: [
       { id: "essoufflement", label: "Essoufflement", description: "Gêne respiratoire, essoufflement" },
-      { id: "toux-seche", label: "Toux sèche", description: "Gêne respiratoire, toux sèche" },
-      { id: "toux-grasse", label: "Toux grasse", description: "Gêne respiratoire, toux grasse" },
+      { 
+        id: "toux-seche", 
+        label: "Toux sèche",
+        children: [
+            { id: "toux-seche-jour", label: "Surtout le jour", description: "Toux sèche, surtout le jour" },
+            { id: "toux-seche-nuit", label: "Surtout la nuit", description: "Toux sèche, surtout la nuit" },
+        ]
+      },
+      { 
+        id: "toux-grasse", 
+        label: "Toux grasse",
+        children: [
+            { id: "toux-grasse-jaune", label: "Expectoration jaune/verte", description: "Toux grasse avec expectoration jaune ou verte" },
+            { id: "toux-grasse-claire", label: "Expectoration claire", description: "Toux grasse avec expectoration claire" },
+        ]
+      },
       { id: "respiration-sifflante", label: "Respiration sifflante", description: "Gêne respiratoire, respiration sifflante" },
     ],
   },
@@ -64,7 +99,14 @@ export const symptomTree: SymptomNode[] = [
     label: "Fièvre",
     icon: Thermometer,
     children: [
-      { id: "legere", label: "Légère (37.5-38.4°C)", description: "Fièvre légère (37.5-38.4°C)" },
+      { 
+        id: "legere", 
+        label: "Légère (37.5-38.4°C)", 
+        children: [
+            { id: "fievre-legere-courte", label: "Depuis 1-2 jours", description: "Fièvre légère depuis 1 à 2 jours" },
+            { id: "fievre-legere-longue", label: "Depuis plus de 3 jours", description: "Fièvre légère depuis plus de 3 jours" },
+        ]
+       },
       { id: "moderee", label: "Modérée (38.5-39.4°C)", description: "Fièvre modérée (38.5-39.4°C)" },
       { id: "elevee", label: "Élevée (>39.5°C)", description: "Fièvre élevée (plus de 39.5°C)" },
       { id: "avec-frissons", label: "Avec frissons", description: "Fièvre accompagnée de frissons" },
