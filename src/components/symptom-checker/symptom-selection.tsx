@@ -36,7 +36,7 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
     const title = path.length > 0 ? `Qu'est-ce qui caractérise cette ${path[path.length - 1].label.toLowerCase()} ?` : "Quel symptôme principal ressentez-vous ?";
 
   return (
-    <Card>
+    <Card className="animate-fade-in-up">
       <CardHeader>
         <div className="flex justify-between items-start">
             <div>
@@ -56,10 +56,10 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
           <Button
             key={node.id}
             variant="outline"
-            className="h-auto p-4 flex flex-col gap-2 items-center justify-center text-center"
+            className="h-auto p-4 flex flex-col gap-2 items-center justify-center text-center group transition-all duration-200 ease-in-out hover:bg-primary/10 hover:border-primary"
             onClick={() => onSelect(node)}
           >
-            {node.icon && <node.icon className="size-8 text-primary mb-2" />}
+            {node.icon && <node.icon className="size-8 text-primary mb-2 transition-transform duration-200 group-hover:scale-110" />}
             <div className="flex flex-col items-center">
                 <span className="text-base font-medium">{node.label}</span>
                 {node.descriptionTunisian && (

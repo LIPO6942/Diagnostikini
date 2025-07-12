@@ -12,7 +12,7 @@ import { saveHealthRecord } from "@/services/health-record-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AssistantResponse } from "@/components/assistant/assistant-response";
-import { LoaderCircle, ArrowLeft, RotateCcw, BrainCircuit } from "lucide-react";
+import { ArrowLeft, RotateCcw, BrainCircuit } from "lucide-react";
 import { useProfile } from "@/contexts/profile-context";
 
 interface SymptomAnalysisProps {
@@ -81,7 +81,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
   };
 
   return (
-    <Card>
+    <Card className="animate-fade-in-up">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <BrainCircuit className="text-primary"/>
@@ -91,9 +91,9 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
       </CardHeader>
       <CardContent>
         {isLoading && (
-          <div className="flex items-center justify-center p-8 gap-2 text-muted-foreground">
-            <LoaderCircle className="animate-spin" />
-            <span>Analyse en cours...</span>
+          <div className="flex flex-col items-center justify-center p-8 gap-4 text-muted-foreground">
+            <BrainCircuit className="animate-pulse text-primary w-12 h-12" />
+            <span className="font-semibold text-lg">On analyse tes symptômes...</span>
           </div>
         )}
         {error && <p className="text-destructive p-8 text-center">{error}</p>}

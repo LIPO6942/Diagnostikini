@@ -8,7 +8,7 @@ body {
 
 @layer base {
   :root {
-    --background: 220 20% 97%; /* Light Gray F3F4F6 */
+    --background: 210 40% 98%; /* Light Blue E0F2FF */
     --foreground: 224 25% 20%;
     --card: 0 0% 100%;
     --card-foreground: 224 25% 20%;
@@ -16,14 +16,14 @@ body {
     --popover-foreground: 224 25% 20%;
     --primary: 223 64% 33%; /* Dark Blue #1E3A8A */
     --primary-foreground: 210 40% 98%;
-    --secondary: 220 17% 91%;
+    --secondary: 220 14% 96%; /* Gray F3F4F6 */
     --secondary-foreground: 222 47% 11%;
-    --muted: 220 17% 91%;
+    --muted: 220 14% 96%;
     --muted-foreground: 220 9% 45%;
-    --accent: 145 63% 90%; /* Soft Green #D1FAE5 */
+    --accent: 145 74% 91%; /* Soft Green #D1FAE5 */
     --accent-foreground: 145 75% 15%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 72% 95%; /* Soft Red #FEE2E2 */
+    --destructive-foreground: 0 84.2% 60.2%;
     --border: 220 13% 89%;
     --input: 220 13% 91%;
     --ring: 223 64% 33%;
