@@ -36,12 +36,12 @@ export function SidebarNav() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Stethoscope className="size-5" />
           </div>
           <h1 className="font-headline text-lg font-bold">Diagnostikini</h1>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
