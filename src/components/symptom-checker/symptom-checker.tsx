@@ -71,7 +71,7 @@ export default function SymptomChecker() {
     <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0 space-y-8">
        <div className="relative w-full h-40 rounded-lg overflow-hidden">
         <Image 
-          src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxM3x8RG9jdG9yfGVufDB8fHx8MTc1MjMyMzMxNXww&ixlib=rb-4.1.0&q=80&w=1080" 
+          src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxEb2N0b3J8ZW58MHx8fHwxNzUyMzIzMzE1fDA&ixlib=rb-4.1.0&q=80&w=1080" 
           alt="Bannière de santé"
           layout="fill"
           objectFit="cover"
