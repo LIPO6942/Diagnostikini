@@ -33,31 +33,34 @@ export function DoctorMap({ doctors, selectedDoctor }: DoctorMapProps) {
 
     if (window.google && window.google.maps) {
       initializeMap(tunisCoords);
-    } else {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=marker&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      (window as any).initMap = () => initializeMap(tunisCoords);
-      document.head.appendChild(script);
-
-      return () => {
-        // Clean up the script and callback
-        const scripts = document.head.getElementsByTagName("script");
-        for (let i = scripts.length; i--;) {
-          if (scripts[i].src.includes("maps.googleapis.com")) {
-            scripts[i].remove();
-          }
-        }
-        if ((window as any).initMap) {
-          delete (window as any).initMap;
-        }
-      };
+      return;
     }
+
+    // Check if the script is already being loaded
+    if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=marker&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    
+    (window as any).initMap = () => initializeMap(tunisCoords);
+
+    document.head.appendChild(script);
+
+    return () => {
+      // The script is now loaded globally, so we don't remove it on cleanup.
+      // We can remove the initMap callback though.
+      if ((window as any).initMap) {
+        (window as any).initMap = undefined;
+      }
+    };
   }, []);
 
   useEffect(() => {
-    if (!mapInstance.current) return;
+    if (!mapInstance.current || !window.google) return;
 
     // Clear existing markers
     markers.current.forEach(marker => marker.setMap(null));
@@ -70,7 +73,7 @@ export function DoctorMap({ doctors, selectedDoctor }: DoctorMapProps) {
         position: doctor.location,
         title: doctor.name,
       });
-      markers.current.push(marker);
+      markers.current.push(marker as unknown as google.maps.Marker);
     });
   }, [doctors]);
 
