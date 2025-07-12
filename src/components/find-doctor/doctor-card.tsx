@@ -10,34 +10,28 @@ import { cn } from "@/lib/utils";
 
 interface DoctorCardProps {
   doctor: Doctor;
-  isSelected: boolean;
-  onClick: () => void;
 }
 
-export function DoctorCard({ doctor, isSelected, onClick }: DoctorCardProps) {
+export function DoctorCard({ doctor }: DoctorCardProps) {
     const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(doctor.address)}`;
   
   return (
     <Card 
-      onClick={onClick}
-      className={cn(
-        "cursor-pointer transition-all hover:shadow-md",
-        isSelected ? "border-primary ring-2 ring-primary" : ""
-      )}
+      className="transition-all hover:shadow-md flex flex-col"
     >
       <CardHeader>
         <CardTitle>{doctor.name}</CardTitle>
         <CardDescription>{doctor.specialty}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm">
+      <CardContent className="space-y-3 text-sm flex-grow">
         <div className="flex items-center gap-3">
           <Phone className="w-4 h-4 text-muted-foreground" />
           <a href={`tel:${doctor.phone}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
             {doctor.phone}
           </a>
         </div>
-        <div className="flex items-center gap-3">
-          <Map className="w-4 h-4 text-muted-foreground" />
+        <div className="flex items-start gap-3">
+          <Map className="w-4 h-4 text-muted-foreground mt-1" />
           <span>{doctor.address}</span>
         </div>
         <div className="flex items-center gap-3">

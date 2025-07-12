@@ -15,12 +15,10 @@ import {
 } from "@/components/ui/select";
 import { doctors, specialties, cities, type Doctor } from "@/constants/doctors";
 import { DoctorCard } from "@/components/find-doctor/doctor-card";
-import { DoctorMap } from "@/components/find-doctor/doctor-map";
 
 export default function FindDoctorPage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [selectedCity, setSelectedCity] = useState("all");
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
 
   const filteredDoctors = useMemo(() => {
     return doctors.filter(doctor => {
@@ -79,26 +77,21 @@ export default function FindDoctorPage() {
         </CardContent>
       </Card>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="space-y-4 max-h-[calc(100vh-18rem)] overflow-y-auto pr-2">
-            <h2 className="text-xl font-bold">Résultats ({filteredDoctors.length})</h2>
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold">Résultats ({filteredDoctors.length})</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDoctors.length > 0 ? (
             filteredDoctors.map((doctor) => (
               <DoctorCard 
                 key={doctor.id} 
                 doctor={doctor}
-                isSelected={selectedDoctor?.id === doctor.id}
-                onClick={() => setSelectedDoctor(doctor)}
               />
             ))
           ) : (
-            <p className="text-muted-foreground text-center py-8">
+            <p className="text-muted-foreground text-center py-8 col-span-full">
               Aucun médecin trouvé pour cette sélection.
             </p>
           )}
-        </div>
-        <div className="lg:sticky lg:top-8 h-96 lg:h-[calc(100vh-8rem)]">
-          <DoctorMap doctors={filteredDoctors} selectedDoctor={selectedDoctor} />
         </div>
       </div>
     </div>
