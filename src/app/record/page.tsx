@@ -134,6 +134,7 @@ export default function HealthRecordPage() {
   const { toast } = useToast();
 
   const refreshRecords = () => {
+    // getHealthRecords reads from localStorage, which is safe
     setRecords(getHealthRecords());
   }
 

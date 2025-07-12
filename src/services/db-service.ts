@@ -1,7 +1,7 @@
 /**
  * @fileoverview Service for interacting with the IndexedDB database.
  */
-import { openDB, type DBSchema } from 'idb';
+import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 
 const DB_NAME = 'DiagnostikiniDB';
 const DB_VERSION = 1;
@@ -14,22 +14,38 @@ interface DiagnostikiniDB extends DBSchema {
   };
 }
 
-const dbPromise = openDB<DiagnostikiniDB>(DB_NAME, DB_VERSION, {
-  upgrade(db) {
-    if (!db.objectStoreNames.contains(STORE_NAME)) {
-      db.createObjectStore(STORE_NAME);
+let dbPromise: Promise<IDBPDatabase<DiagnostikiniDB>> | null = null;
+
+function getDb() {
+    if (typeof window === 'undefined') {
+        // Return a promise that never resolves on the server.
+        // This prevents errors during SSR. The actual logic will only run client-side.
+        return new Promise<IDBPDatabase<DiagnostikiniDB>>(() => {});
     }
-  },
-});
+    if (!dbPromise) {
+        dbPromise = openDB<DiagnostikiniDB>(DB_NAME, DB_VERSION, {
+            upgrade(db) {
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            },
+        });
+    }
+    return dbPromise;
+}
+
 
 export async function saveFile(id: string, file: File) {
-  return (await dbPromise).put(STORE_NAME, file, id);
+  const db = await getDb();
+  return db.put(STORE_NAME, file, id);
 }
 
 export async function getFile(id: string): Promise<File | undefined> {
-  return (await dbPromise).get(STORE_NAME, id);
+  const db = await getDb();
+  return db.get(STORE_NAME, id);
 }
 
 export async function deleteFile(id: string) {
-  return (await dbPromise).delete(STORE_NAME, id);
+  const db = await getDb();
+  return db.delete(STORE_NAME, id);
 }
