@@ -3,26 +3,28 @@
  */
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Doctor } from "@/constants/doctors";
 import { Phone, Map, Clock, Navigation } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-type Doctor = {
-  id: string;
-  name: string;
-  specialty: string;
-  phone: string;
-  address: string;
-  hours: string;
-};
 
 interface DoctorCardProps {
   doctor: Doctor;
+  isSelected: boolean;
+  onClick: () => void;
 }
 
-export function DoctorCard({ doctor }: DoctorCardProps) {
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(doctor.address)}`;
+export function DoctorCard({ doctor, isSelected, onClick }: DoctorCardProps) {
+    const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(doctor.address)}`;
   
   return (
-    <Card>
+    <Card 
+      onClick={onClick}
+      className={cn(
+        "cursor-pointer transition-all hover:shadow-md",
+        isSelected ? "border-primary ring-2 ring-primary" : ""
+      )}
+    >
       <CardHeader>
         <CardTitle>{doctor.name}</CardTitle>
         <CardDescription>{doctor.specialty}</CardDescription>
@@ -30,7 +32,7 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
       <CardContent className="space-y-3 text-sm">
         <div className="flex items-center gap-3">
           <Phone className="w-4 h-4 text-muted-foreground" />
-          <a href={`tel:${doctor.phone}`} className="hover:underline">
+          <a href={`tel:${doctor.phone}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
             {doctor.phone}
           </a>
         </div>
@@ -44,8 +46,8 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
         </div>
       </CardContent>
       <CardFooter className="bg-muted/50 p-4 justify-end">
-        <Button asChild>
-          <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+        <Button asChild onClick={(e) => e.stopPropagation()}>
+          <a href={googleMapsSearchUrl} target="_blank" rel="noopener noreferrer">
             <Navigation className="mr-2 h-4 w-4" />
             Itinéraire
           </a>

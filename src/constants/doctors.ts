@@ -2,6 +2,19 @@
  * @fileoverview This file contains mock data for doctors and specialties.
  */
 
+export type Doctor = {
+  id: string;
+  name: string;
+  specialty: string;
+  phone: string;
+  address: string;
+  hours: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+};
+
 export const specialties = [
   "Généraliste",
   "Pédiatre",
@@ -12,7 +25,7 @@ export const specialties = [
   "Dermatologue",
 ];
 
-export const doctors = [
+export const doctors: Doctor[] = [
   {
     id: "doc1",
     name: "Dr. Ahmed Ben Ali",
@@ -20,6 +33,7 @@ export const doctors = [
     phone: "+216 71 123 456",
     address: "123 Rue de la Liberté, Tunis",
     hours: "Lundi - Vendredi, 9:00 - 17:00",
+    location: { lat: 36.809, lng: 10.18 },
   },
   {
     id: "doc2",
@@ -28,14 +42,16 @@ export const doctors = [
     phone: "+216 71 234 567",
     address: "45 Avenue Habib Bourguiba, Tunis",
     hours: "Mardi, Jeudi, 9:00 - 18:00",
+    location: { lat: 36.800, lng: 10.185 },
   },
   {
     id: "doc3",
     name: "Dr. Youssef Trabelsi",
     specialty: "Cardiologue",
     phone: "+216 71 345 678",
-    address: "789 Boulevard de l'Environnement, Sfax",
+    address: "Clinique El Manar, Tunis",
     hours: "Lundi - Samedi, 8:00 - 16:00",
+    location: { lat: 36.83, lng: 10.15 },
   },
   {
     id: "doc4",
@@ -44,6 +60,7 @@ export const doctors = [
     phone: "+216 73 456 789",
     address: "10 Rue de l'Indépendance, Sousse",
     hours: "Lundi, Mercredi, Vendredi, 10:00 - 19:00",
+    location: { lat: 35.825, lng: 10.641 },
   },
   {
     id: "doc5",
@@ -52,6 +69,7 @@ export const doctors = [
     phone: "+216 71 567 890",
     address: "22 Rue de Carthage, Tunis",
     hours: "Mardi - Samedi, 9:00 - 17:00",
+    location: { lat: 36.79, lng: 10.18 },
   },
     {
     id: "doc6",
@@ -60,6 +78,7 @@ export const doctors = [
     phone: "+216 72 678 901",
     address: "55 Rue des Palmiers, Nabeul",
     hours: "Lundi - Vendredi, 8:30 - 17:30",
+    location: { lat: 36.456, lng: 10.735 },
   },
   {
     id: "doc7",
@@ -68,6 +87,7 @@ export const doctors = [
     phone: "+216 71 789 012",
     address: "8 Rue de la Marsa, La Marsa",
     hours: "Lundi, Mercredi, 14:00 - 20:00",
+    location: { lat: 36.877, lng: 10.325 },
   },
   {
     id: "doc8",
@@ -76,5 +96,6 @@ export const doctors = [
     phone: "+216 71 890 123",
     address: "33 Avenue Charles de Gaulle, Tunis",
     hours: "Lundi - Samedi, 8:00 - 13:00",
+    location: { lat: 36.805, lng: 10.182 },
   },
 ];
