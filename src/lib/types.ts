@@ -29,9 +29,11 @@ export type UserProfile = z.infer<typeof UserProfileSchema>;
 export type HealthRecord = {
   id: string;
   date: string;
-  symptoms: string;
-  diagnosis: string;
-  summary: string;
+  category: 'Consultation IA' | 'Bilan' | 'Ordonnance' | 'Autre';
+  title: string;
+  symptoms?: string; // Optional: for AI consultations
+  summary?: string; // Optional: for AI consultations
+  images?: string[]; // Optional: for uploaded documents (as base64 data URIs)
 };
 
 export type ChatMessage = {

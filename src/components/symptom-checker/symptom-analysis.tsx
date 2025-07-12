@@ -5,7 +5,6 @@
 
 import { useEffect, useState } from "react";
 import { analyzeSymptoms, type AnalyzeSymptomsOutput } from "@/ai/flows/analyze-symptoms";
-import { recordConsultation } from "@/ai/flows/record-consultation";
 import { useToast } from "@/hooks/use-toast";
 import type { HealthRecord } from "@/lib/types";
 import { saveHealthRecord } from "@/services/health-record-service";
@@ -49,35 +48,20 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
   }, [symptomDescription, profile, isProfileComplete]);
 
   const handleSaveRecord = async (symptoms: string, diagnosis: string) => {
-    try {
-      const { recordId, summary } = await recordConsultation({
-        symptoms: symptoms,
-        differentialDiagnosis: diagnosis,
-        remedyRecommendations: "L'utilisateur a vu des remèdes standards et des suggestions de médicaments pour la condition potentielle.",
-      });
+    const newRecord: HealthRecord = {
+      id: new Date().toISOString(),
+      date: new Date().toLocaleDateString('fr-FR'),
+      category: 'Consultation IA',
+      title: diagnosis,
+      symptoms: symptoms,
+      summary: `Basé sur les symptômes, les diagnostics potentiels incluent : ${analysisResult?.diagnosisSuggestions.join(', ')}. Médicaments suggérés : ${analysisResult?.medicationSuggestions.join(', ')}.`,
+    };
 
-      if (recordId && summary) {
-        const newRecord: HealthRecord = {
-          id: recordId || new Date().toISOString(),
-          date: new Date().toLocaleDateString(),
-          symptoms: symptoms,
-          diagnosis: diagnosis,
-          summary: summary,
-        };
-        saveHealthRecord(newRecord);
-        toast({
-          title: "Dossier sauvegardé",
-          description: "Votre consultation a été sauvegardée avec succès.",
-        });
-      }
-    } catch (error) {
-      console.error("Échec de la sauvegarde du dossier :", error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de sauvegarder le dossier de santé.",
-      });
-    }
+    saveHealthRecord(newRecord);
+    toast({
+      title: "Dossier sauvegardé",
+      description: "Votre consultation a été sauvegardée avec succès.",
+    });
   };
 
   return (
@@ -104,7 +88,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
             clarifyingQuestions={analysisResult.clarifyingQuestions}
             medicationSuggestions={analysisResult.medicationSuggestions}
             traditionalRemedies={analysisResult.traditionalRemedies}
-            onSaveRecord={handleSaveRecord}
+            fullAnalysis={analysisResult}
           />
         )}
       </CardContent>

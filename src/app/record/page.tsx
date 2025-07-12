@@ -1,5 +1,5 @@
 /**
- * @fileoverview Health record page component with smart symptom tracking.
+ * @fileoverview Health record page component with smart symptom tracking and document management.
  */
 "use client";
 
@@ -7,12 +7,15 @@ import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, TriangleAlert, Trash2 } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileImage, FileKey2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { AddDocumentDialog } from '@/components/record/add-document-dialog';
+import { ImageGalleryDialog } from '@/components/record/image-gallery-dialog';
+import { Separator } from '@/components/ui/separator';
 
 function HealthRecordSkeleton() {
   return (
@@ -41,10 +44,13 @@ function EmptyState() {
                 <BookHeart className="size-8" />
             </div>
             <h3 className="text-xl font-semibold">Aucun dossier trouvé</h3>
-            <p className="text-muted-foreground mt-2">L'historique de vos consultations apparaîtra ici.</p>
-            <Button asChild className="mt-4">
-                <Link href="/">Démarrer une nouvelle consultation</Link>
-            </Button>
+            <p className="text-muted-foreground mt-2">L'historique de vos consultations et documents apparaîtra ici.</p>
+            <div className="flex justify-center gap-2 mt-4">
+                <AddDocumentDialog onRecordAdded={() => { /* This will be handled by the parent component's refresh logic */ }} />
+                <Button asChild variant="outline">
+                    <Link href="/">Démarrer une consultation IA</Link>
+                </Button>
+            </div>
         </Card>
     );
 }
@@ -61,19 +67,30 @@ function RecurringSymptomAlert({ symptom }: { symptom: string }) {
     )
 }
 
+const categoryIcons = {
+    'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
+    'Bilan': <FileText className="h-5 w-5 text-blue-500" />,
+    'Ordonnance': <FileText className="h-5 w-5 text-green-500" />,
+    'Autre': <FileText className="h-5 w-5 text-gray-500" />,
+}
+
 export default function HealthRecordPage() {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const refreshRecords = () => {
     setRecords(getHealthRecords());
+  }
+
+  useEffect(() => {
+    refreshRecords();
     setIsMounted(true);
   }, []);
 
   const handleDeleteRecord = (id: string) => {
     deleteHealthRecord(id);
-    setRecords(getHealthRecords()); // Refresh records from storage
+    refreshRecords();
     toast({
         title: "Dossier supprimé",
         description: "Le dossier de santé a été supprimé avec succès.",
@@ -83,15 +100,16 @@ export default function HealthRecordPage() {
   const recurringSymptom = useMemo(() => {
     if (records.length < 2) return null;
     
-    const symptomCounts: Record<string, number> = {};
-    const recentRecords = records.slice(0, 5); // Check last 5 records
+    const aiConsultations = records.filter(r => r.category === 'Consultation IA');
+    const diagnosisCounts: Record<string, number> = {};
+    const recentRecords = aiConsultations.slice(0, 5); // Check last 5 AI records
 
     for (const record of recentRecords) {
-        // Use diagnosis as the key for recurrence check
-        const key = record.diagnosis;
-        symptomCounts[key] = (symptomCounts[key] || 0) + 1;
-        if (symptomCounts[key] >= 2) { // Trigger alert on 2nd occurrence
-            return key;
+        if(record.title){
+            diagnosisCounts[record.title] = (diagnosisCounts[record.title] || 0) + 1;
+            if (diagnosisCounts[record.title] >= 2) { // Trigger alert on 2nd occurrence
+                return record.title;
+            }
         }
     }
     
@@ -103,13 +121,24 @@ export default function HealthRecordPage() {
     return <HealthRecordSkeleton />;
   }
 
+  const groupedRecords = records.reduce((acc, record) => {
+    const category = record.category || 'Autre';
+    if(!acc[category]) acc[category] = [];
+    acc[category].push(record);
+    return acc;
+  }, {} as Record<string, HealthRecord[]>);
+  
+  const categories = ['Consultation IA', 'Bilan', 'Ordonnance', 'Autre'];
+
+
   return (
     <div className="space-y-6">
        <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold font-headline">Dossier de santé</h1>
-          <p className="text-muted-foreground">Un journal de vos consultations passées.</p>
+          <p className="text-muted-foreground">Un journal de vos consultations et documents.</p>
         </div>
+        <AddDocumentDialog onRecordAdded={refreshRecords} />
       </div>
 
       {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
@@ -117,49 +146,73 @@ export default function HealthRecordPage() {
       {records.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="space-y-4">
-          {records.map(record => (
-            <Card key={record.id} className={record.diagnosis === recurringSymptom ? "border-destructive" : ""}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    {record.diagnosis}
-                  </CardTitle>
-                  <CardDescription>{record.date}</CardDescription>
+        <div className="space-y-8">
+          {categories.map(category => (
+            groupedRecords[category] && (
+                <div key={category}>
+                    <h2 className="text-xl font-semibold mb-3">{category}</h2>
+                     <div className="space-y-4">
+                        {groupedRecords[category].map(record => (
+                            <Card key={record.id} className={record.title === recurringSymptom ? "border-destructive" : ""}>
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                <CardTitle className="flex items-center gap-2">
+                                    {categoryIcons[record.category as keyof typeof categoryIcons] || categoryIcons['Autre']}
+                                    {record.title}
+                                </CardTitle>
+                                <CardDescription>{record.date}</CardDescription>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                {record.symptoms && (
+                                <>
+                                    <p className="font-semibold text-sm">Symptômes signalés :</p>
+                                    <p className="text-muted-foreground text-sm mb-4">{record.symptoms}</p>
+                                </>
+                                )}
+                                {record.summary && (
+                                <>
+                                    <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
+                                    <p className="text-muted-foreground text-sm">{record.summary}</p>
+                                </>
+                                )}
+                                {record.images && record.images.length > 0 && (
+                                    <>
+                                        <Separator className="my-4" />
+                                        <p className="font-semibold text-sm mb-2">Documents ({record.images.length}) :</p>
+                                        <ImageGalleryDialog record={record} />
+                                    </>
+                                )}
+                            </CardContent>
+                            <CardFooter className="justify-end">
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            Supprimer
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Cette action est irréversible. Le dossier de santé sera définitivement supprimé de votre appareil.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
+                                                Supprimer
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="font-semibold text-sm">Symptômes signalés :</p>
-                <p className="text-muted-foreground text-sm mb-4">{record.symptoms}</p>
-                <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
-                <p className="text-muted-foreground text-sm">{record.summary}</p>
-              </CardContent>
-              <CardFooter className="justify-end">
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Supprimer
-                        </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Cette action est irréversible. Le dossier de santé sera définitivement supprimé de votre appareil.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
-                                Supprimer
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-              </CardFooter>
-            </Card>
+            )
           ))}
         </div>
       )}

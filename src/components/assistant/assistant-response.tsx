@@ -11,6 +11,9 @@ import { FilePlus2, HeartPulse, Pill, Languages, LoaderCircle, Leaf } from "luci
 import { RemedyCard } from "./remedy-card";
 import { translateText } from "@/ai/flows/translate-text";
 import { TraditionalRemedyCard } from "./traditional-remedy-card";
+import { saveHealthRecord } from "@/services/health-record-service";
+import type { HealthRecord } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface AssistantResponseProps {
   symptoms: string;
@@ -18,7 +21,7 @@ interface AssistantResponseProps {
   clarifyingQuestions: string[];
   medicationSuggestions: string[];
   traditionalRemedies: TraditionalRemedy[];
-  onSaveRecord: (symptoms: string, diagnosis: string) => void;
+  fullAnalysis: any;
 }
 
 export const AssistantResponse = ({
@@ -27,11 +30,12 @@ export const AssistantResponse = ({
   clarifyingQuestions,
   medicationSuggestions,
   traditionalRemedies,
-  onSaveRecord,
+  fullAnalysis,
 }: AssistantResponseProps) => {
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+  const { toast } = useToast();
 
   const potentialDiagnosis = diagnosisSuggestions[0] || "Inconnu";
 
@@ -77,6 +81,23 @@ Suggestions de médicaments:
       }
   };
 
+  const onSaveRecord = async () => {
+    const newRecord: HealthRecord = {
+        id: new Date().toISOString(),
+        date: new Date().toLocaleDateString('fr-FR'),
+        category: 'Consultation IA',
+        title: potentialDiagnosis,
+        symptoms: symptoms,
+        summary: `Basé sur les symptômes, les diagnostics potentiels incluent : ${diagnosisSuggestions.join(', ')}. Médicaments suggérés : ${medicationSuggestions.join(', ')}.`,
+    };
+
+    saveHealthRecord(newRecord);
+    toast({
+        title: "Dossier sauvegardé",
+        description: "Votre consultation a été sauvegardée avec succès.",
+    });
+  };
+
 
   return (
     <div className="space-y-4">
@@ -96,14 +117,18 @@ Suggestions de médicaments:
                 ))}
                 </ul>
             </div>
-            <div>
-                <h3 className="font-bold mb-2">Questions de clarification</h3>
-                <ul className="list-disc list-inside space-y-1">
-                {clarifyingQuestions.map((q, i) => (
-                    <li key={i}>{q}</li>
-                ))}
-                </ul>
-            </div>
+            
+            {clarifyingQuestions && clarifyingQuestions.length > 0 && (
+                 <div>
+                    <h3 className="font-bold mb-2">Questions de clarification</h3>
+                    <ul className="list-disc list-inside space-y-1">
+                    {clarifyingQuestions.map((q, i) => (
+                        <li key={i}>{q}</li>
+                    ))}
+                    </ul>
+                </div>
+            )}
+
 
             {medicationSuggestions && medicationSuggestions.length > 0 && (
                 <div>
@@ -148,7 +173,7 @@ Suggestions de médicaments:
           <HeartPulse className="mr-2 h-4 w-4" />
           Afficher les remèdes
         </Button>
-        <Button variant="outline" size="sm" onClick={() => onSaveRecord(symptoms, potentialDiagnosis)}>
+        <Button variant="outline" size="sm" onClick={onSaveRecord}>
           <FilePlus2 className="mr-2 h-4 w-4" />
           Sauvegarder
         </Button>
