@@ -32,19 +32,19 @@ export default function AssistantChat() {
 
   const handleSaveRecord = async (symptoms: string, diagnosis: string) => {
     try {
-      const { output } = await recordConsultation({
+      const { recordId, summary } = await recordConsultation({
         symptoms: symptoms,
         differentialDiagnosis: diagnosis,
         remedyRecommendations: "L'utilisateur a vu des remèdes standards pour la condition potentielle.",
       });
 
-      if (output) {
+      if (recordId && summary) {
         const newRecord: HealthRecord = {
-          id: output.recordId || new Date().toISOString(),
+          id: recordId || new Date().toISOString(),
           date: new Date().toLocaleDateString(),
           symptoms: symptoms,
           diagnosis: diagnosis,
-          summary: output.summary,
+          summary: summary,
         };
 
         saveHealthRecord(newRecord);
@@ -78,19 +78,19 @@ export default function AssistantChat() {
     setIsLoading(true);
 
     try {
-      const { output } = await analyzeSymptoms({
+      const analysisOutput = await analyzeSymptoms({
         symptomsDescription: symptoms,
       });
 
-      if (output) {
+      if (analysisOutput) {
         const assistantMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content: (
             <AssistantResponse
               symptoms={symptoms}
-              diagnosisSuggestions={output.diagnosisSuggestions}
-              clarifyingQuestions={output.clarifyingQuestions}
+              diagnosisSuggestions={analysisOutput.diagnosisSuggestions}
+              clarifyingQuestions={analysisOutput.clarifyingQuestions}
               onSaveRecord={handleSaveRecord}
             />
           ),

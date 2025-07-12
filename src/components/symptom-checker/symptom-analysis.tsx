@@ -33,12 +33,12 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
       setIsLoading(true);
       setError(null);
       try {
-        const { output } = await analyzeSymptoms({ 
+        const analysisOutput = await analyzeSymptoms({ 
             symptomsDescription: symptomDescription,
             userProfile: isProfileComplete && profile ? profile : undefined
         });
-        if (output) {
-          setAnalysisResult(output);
+        if (analysisOutput) {
+          setAnalysisResult(analysisOutput);
         } else {
           throw new Error("L'analyse n'a retourné aucun résultat.");
         }
@@ -54,19 +54,19 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
 
   const handleSaveRecord = async (symptoms: string, diagnosis: string) => {
     try {
-      const { output } = await recordConsultation({
+      const { recordId, summary } = await recordConsultation({
         symptoms: symptoms,
         differentialDiagnosis: diagnosis,
         remedyRecommendations: "L'utilisateur a vu des remèdes standards pour la condition potentielle.",
       });
 
-      if (output) {
+      if (recordId && summary) {
         const newRecord: HealthRecord = {
-          id: output.recordId || new Date().toISOString(),
+          id: recordId || new Date().toISOString(),
           date: new Date().toLocaleDateString(),
           symptoms: symptoms,
           diagnosis: diagnosis,
-          summary: output.summary,
+          summary: summary,
         };
         saveHealthRecord(newRecord);
         toast({
