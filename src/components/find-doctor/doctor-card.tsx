@@ -13,7 +13,7 @@ interface DoctorCardProps {
 }
 
 export function DoctorCard({ doctor }: DoctorCardProps) {
-    const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${doctor.location.lat},${doctor.location.lng}`;
+    const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${doctor.name}, ${doctor.address}`)}`;
   
   return (
     <Card 
