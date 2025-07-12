@@ -13,20 +13,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { doctors, specialties, type Doctor } from "@/constants/doctors";
+import { doctors, specialties, cities, type Doctor } from "@/constants/doctors";
 import { DoctorCard } from "@/components/find-doctor/doctor-card";
 import { DoctorMap } from "@/components/find-doctor/doctor-map";
 
 export default function FindDoctorPage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
+  const [selectedCity, setSelectedCity] = useState("all");
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
 
   const filteredDoctors = useMemo(() => {
-    if (selectedSpecialty === "all") {
-      return doctors;
-    }
-    return doctors.filter((doctor) => doctor.specialty === selectedSpecialty);
-  }, [selectedSpecialty]);
+    return doctors.filter(doctor => {
+        const specialtyMatch = selectedSpecialty === "all" || doctor.specialty === selectedSpecialty;
+        const cityMatch = selectedCity === "all" || doctor.city === selectedCity;
+        return specialtyMatch && cityMatch;
+    });
+  }, [selectedSpecialty, selectedCity]);
 
   return (
     <div className="space-y-6">
@@ -44,12 +46,12 @@ export default function FindDoctorPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="h-5 w-5" />
-            Filtrer par spécialité
+            Filtrer votre recherche
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid sm:grid-cols-2 gap-4">
           <Select onValueChange={setSelectedSpecialty} defaultValue="all">
-            <SelectTrigger className="w-full md:w-[300px]">
+            <SelectTrigger>
               <SelectValue placeholder="Toutes les spécialités" />
             </SelectTrigger>
             <SelectContent>
@@ -59,6 +61,19 @@ export default function FindDoctorPage() {
                   {specialty}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={setSelectedCity} defaultValue="all">
+            <SelectTrigger>
+                <SelectValue placeholder="Toutes les zones" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="all">Toutes les zones</SelectItem>
+                {cities.map((city) => (
+                    <SelectItem key={city} value={city}>
+                        {city}
+                    </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </CardContent>
@@ -78,7 +93,7 @@ export default function FindDoctorPage() {
             ))
           ) : (
             <p className="text-muted-foreground text-center py-8">
-              Aucun médecin trouvé pour cette spécialité.
+              Aucun médecin trouvé pour cette sélection.
             </p>
           )}
         </div>
