@@ -45,7 +45,8 @@ export default function ProfilePage() {
       weight: '',
       medicalHistory: '',
       allergies: '',
-      currentTreatments: ''
+      currentTreatments: '',
+      additionalSymptoms: ''
     },
   });
 
@@ -176,6 +177,26 @@ export default function ProfilePage() {
                       </FormControl>
                        <FormDescription>
                         Cela aide à éviter les suggestions de remèdes contradictoires.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="additionalSymptoms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Symptômes généraux supplémentaires</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Décrivez ici tout autre symptôme ou information pertinente (ex: perte d'appétit, déshydratation, insomnie...)"
+                          {...field}
+                           value={field.value ?? ''}
+                        />
+                      </FormControl>
+                       <FormDescription>
+                        Ces informations aideront à affiner l'analyse de l'IA.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

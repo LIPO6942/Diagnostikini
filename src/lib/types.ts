@@ -8,6 +8,7 @@ export const UserProfileSchema = z.object({
   medicalHistory: z.string().optional().nullable(),
   allergies: z.string().optional().nullable(),
   currentTreatments: z.string().optional().nullable(),
+  additionalSymptoms: z.string().optional().nullable(),
 });
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
