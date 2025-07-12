@@ -8,7 +8,7 @@ export const wellnessTips = [
     category: "Nutrition",
     icon: Apple,
     image: {
-      src: "https://placehold.co/600x400.png",
+      src: "https://images.unsplash.com/photo-1533803779054-839aa3e212d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxXZWxsbmVzcyUyMGZydWl0fGVufDB8fHx8MTc1MjMyMjk0N3ww&ixlib=rb-4.1.0&q=80&w=1080",
       hint: "nourriture saine"
     },
     tips: [
