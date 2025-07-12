@@ -11,6 +11,7 @@ import {
   User,
   Stethoscope,
   RotateCcw,
+  MapPin,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -78,6 +79,18 @@ export function SidebarNav() {
               <Link href="/wellness">
                 <HeartPulse />
                 <span>Bien-être</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive("/find-doctor")}
+              tooltip="Trouver un médecin"
+            >
+              <Link href="/find-doctor">
+                <MapPin />
+                <span>Trouver un médecin</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
