@@ -5,7 +5,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,7 @@ import { UserProfileSchema, type UserProfile } from "@/lib/types";
 export default function ProfilePage() {
   const { profile, saveProfile } = useProfile();
   const { toast } = useToast();
+  const router = useRouter();
   
   const form = useForm<UserProfile>({
     resolver: zodResolver(UserProfileSchema),
@@ -52,8 +53,9 @@ export default function ProfilePage() {
     saveProfile(values);
     toast({
       title: "Profil sauvegardé",
-      description: "Vos informations ont été mises à jour avec succès.",
+      description: "Vos informations ont été mises à jour. Vous allez être redirigé.",
     });
+    router.push('/');
   }
 
   return (
@@ -179,7 +181,7 @@ export default function ProfilePage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">Sauvegarder le profil</Button>
+                <Button type="submit">Sauvegarder et continuer</Button>
               </form>
             </Form>
           </CardContent>
