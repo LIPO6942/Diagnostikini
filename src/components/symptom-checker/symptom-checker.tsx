@@ -67,10 +67,7 @@ export default function SymptomChecker() {
 
 
   return (
-    <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0 space-y-4">
-       <h2 className="text-xl font-bold text-center text-foreground/80">
-        Ton diagnostic, en quelques clics
-      </h2>
+    <div className="mx-auto max-w-2xl w-full px-4 sm:px-0">
       {analysis ? (
         <SymptomAnalysis 
             symptomDescription={analysis}
