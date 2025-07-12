@@ -1,5 +1,5 @@
 /**
- * @fileoverview Dialog component to display a gallery of document images.
+ * @fileoverview Dialog component to display a gallery of document images and PDFs.
  */
 "use client";
 
@@ -12,7 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
 import {
   Carousel,
   CarouselContent,
@@ -21,7 +20,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import type { HealthRecord } from '@/lib/types';
-import { FileImage, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface ImageGalleryDialogProps {
   record: HealthRecord;
@@ -34,10 +33,13 @@ export function ImageGalleryDialog({ record }: ImageGalleryDialogProps) {
     return null;
   }
 
+  const imageDocuments = record.documents.filter(doc => doc.mimeType.startsWith('image/'));
+  const otherDocuments = record.documents.filter(doc => !doc.mimeType.startsWith('image/'));
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 cursor-pointer">
             {record.documents.slice(0, 5).map((doc, index) => (
                 <button key={index} className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-16">
                      {doc.mimeType.startsWith('image/') ? (
@@ -69,23 +71,29 @@ export function ImageGalleryDialog({ record }: ImageGalleryDialogProps) {
              <Carousel className="w-full h-full flex-grow">
                 <CarouselContent className="h-full">
                     {record.documents.map((doc, index) => (
-                    <CarouselItem key={index} className="h-full">
-                        <div className="p-1 h-full flex flex-col">
-                            <div className="relative flex-grow">
-                                {doc.mimeType.startsWith('image/') ? (
-                                    <Image
-                                        src={doc.dataUrl}
-                                        alt={`Document page ${index + 1}`}
-                                        fill
-                                        className="object-contain"
-                                    />
-                                ) : (
-                                    <iframe src={doc.dataUrl} className="w-full h-full border-0" title={doc.name} />
-                                )}
-                            </div>
-                            <p className="text-center text-sm text-muted-foreground mt-2">Page {index + 1} / {record.documents.length}</p>
+                      <CarouselItem key={index} className="h-full">
+                        <div className="w-full h-full flex flex-col items-center justify-center">
+                          <div className="w-full h-full flex-grow relative">
+                            {doc.mimeType.startsWith('image/') ? (
+                              <Image
+                                src={doc.dataUrl}
+                                alt={`Document page ${index + 1}`}
+                                fill
+                                className="object-contain"
+                              />
+                            ) : (
+                              <iframe 
+                                src={doc.dataUrl} 
+                                className="w-full h-full border-0" 
+                                title={doc.name} 
+                              />
+                            )}
+                          </div>
+                          <p className="text-center text-sm text-muted-foreground mt-2">
+                            Page {index + 1} / {record.documents?.length} - {doc.name}
+                          </p>
                         </div>
-                    </CarouselItem>
+                      </CarouselItem>
                     ))}
                 </CarouselContent>
                 <CarouselPrevious />

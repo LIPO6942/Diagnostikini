@@ -66,16 +66,32 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
       category: "Bilan",
     },
   });
-
+  
+  const resetAndClose = () => {
+    form.reset({
+      title: "",
+      category: "Bilan",
+    });
+    setDocuments([]);
+    setOpen(false);
+  };
+  
   useEffect(() => {
-    if (existingRecord) {
+    if (open && existingRecord) {
         form.reset({
             title: existingRecord.title,
             category: existingRecord.category,
         });
         setDocuments(existingRecord.documents || []);
+    } else if (!open) {
+        // Reset form when dialog closes
+        form.reset({
+            title: "",
+            category: "Bilan",
+        });
+        setDocuments([]);
     }
-  }, [existingRecord, form]);
+  }, [open, existingRecord, form]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,13 +160,6 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
     resetAndClose();
   };
 
-  const resetAndClose = () => {
-    if (!isEditing) {
-      form.reset();
-      setDocuments([]);
-    }
-    setOpen(false);
-  };
 
   const dialogTitle = isEditing ? "Modifier le document" : "Ajouter un nouveau document";
   const dialogDescription = isEditing 
@@ -168,10 +177,8 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => {
-        // Allow closing if not editing or form is not dirty
-        if(!isEditing || !form.formState.isDirty) {
-          resetAndClose();
-        } else {
+        // Prevent closing if form is dirty
+        if(form.formState.isDirty || documents.length > 0) {
           e.preventDefault();
         }
       }}>
