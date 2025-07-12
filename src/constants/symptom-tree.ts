@@ -50,10 +50,26 @@ export const symptomTree: SymptomNode[] = [
         label: "Poitrine",
         descriptionTunisian: "صدر",
         children: [
-            { id: "oppression-poitrine", label: "Oppression / serrement", description: "Douleur à la poitrine, sensation d'oppression ou de serrement", descriptionTunisian: "تحس صدرك مزير عليك" },
-            { id: "brulure-poitrine", label: "Brûlure (remontant vers la gorge)", description: "Douleur à la poitrine, sensation de brûlure qui remonte", descriptionTunisian: "حرقة طالعة لقرجومك"},
+            { 
+              id: "oppression-poitrine", 
+              label: "Oppression / serrement",
+              descriptionTunisian: "تحس صدرك مزير عليك",
+              children: [
+                { id: "poitrine-oppression-effort", label: "À l'effort", description: "Oppression à la poitrine lors d'un effort", descriptionTunisian: "وقت المجهود" },
+                { id: "poitrine-oppression-repos", label: "Au repos", description: "Oppression à la poitrine au repos", descriptionTunisian: "في الراحة" },
+                { id: "poitrine-oppression-irradie", label: "Irradie vers le bras/mâchoire", description: "Oppression qui s'étend au bras ou à la mâchoire", descriptionTunisian: "الوجيعة تمشي للذراع/الفك" },
+              ]
+            },
+            { 
+              id: "brulure-poitrine",
+              label: "Brûlure (remontant vers la gorge)", 
+              descriptionTunisian: "حرقة طالعة لقرجومك",
+              children: [
+                { id: "poitrine-brulure-repas", label: "Après les repas", description: "Brûlure à la poitrine après avoir mangé", descriptionTunisian: "بعد الماكلة" },
+                { id: "poitrine-brulure-couche", label: "En position couchée", description: "Brûlure à la poitrine en étant allongé", descriptionTunisian: "كي تتمد" },
+              ]
+            },
             { id: "elancement-poitrine", label: "Élancement (comme un coup de poignard)", description: "Douleur aiguë et brève à la poitrine", descriptionTunisian: "تحس في نغزة"},
-            { id: "poitrine-effort", label: "Douleur à l'effort", description: "Douleur à la poitrine qui apparaît pendant un effort physique", descriptionTunisian: "الوجيعة وقت تعمل مجهود"},
         ]
       },
       {
@@ -61,10 +77,34 @@ export const symptomTree: SymptomNode[] = [
         label: "Ventre",
         descriptionTunisian: "كرش",
         children: [
-            {id: "crampes-ventre", label: "Crampes", description: "Douleur au ventre, de type crampes", descriptionTunisian: "تشنجات"},
-            {id: "brulures-estomac-ventre", label: "Brûlures d'estomac", description: "Douleur au ventre, de type brûlures d'estomac", descriptionTunisian: "حرقة في المعدة"},
-            {id: "ventre-localise", label: "Douleur localisée", description: "Douleur dans une zone précise du ventre", descriptionTunisian: "في بقعة معينة"},
-            {id: "ventre-generalise", label: "Douleur généralisée", description: "Douleur diffuse dans tout le ventre", descriptionTunisian: "الكرش الكل توجع"},
+            {
+              id: "crampes-ventre", 
+              label: "Crampes", 
+              descriptionTunisian: "تشنجات",
+              children: [
+                { id: "ventre-crampes-diarrhee", label: "Avec diarrhée", description: "Crampes au ventre avec diarrhée", descriptionTunisian: "معاها جريان كرش" },
+                { id: "ventre-crampes-ballonnement", label: "Avec ballonnements", description: "Crampes au ventre avec ballonnements", descriptionTunisian: "معاها نفخ" },
+              ]
+            },
+            {
+              id: "brulures-estomac-ventre", 
+              label: "Brûlures d'estomac", 
+              descriptionTunisian: "حرقة في المعدة",
+              children: [
+                 { id: "ventre-brulure-repas", label: "Liées aux repas", description: "Brûlures d'estomac liées aux repas", descriptionTunisian: "مرتبطة بالماكلة" },
+                 { id: "ventre-brulure-nuit", label: "Surtout la nuit", description: "Brûlures d'estomac principalement la nuit", descriptionTunisian: "خاصة في الليل" },
+              ]
+            },
+            {
+              id: "ventre-localise", 
+              label: "Douleur localisée", 
+              descriptionTunisian: "في بقعة معينة",
+              children: [
+                { id: "ventre-localise-droite-bas", label: "En bas à droite", description: "Douleur localisée en bas à droite du ventre", descriptionTunisian: "التحت على اليمين" },
+                { id: "ventre-localise-haut", label: "Partie supérieure", description: "Douleur localisée dans la partie supérieure du ventre", descriptionTunisian: "من الفوق" },
+              ]
+            },
+            { id: "ventre-generalise", label: "Douleur généralisée", description: "Douleur diffuse dans tout le ventre", descriptionTunisian: "الكرش الكل توجع"},
         ]
       },
       {
@@ -73,8 +113,16 @@ export const symptomTree: SymptomNode[] = [
         descriptionTunisian: "ظهر",
         children: [
             {id: "haut-dos", label: "Haut du dos / nuque", description: "Douleur dans le haut du dos ou la nuque", descriptionTunisian: "أعلى الظهر / رقبة"},
-            {id: "bas-dos", label: "Bas du dos (lombaire)", description: "Douleur dans le bas du dos", descriptionTunisian: "أسفل الظهر"},
-            {id: "dos-irradie", label: "Irradie dans la jambe", description: "Douleur au dos qui descend dans la jambe", descriptionTunisian: "الوجيعة هابطة للساق"},
+            {
+              id: "bas-dos", 
+              label: "Bas du dos (lombaire)", 
+              descriptionTunisian: "أسفل الظهر",
+              children: [
+                { id: "dos-bas-mouvement", label: "Aggravée par le mouvement", description: "Douleur au bas du dos aggravée par le mouvement", descriptionTunisian: "تزيد مع الحركة" },
+                { id: "dos-bas-matin", label: "Raideur le matin", description: "Douleur et raideur au bas du dos le matin", descriptionTunisian: "تّبس في الصباح" },
+              ]
+            },
+            { id: "dos-irradie", label: "Irradie dans la jambe", description: "Douleur au dos qui descend dans la jambe", descriptionTunisian: "الوجيعة هابطة للساق"},
         ]
       },
       {
@@ -103,9 +151,24 @@ export const symptomTree: SymptomNode[] = [
         label: "Toux",
         descriptionTunisian: "كحة",
         children: [
-            { id: "toux-seche", label: "Toux sèche et irritante", description: "Toux sèche qui irrite la gorge", descriptionTunisian: "كحة شايحة" },
-            { id: "toux-grasse", label: "Toux grasse (avec glaires)", description: "Toux grasse avec expectorations", descriptionTunisian: "كحة بالبلغم" },
-            { id: "toux-nocturne", label: "Toux principalement la nuit", description: "Toux qui s'intensifie la nuit", descriptionTunisian: "تكح خاصة في الليل" },
+            { 
+              id: "toux-seche", 
+              label: "Toux sèche et irritante", 
+              descriptionTunisian: "كحة شايحة",
+              children: [
+                { id: "toux-seche-jour", label: "Surtout le jour", description: "Toux sèche principalement pendant la journée", descriptionTunisian: "خاصة في النهار" },
+                { id: "toux-seche-nuit", label: "Surtout la nuit", description: "Toux sèche principalement la nuit", descriptionTunisian: "خاصة في الليل" },
+              ]
+            },
+            { 
+              id: "toux-grasse", 
+              label: "Toux grasse (avec glaires)", 
+              descriptionTunisian: "كحة بالبلغم",
+              children: [
+                { id: "toux-grasse-claires", label: "Glaires claires / blanches", description: "Toux grasse avec expectorations claires ou blanches", descriptionTunisian: "بلغم أبيض شفاف" },
+                { id: "toux-grasse-colorees", label: "Glaires jaunes / vertes", description: "Toux grasse avec expectorations jaunes ou vertes", descriptionTunisian: "بلغم أصفر / أخضر" },
+              ]
+            },
         ]
       },
       { id: "respiration-sifflante", label: "Respiration sifflante", description: "Sifflement audible lors de la respiration", descriptionTunisian: "نفسك يزفر" },
@@ -129,7 +192,15 @@ export const symptomTree: SymptomNode[] = [
        },
       { id: "fievre-moderee", label: "Modérée (38.5-39.4°C)", description: "Fièvre modérée (38.5-39.4°C)", descriptionTunisian: "متوسطة" },
       { id: "fievre-elevee", label: "Élevée (>39.5°C)", description: "Fièvre élevée (plus de 39.5°C)", descriptionTunisian: "قوية" },
-      { id: "fievre-frissons", label: "Avec frissons et sueurs", description: "Fièvre accompagnée de frissons et/ou de sueurs", descriptionTunisian: "معاها رعشة و عرق" },
+      { 
+        id: "fievre-frissons", 
+        label: "Avec frissons et sueurs", 
+        descriptionTunisian: "معاها رعشة و عرق",
+        children: [
+          { id: "fievre-frissons-continus", label: "Frissons continus", description: "Fièvre avec des frissons constants", descriptionTunisian: "رعشة متواصلة" },
+          { id: "fievre-sueurs-nocturnes", label: "Sueurs surtout la nuit", description: "Fièvre avec des sueurs principalement nocturnes", descriptionTunisian: "عرق في الليل" },
+        ]
+      },
     ],
   },
    {
@@ -151,9 +222,25 @@ export const symptomTree: SymptomNode[] = [
     descriptionTunisian: "قراجم، خشم، وذنين",
     icon: Ear,
     children: [
-      { id: "mal-gorge", label: "Mal de gorge", description: "Douleur ou irritation de la gorge", descriptionTunisian: "وجيعة قراجم" },
+      { 
+        id: "mal-gorge", 
+        label: "Mal de gorge", 
+        descriptionTunisian: "وجيعة قراجم",
+        children: [
+          { id: "gorge-avaler", label: "Difficulté à avaler", description: "Mal de gorge avec difficulté à déglutir", descriptionTunisian: "صعوبة في البلع" },
+          { id: "gorge-blanche", label: "Points blancs sur les amygdales", description: "Mal de gorge avec présence de points blancs", descriptionTunisian: "نقط بيض في اللوزتين" },
+        ]
+      },
       { id: "nez-bouche", label: "Nez bouché", description: "Congestion nasale", descriptionTunisian: "خشم مسكر" },
-      { id: "ecoulement-nasal", label: "Écoulement nasal", description: "Nez qui coule (clair ou coloré)", descriptionTunisian: "خشم يجري" },
+      { 
+        id: "ecoulement-nasal", 
+        label: "Écoulement nasal", 
+        descriptionTunisian: "خشم يجري",
+        children: [
+           { id: "ecoulement-clair", label: "Clair (comme de l'eau)", description: "Écoulement nasal clair", descriptionTunisian: "صافي كي الماء" },
+           { id: "ecoulement-epais", label: "Épais et coloré", description: "Écoulement nasal épais (jaune/vert)", descriptionTunisian: "خاثر و ملون" },
+        ]
+      },
       { id: "douleur-oreille", label: "Douleur d'oreille", description: "Douleur dans une ou les deux oreilles", descriptionTunisian: "وجيعة وذنين" },
       { id: "sinus-douloureux", label: "Sinus douloureux", description: "Douleur au niveau du front ou des joues", descriptionTunisian: "وجيعة في الجيوب الأنفية"},
     ],
@@ -177,7 +264,15 @@ export const symptomTree: SymptomNode[] = [
     icon: BrainCircuit,
     children: [
       { id: "fatigue-inhabituelle", label: "Fatigue intense et inhabituelle", description: "Grande fatigue qui ne passe pas avec le repos", descriptionTunisian: "تعب كبير غير عادي" },
-      { id: "vertiges-etourdissements", label: "Vertiges ou étourdissements", description: "Sensation que la tête tourne", descriptionTunisian: "دوخة" },
+      { 
+        id: "vertiges-etourdissements", 
+        label: "Vertiges ou étourdissements", 
+        descriptionTunisian: "دوخة",
+        children: [
+          { id: "vertiges-debout", label: "En se levant", description: "Vertiges en passant de la position assise à debout", descriptionTunisian: "كي تقوم من بلاصتك" },
+          { id: "vertiges-continus", label: "Continus", description: "Vertiges constants", descriptionTunisian: "متواصلة" },
+        ]
+      },
       { id: "somnolence", label: "Somnolence excessive", description: "Envie de dormir constante durant la journée", descriptionTunisian: "تحب ترقد برشة" },
       { id: "trouble-concentration", label: "Difficulté de concentration", description: "Difficulté à se concentrer ou confusion", descriptionTunisian: "صعوبة في التركيز"},
     ],
