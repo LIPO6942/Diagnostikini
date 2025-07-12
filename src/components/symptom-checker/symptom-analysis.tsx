@@ -35,7 +35,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
       try {
         const analysisOutput = await analyzeSymptoms({ 
             symptomsDescription: symptomDescription,
-            userProfile: isProfileComplete && profile ? profile : undefined
+            userProfile: isProfileComplete ? profile ?? undefined : undefined
         });
         setAnalysisResult(analysisOutput);
       } catch (e) {
