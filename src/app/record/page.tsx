@@ -176,10 +176,10 @@ export default function HealthRecordPage() {
                                     <p className="text-muted-foreground text-sm">{record.summary}</p>
                                 </>
                                 )}
-                                {record.images && record.images.length > 0 && (
+                                {record.documents && record.documents.length > 0 && (
                                     <>
                                         <Separator className="my-4" />
-                                        <p className="font-semibold text-sm mb-2">Documents ({record.images.length}) :</p>
+                                        <p className="font-semibold text-sm mb-2">Documents ({record.documents.length}) :</p>
                                         <ImageGalleryDialog record={record} />
                                     </>
                                 )}

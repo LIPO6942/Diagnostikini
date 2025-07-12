@@ -33,8 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, LoaderCircle, Image as ImageIcon, X } from "lucide-react";
-import type { HealthRecord } from "@/lib/types";
+import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText } from "lucide-react";
+import type { HealthRecord, HealthDocument } from "@/lib/types";
 import { saveHealthRecord } from "@/services/health-record-service";
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
@@ -52,7 +52,7 @@ interface AddDocumentDialogProps {
 
 export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
   const [open, setOpen] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
+  const [documents, setDocuments] = useState<HealthDocument[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
@@ -69,17 +69,21 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
       setIsUploading(true);
       const filesArray = Array.from(e.target.files);
       const filePromises = filesArray.map(file => {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<HealthDocument>((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result as string);
+          reader.onload = () => resolve({
+            dataUrl: reader.result as string,
+            mimeType: file.type,
+            name: file.name
+          });
           reader.onerror = error => reject(error);
         });
       });
 
       Promise.all(filePromises)
-        .then(base64Images => {
-          setImages(prev => [...prev, ...base64Images]);
+        .then(newDocuments => {
+          setDocuments(prev => [...prev, ...newDocuments]);
           setIsUploading(false);
         })
         .catch(error => {
@@ -90,13 +94,13 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
     }
   };
 
-  const removeImage = (index: number) => {
-      setImages(prev => prev.filter((_, i) => i !== index));
+  const removeDocument = (index: number) => {
+      setDocuments(prev => prev.filter((_, i) => i !== index));
   }
 
   const onSubmit = (values: AddDocumentForm) => {
-    if (images.length === 0) {
-        toast({ variant: "destructive", title: "Veuillez ajouter au moins une image." });
+    if (documents.length === 0) {
+        toast({ variant: "destructive", title: "Veuillez ajouter au moins un document." });
         return;
     }
     
@@ -105,7 +109,7 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
       date: new Date().toLocaleDateString('fr-FR'),
       title: values.title,
       category: values.category,
-      images: images,
+      documents: documents,
     };
     
     saveHealthRecord(newRecord);
@@ -116,7 +120,7 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
 
   const resetAndClose = () => {
     form.reset();
-    setImages([]);
+    setDocuments([]);
     setOpen(false);
   };
 
@@ -132,7 +136,7 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
         <DialogHeader>
           <DialogTitle>Ajouter un nouveau document</DialogTitle>
           <DialogDescription>
-            Importez des bilans, des ordonnances ou d'autres documents importants.
+            Importez des bilans, des ordonnances ou d'autres documents importants (images ou PDF).
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -174,7 +178,7 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
             />
             
             <FormItem>
-              <FormLabel>Images du document</FormLabel>
+              <FormLabel>Fichiers (Images ou PDF)</FormLabel>
               <FormControl>
                 <div>
                   <label htmlFor="file-upload" className="cursor-pointer mt-2 flex justify-center w-full rounded-md border-2 border-dashed border-border px-6 pt-5 pb-6">
@@ -182,9 +186,9 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
                         <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
                         <div className="flex text-sm text-muted-foreground">
                             <span>{isUploading ? "Chargement..." : "Téléchargez un ou plusieurs fichiers"}</span>
-                            <input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleFileChange} disabled={isUploading} />
+                            <input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*,application/pdf" onChange={handleFileChange} disabled={isUploading} />
                         </div>
-                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF jusqu'à 10MB</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, PDF jusqu'à 10MB</p>
                     </div>
                   </label>
                   {isUploading && <LoaderCircle className="animate-spin mt-2" />}
@@ -192,17 +196,24 @@ export function AddDocumentDialog({ onRecordAdded }: AddDocumentDialogProps) {
               </FormControl>
             </FormItem>
 
-            {images.length > 0 && (
-                <div className="grid grid-cols-3 gap-4">
-                    {images.map((img, index) => (
+            {documents.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                    {documents.map((doc, index) => (
                         <div key={index} className="relative group">
-                            <Image src={img} alt={`preview ${index}`} width={150} height={150} className="rounded-md object-cover aspect-square" />
+                            {doc.mimeType.startsWith('image/') ? (
+                                <Image src={doc.dataUrl} alt={`preview ${index}`} width={150} height={150} className="rounded-md object-cover aspect-square border" />
+                            ) : (
+                                <div className="rounded-md object-cover aspect-square border bg-secondary flex flex-col items-center justify-center p-2">
+                                    <FileText className="size-8 text-secondary-foreground"/>
+                                    <span className="text-xs text-secondary-foreground text-center truncate w-full mt-1">{doc.name}</span>
+                                </div>
+                            )}
                             <Button
                                 type="button"
                                 variant="destructive"
                                 size="icon"
-                                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => removeImage(index)}
+                                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                onClick={() => removeDocument(index)}
                             >
                                 <X className="h-4 w-4"/>
                             </Button>

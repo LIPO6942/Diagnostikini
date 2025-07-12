@@ -26,6 +26,12 @@ export const UserProfileSchema = z.object({
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
+export type HealthDocument = {
+  dataUrl: string; // base64 data URI
+  mimeType: string;
+  name: string;
+};
+
 export type HealthRecord = {
   id: string;
   date: string;
@@ -33,7 +39,7 @@ export type HealthRecord = {
   title: string;
   symptoms?: string; // Optional: for AI consultations
   summary?: string; // Optional: for AI consultations
-  images?: string[]; // Optional: for uploaded documents (as base64 data URIs)
+  documents?: HealthDocument[]; // Optional: for uploaded documents
 };
 
 export type ChatMessage = {
