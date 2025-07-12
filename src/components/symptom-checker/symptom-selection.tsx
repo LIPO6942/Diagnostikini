@@ -60,7 +60,14 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
             onClick={() => onSelect(node)}
           >
             {node.icon && <node.icon className="size-8 text-primary mb-2" />}
-            <span className="text-base font-medium">{node.label}</span>
+            <div className="flex flex-col items-center">
+                <span className="text-base font-medium">{node.label}</span>
+                {node.descriptionTunisian && (
+                    <span className="text-xs text-muted-foreground font-normal mt-1">
+                        ({node.descriptionTunisian})
+                    </span>
+                )}
+            </div>
           </Button>
         ))}
       </CardContent>

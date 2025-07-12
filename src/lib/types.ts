@@ -62,6 +62,7 @@ export type SymptomNode = {
   label: string;
   icon?: LucideIcon;
   description?: string;
+  descriptionTunisian?: string;
   children?: SymptomNode[];
 };
 
