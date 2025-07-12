@@ -11,7 +11,6 @@ import { SymptomSelection } from "./symptom-selection";
 import { SymptomAnalysis } from "./symptom-analysis";
 import { ProfilePrompt } from "./profile-prompt";
 import { useProfile } from "@/contexts/profile-context";
-import Image from "next/image";
 
 export default function SymptomChecker() {
   const [currentNode, setCurrentNode] = useState<SymptomNode[]>(symptomTree);
@@ -68,7 +67,10 @@ export default function SymptomChecker() {
 
 
   return (
-    <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0 space-y-8">
+    <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0 space-y-4">
+       <h2 className="text-xl font-bold text-center text-foreground/80">
+        Ton diagnostic, en quelques clics
+      </h2>
       {analysis ? (
         <SymptomAnalysis 
             symptomDescription={analysis}
