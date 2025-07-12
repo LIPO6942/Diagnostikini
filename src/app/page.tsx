@@ -1,5 +1,5 @@
-import AssistantChat from "@/components/assistant/assistant-chat";
+import SymptomChecker from "@/components/symptom-checker/symptom-checker";
 
 export default function Home() {
-  return <AssistantChat />;
+  return <SymptomChecker />;
 }

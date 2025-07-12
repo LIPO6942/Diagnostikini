@@ -131,7 +131,7 @@ export default function AssistantChat() {
         <ScrollArea className="h-full" ref={scrollAreaRef}>
           <div className="p-4 space-y-6">
             {messages.length === 0 && (
-              <WelcomeMessage />
+              <WelcomeMessage onSelectSymptom={(symptom) => setSymptoms(symptom)} />
             )}
             {messages.map((message) => (
               <ChatMessageBubble key={message.id} message={message} />

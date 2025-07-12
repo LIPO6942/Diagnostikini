@@ -24,3 +24,11 @@ export type DiagnosisRemedies = {
   keywords: string[];
   remedies: Remedy[];
 };
+
+export type SymptomNode = {
+  id: string;
+  label: string;
+  icon?: LucideIcon;
+  description?: string;
+  children?: SymptomNode[];
+};
