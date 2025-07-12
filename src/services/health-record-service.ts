@@ -22,3 +22,12 @@ export function saveHealthRecord(newRecord: HealthRecord): void {
     JSON.stringify([newRecord, ...existingRecords])
   );
 }
+
+export function deleteHealthRecord(id: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  const existingRecords = getHealthRecords();
+  const updatedRecords = existingRecords.filter(record => record.id !== id);
+  localStorage.setItem('healthRecords', JSON.stringify(updatedRecords));
+}

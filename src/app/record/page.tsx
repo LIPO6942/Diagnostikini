@@ -7,10 +7,12 @@ import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, TriangleAlert } from 'lucide-react';
+import { BookHeart, FileText, TriangleAlert, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getHealthRecords } from '@/services/health-record-service';
+import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 function HealthRecordSkeleton() {
   return (
@@ -62,11 +64,21 @@ function RecurringSymptomAlert({ symptom }: { symptom: string }) {
 export default function HealthRecordPage() {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setRecords(getHealthRecords());
     setIsMounted(true);
   }, []);
+
+  const handleDeleteRecord = (id: string) => {
+    deleteHealthRecord(id);
+    setRecords(getHealthRecords()); // Refresh records from storage
+    toast({
+        title: "Dossier supprimé",
+        description: "Le dossier de santé a été supprimé avec succès.",
+    });
+  };
 
   const recurringSymptom = useMemo(() => {
     if (records.length < 2) return null;
@@ -123,8 +135,29 @@ export default function HealthRecordPage() {
                 <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
                 <p className="text-muted-foreground text-sm">{record.summary}</p>
               </CardContent>
-              <CardFooter>
-                 <Button variant="link" size="sm" className="p-0 h-auto">Ajouter un rappel</Button>
+              <CardFooter className="justify-end">
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Supprimer
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Cette action est irréversible. Le dossier de santé sera définitivement supprimé de votre appareil.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
+                                Supprimer
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
               </CardFooter>
             </Card>
           ))}
