@@ -38,10 +38,10 @@ export function SidebarNav() {
     <Sidebar>
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Stethoscope className="size-5" />
+          <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Stethoscope className="size-6" />
           </div>
-          <h1 className="font-headline text-lg font-bold">Diagnostikini</h1>
+          <h1 className="font-headline text-xl font-bold">Diagnostikini</h1>
         </Link>
       </SidebarHeader>
       <SidebarContent>
