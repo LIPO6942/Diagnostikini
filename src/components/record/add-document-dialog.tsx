@@ -131,7 +131,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
     // Create document metadata and save files to IndexedDB
     const newDocuments: HealthDocument[] = [];
     for (const file of documentFiles) {
-        const docId = `${Date.now()}-${Math.random()}`;
+        const docId = crypto.randomUUID();
         await saveFile(docId, file);
         newDocuments.push({
             id: docId,

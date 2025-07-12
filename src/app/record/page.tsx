@@ -81,6 +81,7 @@ function DocumentPreview({ doc }: { doc: {id: string, name: string, mimeType: st
     useEffect(() => {
         let objectUrl: string;
         async function loadFile() {
+            if (!doc.id) return; // Safety check
             const file = await getFile(doc.id);
             if(file) {
                 objectUrl = URL.createObjectURL(file);
@@ -237,7 +238,7 @@ export default function HealthRecordPage() {
                                         <p className="font-semibold text-sm mb-2">Documents ({record.documents.length}) :</p>
                                         <div className="flex flex-wrap gap-2">
                                             {record.documents.map((doc, index) => (
-                                                <DocumentPreview key={index} doc={doc} />
+                                                <DocumentPreview key={doc.id || index} doc={doc} />
                                             ))}
                                         </div>
                                     </>
