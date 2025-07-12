@@ -11,6 +11,7 @@ import { SymptomSelection } from "./symptom-selection";
 import { SymptomAnalysis } from "./symptom-analysis";
 import { ProfilePrompt } from "./profile-prompt";
 import { useProfile } from "@/contexts/profile-context";
+import Image from "next/image";
 
 export default function SymptomChecker() {
   const [currentNode, setCurrentNode] = useState<SymptomNode[]>(symptomTree);
@@ -67,7 +68,17 @@ export default function SymptomChecker() {
 
 
   return (
-    <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0">
+    <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0 space-y-8">
+       <div className="relative w-full h-40 rounded-lg overflow-hidden">
+        <Image 
+          src="https://placehold.co/800x300.png" 
+          alt="Bannière de santé"
+          layout="fill"
+          objectFit="cover"
+          data-ai-hint="santé bien-être"
+        />
+      </div>
+
       {analysis ? (
         <SymptomAnalysis 
             symptomDescription={analysis}
