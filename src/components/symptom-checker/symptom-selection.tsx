@@ -3,14 +3,16 @@
  */
 import type { SymptomNode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Home, ChevronRight } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { ArrowLeft, Home, ChevronRight, RotateCcw } from "lucide-react";
+import Link from 'next/link';
 
 interface SymptomSelectionProps {
   nodes: SymptomNode[];
   path: SymptomNode[];
   onSelect: (node: SymptomNode) => void;
   onBack: () => void;
+  onReset: () => void;
   canGoBack: boolean;
 }
 
@@ -30,7 +32,7 @@ function Breadcrumbs({ path }: { path: SymptomNode[] }) {
 }
 
 
-export function SymptomSelection({ nodes, path, onSelect, onBack, canGoBack }: SymptomSelectionProps) {
+export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGoBack }: SymptomSelectionProps) {
     const title = path.length > 0 ? `Qu'est-ce qui caractérise cette ${path[path.length - 1].label.toLowerCase()} ?` : "Quel symptôme principal ressentez-vous ?";
 
   return (
@@ -62,6 +64,20 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, canGoBack }: S
           </Button>
         ))}
       </CardContent>
+       {path.length === 0 && (
+         <CardFooter className="flex-col items-start gap-4 border-t pt-6">
+            <p className="text-sm text-muted-foreground">Vous pouvez recommencer le questionnaire ou mettre à jour votre profil.</p>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={onReset}>
+                    <RotateCcw className="mr-2" />
+                    Recommencer
+                </Button>
+                 <Button variant="outline" asChild>
+                    <Link href="/profile">Mettre à jour le profil</Link>
+                </Button>
+            </div>
+         </CardFooter>
+      )}
     </Card>
   );
 }

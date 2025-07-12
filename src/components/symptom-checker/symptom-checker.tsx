@@ -80,6 +80,7 @@ export default function SymptomChecker() {
           path={selectedPath}
           onSelect={handleSelectNode}
           onBack={handleGoBack}
+          onReset={handleReset}
           canGoBack={canGoBack}
         />
       )}
