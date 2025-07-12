@@ -62,7 +62,17 @@ const analyzeSymptomsFlow = ai.defineFlow(
     outputSchema: AnalyzeSymptomsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const llmResponse = await prompt(input);
+    const output = llmResponse.output;
+
+    if (!output) {
+      console.error('LLM response was empty or failed', llmResponse);
+      return {
+        diagnosisSuggestions: ["Analyse non disponible"],
+        clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
+      };
+    }
+
+    return output;
   }
 );
