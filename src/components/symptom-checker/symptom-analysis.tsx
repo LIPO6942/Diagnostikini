@@ -57,7 +57,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
       const { recordId, summary } = await recordConsultation({
         symptoms: symptoms,
         differentialDiagnosis: diagnosis,
-        remedyRecommendations: "L'utilisateur a vu des remèdes standards pour la condition potentielle.",
+        remedyRecommendations: "L'utilisateur a vu des remèdes standards et des suggestions de médicaments pour la condition potentielle.",
       });
 
       if (recordId && summary) {
@@ -106,17 +106,18 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
             symptoms={symptomDescription}
             diagnosisSuggestions={analysisResult.diagnosisSuggestions}
             clarifyingQuestions={analysisResult.clarifyingQuestions}
+            medicationSuggestions={analysisResult.medicationSuggestions}
             onSaveRecord={handleSaveRecord}
           />
         )}
       </CardContent>
       <CardFooter className="flex justify-between border-t pt-6">
         <Button variant="outline" onClick={onBack}>
-          <ArrowLeft className="mr-2" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Retour
         </Button>
          <Button variant="ghost" onClick={onReset}>
-          <RotateCcw className="mr-2" />
+          <RotateCcw className="mr-2 h-4 w-4" />
           Recommencer
         </Button>
       </CardFooter>

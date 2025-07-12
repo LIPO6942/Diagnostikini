@@ -7,13 +7,14 @@ import { useState } from "react";
 import type { Remedy } from "@/lib/types";
 import { commonRemedies } from "@/lib/remedies";
 import { Button } from "@/components/ui/button";
-import { FilePlus2, HeartPulse } from "lucide-react";
+import { FilePlus2, HeartPulse, Pill } from "lucide-react";
 import { RemedyCard } from "./remedy-card";
 
 interface AssistantResponseProps {
   symptoms: string;
   diagnosisSuggestions: string[];
   clarifyingQuestions: string[];
+  medicationSuggestions: string[];
   onSaveRecord: (symptoms: string, diagnosis: string) => void;
 }
 
@@ -21,6 +22,7 @@ export const AssistantResponse = ({
   symptoms,
   diagnosisSuggestions,
   clarifyingQuestions,
+  medicationSuggestions,
   onSaveRecord,
 }: AssistantResponseProps) => {
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
@@ -52,6 +54,20 @@ export const AssistantResponse = ({
           ))}
         </ul>
       </div>
+
+      {medicationSuggestions && medicationSuggestions.length > 0 && (
+         <div>
+            <h3 className="font-bold mb-2 flex items-center gap-2"><Pill className="h-4 w-4" /> Suggestions de médicaments</h3>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                {medicationSuggestions.map((med, i) => (
+                    <li key={i}>{med}</li>
+                ))}
+            </ul>
+             <p className="text-xs text-muted-foreground/80 mt-1">
+                Note : Ceci n'est pas une ordonnance. L'avis d'un professionnel de santé est requis.
+            </p>
+        </div>
+      )}
 
       {remedies && (
          <div>

@@ -2,7 +2,7 @@
  * @fileoverview Defines the interactive symptom tree structure.
  */
 import type { SymptomNode } from "@/lib/types";
-import { Angry, Bone, Ear, Eye, Heart, PersonStanding, Thermometer, Wind, Waves, BrainCircuit } from "lucide-react";
+import { PersonStanding, Wind, Thermometer, Waves, Ear, BrainCircuit, Bone, Eye, Sheet } from "lucide-react";
 
 export const symptomTree: SymptomNode[] = [
   {
@@ -92,6 +92,17 @@ export const symptomTree: SymptomNode[] = [
       { id: "douleur-oreille", label: "Douleur d'oreille", description: "Troubles ORL : douleur d'oreille" },
     ],
   },
+  {
+    id: "peau",
+    label: "Problèmes de peau",
+    icon: Sheet,
+    children: [
+      { id: "eruption-cutanee", label: "Éruption cutanée", description: "Problèmes de peau : éruption cutanée" },
+      { id: "demangeaisons", label: "Démangeaisons", description: "Problèmes de peau : démangeaisons" },
+      { id: "secheresse", label: "Sécheresse", description: "Problèmes de peau : sécheresse ou desquamation" },
+      { id: "acne", label: "Acné", description: "Problèmes de peau : acné ou boutons" },
+    ]
+  },
    {
     id: "etat-general",
     label: "État général",
@@ -103,4 +114,15 @@ export const symptomTree: SymptomNode[] = [
       { id: "somnolence", label: "Somnolence excessive", description: "État général : somnolence excessive" },
     ],
   },
+  {
+    id: "troubles-yeux",
+    label: "Troubles oculaires",
+    icon: Eye,
+    children: [
+        { id: "yeux-rouges", label: "Yeux rouges", description: "Troubles oculaires : yeux rouges ou irrités" },
+        { id: "vision-floue", label: "Vision floue", description: "Troubles oculaires : vision floue" },
+        { id: "secheresse-oculaire", label: "Sécheresse oculaire", description: "Troubles oculaires : sensation de sécheresse ou de sable" },
+        { id: "larmoiement", label: "Larmoiement excessif", description: "Troubles oculaires : larmoiement excessif" },
+    ]
+  }
 ];

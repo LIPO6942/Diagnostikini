@@ -44,3 +44,9 @@ export type SymptomNode = {
   description?: string;
   children?: SymptomNode[];
 };
+
+export type AnalyzeSymptomsOutput = {
+    diagnosisSuggestions: string[];
+    clarifyingQuestions: string[];
+    medicationSuggestions: string[];
+}

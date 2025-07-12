@@ -1,4 +1,3 @@
-// 'use server'
 'use server';
 /**
  * @fileOverview AI-powered symptom analysis flow.
@@ -27,6 +26,9 @@ const AnalyzeSymptomsOutputSchema = z.object({
   clarifyingQuestions: z
     .array(z.string())
     .describe("Une liste de questions de clarification à poser à l'utilisateur pour plus d'informations."),
+  medicationSuggestions: z
+    .array(z.string())
+    .describe("Une liste de médicaments en vente libre suggérés, avec un avertissement de consulter un médecin."),
 });
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
@@ -38,9 +40,13 @@ const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
-  prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Vous poserez des questions de clarification pour affiner les diagnostics potentiels.
+  prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Votre tâche est de fournir une analyse préliminaire.
 
-  En fonction de la description de l'utilisateur, suggérez quelques diagnostics potentiels. Posez également des questions de clarification pour aider à affiner les possibilités. Assurez-vous que toute votre sortie (suggestions de diagnostic et questions) est en français.
+  Tâches :
+  1.  Suggérez quelques diagnostics potentiels basés sur les symptômes.
+  2.  Posez des questions de clarification pour aider à affiner les possibilités.
+  3.  Suggérez des médicaments en vente libre pertinents qui pourraient soulager les symptômes. Précisez TOUJOURS que l'avis d'un médecin est préférable avant de prendre tout médicament. Par exemple : "Ibuprofène (consultez un médecin avant de le prendre)".
+  4.  Assurez-vous que toute votre sortie (suggestions de diagnostic, questions et médicaments) est en français.
 
   {{#if userProfile}}
   Voici quelques informations sur l'utilisateur pour vous aider à affiner votre analyse. Utilisez ces informations pour contextualiser votre réponse.
@@ -70,6 +76,7 @@ const analyzeSymptomsFlow = ai.defineFlow(
       return {
         diagnosisSuggestions: ["Analyse non disponible"],
         clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
+        medicationSuggestions: [],
       };
     }
 
