@@ -10,6 +10,7 @@ import {
   Sparkles,
   User,
   Stethoscope,
+  RotateCcw,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -23,6 +24,7 @@ import {
   SidebarTrigger,
   SidebarFooter,
 } from "@/components/ui/sidebar"
+import { Button } from "../ui/button"
 
 export function SidebarNav() {
   const pathname = usePathname()
