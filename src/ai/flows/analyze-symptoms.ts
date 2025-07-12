@@ -29,6 +29,11 @@ const AnalyzeSymptomsOutputSchema = z.object({
   medicationSuggestions: z
     .array(z.string())
     .describe("Une liste de médicaments en vente libre suggérés, avec un avertissement de consulter un médecin."),
+  traditionalRemedies: z.array(z.object({
+    remedyName: z.string().describe("Le nom du remède traditionnel tunisien (ex: Tisane de thym)."),
+    status: z.enum(['approved', 'not_recommended', 'neutral']).describe("Statut du remède : 'approved' (approuvé), 'not_recommended' (déconseillé), ou 'neutral' (neutre/informatif)."),
+    justification: z.string().describe("Une brève justification scientifique ou médicale pour le statut du remède.")
+  })).describe("Une liste de remèdes traditionnels tunisiens pertinents, avec leur statut et une justification.")
 });
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
@@ -46,7 +51,8 @@ const prompt = ai.definePrompt({
   1.  Suggérez quelques diagnostics potentiels basés sur les symptômes.
   2.  Posez des questions de clarification pour aider à affiner les possibilités.
   3.  Suggérez des médicaments en vente libre pertinents qui pourraient soulager les symptômes. Précisez TOUJOURS que l'avis d'un médecin est préférable avant de prendre tout médicament. Par exemple : "Ibuprofène (consultez un médecin avant de le prendre)".
-  4.  Assurez-vous que toute votre sortie (suggestions de diagnostic, questions et médicaments) est en français.
+  4.  Pour le diagnostic probable, suggérez des remèdes traditionnels tunisiens (remèdes de grand-mère). Pour chaque remède, spécifiez son statut (approuvé, déconseillé, ou neutre) et fournissez une justification scientifique claire et simple. Par exemple, pour un rhume, "Tisane au thym et au miel (Approuvé : Le thym a des propriétés antiseptiques et le miel adoucit la gorge)".
+  5.  Assurez-vous que toute votre sortie (suggestions de diagnostic, questions, médicaments et remèdes traditionnels) est en français.
 
   {{#if userProfile}}
   Voici quelques informations sur l'utilisateur pour vous aider à affiner votre analyse. Utilisez ces informations pour contextualiser votre réponse.
@@ -77,6 +83,7 @@ const analyzeSymptomsFlow = ai.defineFlow(
         diagnosisSuggestions: ["Analyse non disponible"],
         clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
         medicationSuggestions: [],
+        traditionalRemedies: [],
       };
     }
 

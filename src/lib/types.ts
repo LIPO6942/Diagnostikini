@@ -37,6 +37,12 @@ export type DiagnosisRemedies = {
   remedies: Remedy[];
 };
 
+export type TraditionalRemedy = {
+  remedyName: string;
+  status: 'approved' | 'not_recommended' | 'neutral';
+  justification: string;
+};
+
 export type SymptomNode = {
   id: string;
   label: string;
@@ -49,4 +55,5 @@ export type AnalyzeSymptomsOutput = {
     diagnosisSuggestions: string[];
     clarifyingQuestions: string[];
     medicationSuggestions: string[];
+    traditionalRemedies: TraditionalRemedy[];
 }

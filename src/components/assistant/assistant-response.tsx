@@ -4,18 +4,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Remedy } from "@/lib/types";
+import type { Remedy, TraditionalRemedy } from "@/lib/types";
 import { commonRemedies, baseRemedies } from "@/lib/remedies";
 import { Button } from "@/components/ui/button";
-import { FilePlus2, HeartPulse, Pill, Languages, LoaderCircle } from "lucide-react";
+import { FilePlus2, HeartPulse, Pill, Languages, LoaderCircle, Leaf } from "lucide-react";
 import { RemedyCard } from "./remedy-card";
 import { translateText } from "@/ai/flows/translate-text";
+import { TraditionalRemedyCard } from "./traditional-remedy-card";
 
 interface AssistantResponseProps {
   symptoms: string;
   diagnosisSuggestions: string[];
   clarifyingQuestions: string[];
   medicationSuggestions: string[];
+  traditionalRemedies: TraditionalRemedy[];
   onSaveRecord: (symptoms: string, diagnosis: string) => void;
 }
 
@@ -24,6 +26,7 @@ export const AssistantResponse = ({
   diagnosisSuggestions,
   clarifyingQuestions,
   medicationSuggestions,
+  traditionalRemedies,
   onSaveRecord,
 }: AssistantResponseProps) => {
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
@@ -41,7 +44,8 @@ export const AssistantResponse = ({
   const handleTranslate = async () => {
       setIsTranslating(true);
       setTranslatedContent(null);
-      const contentToTranslate = `
+      
+      let contentToTranslate = `
 Diagnostic Potentiel:
 - ${diagnosisSuggestions.join('\n- ')}
 
@@ -51,6 +55,13 @@ Questions de clarification:
 Suggestions de médicaments:
 - ${medicationSuggestions.join('\n- ')}
       `;
+
+      if (traditionalRemedies.length > 0) {
+          contentToTranslate += `\nRemèdes traditionnels:\n`
+          traditionalRemedies.forEach(remedy => {
+              contentToTranslate += `- ${remedy.remedyName}: ${remedy.justification}\n`;
+          })
+      }
 
       try {
         const result = await translateText({
@@ -110,6 +121,16 @@ Suggestions de médicaments:
        </>
       )}
 
+      {traditionalRemedies && traditionalRemedies.length > 0 && !translatedContent && (
+        <div>
+            <h3 className="font-bold mb-2 flex items-center gap-2"><Leaf className="h-4 w-4" /> Remèdes traditionnels</h3>
+             <div className="grid sm:grid-cols-1 gap-2">
+                {traditionalRemedies.map((remedy) => (
+                    <TraditionalRemedyCard key={remedy.remedyName} {...remedy} />
+                ))}
+            </div>
+        </div>
+      )}
 
       {remedies && (
          <div>

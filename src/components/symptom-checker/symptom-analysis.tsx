@@ -37,11 +37,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
             symptomsDescription: symptomDescription,
             userProfile: isProfileComplete && profile ? profile : undefined
         });
-        if (analysisOutput) {
-          setAnalysisResult(analysisOutput);
-        } else {
-          throw new Error("L'analyse n'a retourné aucun résultat.");
-        }
+        setAnalysisResult(analysisOutput);
       } catch (e) {
         console.error("Erreur lors de l'analyse des symptômes :", e);
         setError("Désolé, une erreur s'est produite lors de l'analyse. Veuillez réessayer.");
@@ -107,6 +103,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
             diagnosisSuggestions={analysisResult.diagnosisSuggestions}
             clarifyingQuestions={analysisResult.clarifyingQuestions}
             medicationSuggestions={analysisResult.medicationSuggestions}
+            traditionalRemedies={analysisResult.traditionalRemedies}
             onSaveRecord={handleSaveRecord}
           />
         )}
