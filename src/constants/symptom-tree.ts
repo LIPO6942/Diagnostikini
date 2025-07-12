@@ -2,7 +2,7 @@
  * @fileoverview Defines the interactive symptom tree structure.
  */
 import type { SymptomNode } from "@/lib/types";
-import { PersonStanding, Wind, Thermometer, Waves, Ear, BrainCircuit, Bone, Eye, Sheet, Activity, Droplet } from "lucide-react";
+import { PersonStanding, Wind, Thermometer, Waves, Ear, Brain, Bone, Eye, Sheet, Activity, Droplet, HeartPulse, ShieldAlert, BadgeInfo, BrainCircuit } from "lucide-react";
 
 export const symptomTree: SymptomNode[] = [
   {
@@ -15,6 +15,7 @@ export const symptomTree: SymptomNode[] = [
         id: "tete",
         label: "Tête",
         descriptionTunisian: "راس",
+        icon: Brain,
         children: [
           { 
             id: "pulsatile", 
@@ -49,6 +50,7 @@ export const symptomTree: SymptomNode[] = [
         id: "poitrine",
         label: "Poitrine",
         descriptionTunisian: "صدر",
+        icon: HeartPulse,
         children: [
             { 
               id: "oppression-poitrine", 
@@ -76,6 +78,7 @@ export const symptomTree: SymptomNode[] = [
         id: "ventre",
         label: "Ventre",
         descriptionTunisian: "كرش",
+        icon: ShieldAlert,
         children: [
             {
               id: "crampes-ventre", 
@@ -111,6 +114,7 @@ export const symptomTree: SymptomNode[] = [
         id: "dos",
         label: "Dos",
         descriptionTunisian: "ظهر",
+        icon: PersonStanding,
         children: [
             {id: "haut-dos", label: "Haut du dos / nuque", description: "Douleur dans le haut du dos ou la nuque", descriptionTunisian: "أعلى الظهر / رقبة"},
             {
