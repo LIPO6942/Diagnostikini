@@ -1,8 +1,9 @@
 /**
- * @fileoverview Service for managing health records in localStorage.
+ * @fileoverview Service for managing health records in localStorage and files in IndexedDB.
  */
 'use client';
 import type { HealthRecord } from '@/lib/types';
+import { deleteFile } from '@/services/db-service';
 
 const HEALTH_RECORDS_KEY = 'healthRecords';
 
@@ -54,12 +55,20 @@ export function updateHealthRecord(updatedRecord: HealthRecord): void {
     localStorage.setItem(HEALTH_RECORDS_KEY, JSON.stringify(updatedRecords));
 }
   
-
-export function deleteHealthRecord(id: string): void {
+export async function deleteHealthRecord(id: string): Promise<void> {
   if (typeof window === 'undefined') {
     return;
   }
   const existingRecords = getHealthRecords();
+  const recordToDelete = existingRecords.find(record => record.id === id);
+
+  // Delete associated files from IndexedDB
+  if (recordToDelete?.documents) {
+    for (const doc of recordToDelete.documents) {
+      await deleteFile(doc.id);
+    }
+  }
+  
   const updatedRecords = existingRecords.filter(record => record.id !== id);
   localStorage.setItem(HEALTH_RECORDS_KEY, JSON.stringify(updatedRecords));
 }

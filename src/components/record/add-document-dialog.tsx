@@ -36,6 +36,7 @@ import {
 import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText } from "lucide-react";
 import type { HealthRecord, HealthDocument } from "@/lib/types";
 import { saveHealthRecord, updateHealthRecord } from "@/services/health-record-service";
+import { saveFile } from "@/services/db-service";
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 
@@ -46,6 +47,9 @@ const addDocumentSchema = z.object({
 
 type AddDocumentForm = z.infer<typeof addDocumentSchema>;
 
+// Helper to create a temporary preview URL from a File object
+const getPreviewUrl = (file: File) => URL.createObjectURL(file);
+
 interface AddDocumentDialogProps {
     onRecordUpdate: () => void;
     existingRecord?: HealthRecord;
@@ -54,7 +58,8 @@ interface AddDocumentDialogProps {
 
 export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButton }: AddDocumentDialogProps) {
   const [open, setOpen] = useState(false);
-  const [documents, setDocuments] = useState<HealthDocument[]>([]);
+  const [documentFiles, setDocumentFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const isEditing = !!existingRecord;
@@ -72,24 +77,25 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
       title: "",
       category: "Bilan",
     });
-    setDocuments([]);
+    setDocumentFiles([]);
+    setPreviewUrls([]);
     setOpen(false);
   };
   
   useEffect(() => {
-    if (open && existingRecord) {
+    if (!open) {
+        // Clean up preview URLs when dialog closes
+        previewUrls.forEach(url => URL.revokeObjectURL(url));
+        setPreviewUrls([]);
+        setDocumentFiles([]);
+        form.reset({ title: "", category: "Bilan" });
+    } else if (existingRecord) {
         form.reset({
             title: existingRecord.title,
             category: existingRecord.category,
         });
-        setDocuments(existingRecord.documents || []);
-    } else if (!open) {
-        // Reset form when dialog closes
-        form.reset({
-            title: "",
-            category: "Bilan",
-        });
-        setDocuments([]);
+        // Note: We don't load existing files for preview/editing to keep it simple.
+        // The logic will append new files to the existing ones.
     }
   }, [open, existingRecord, form]);
 
@@ -98,40 +104,40 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
     if (e.target.files) {
       setIsUploading(true);
       const filesArray = Array.from(e.target.files);
-      const filePromises = filesArray.map(file => {
-        return new Promise<HealthDocument>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve({
-            dataUrl: reader.result as string,
-            mimeType: file.type,
-            name: file.name
-          });
-          reader.onerror = error => reject(error);
-        });
-      });
-
-      Promise.all(filePromises)
-        .then(newDocuments => {
-          setDocuments(prev => [...prev, ...newDocuments]);
-          setIsUploading(false);
-        })
-        .catch(error => {
-          console.error("Error reading files:", error);
-          toast({ variant: "destructive", title: "Erreur de lecture de fichier" });
-          setIsUploading(false);
-        });
+      setDocumentFiles(prev => [...prev, ...filesArray]);
+      
+      const newPreviewUrls = filesArray.map(getPreviewUrl);
+      setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+      
+      setIsUploading(false);
     }
   };
 
   const removeDocument = (index: number) => {
-      setDocuments(prev => prev.filter((_, i) => i !== index));
+      setDocumentFiles(prev => prev.filter((_, i) => i !== index));
+      setPreviewUrls(prev => {
+          const newPreviews = prev.filter((_, i) => i !== index);
+          URL.revokeObjectURL(prev[index]); // Clean up memory
+          return newPreviews;
+      });
   }
 
-  const onSubmit = (values: AddDocumentForm) => {
-    if (documents.length === 0) {
+  const onSubmit = async (values: AddDocumentForm) => {
+    if (documentFiles.length === 0 && !isEditing) {
         toast({ variant: "destructive", title: "Veuillez ajouter au moins un document." });
         return;
+    }
+    
+    // Create document metadata and save files to IndexedDB
+    const newDocuments: HealthDocument[] = [];
+    for (const file of documentFiles) {
+        const docId = `${Date.now()}-${Math.random()}`;
+        await saveFile(docId, file);
+        newDocuments.push({
+            id: docId,
+            name: file.name,
+            mimeType: file.type,
+        });
     }
     
     if (isEditing) {
@@ -139,7 +145,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
           ...existingRecord,
           title: values.title,
           category: values.category,
-          documents: documents,
+          documents: [...(existingRecord.documents || []), ...newDocuments],
         };
         updateHealthRecord(updatedRecord);
         toast({ title: "Document mis à jour", description: "Votre document a été modifié avec succès." });
@@ -150,7 +156,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
             date: new Date().toLocaleDateString('fr-FR'),
             title: values.title,
             category: values.category,
-            documents: documents,
+            documents: newDocuments,
         };
         saveHealthRecord(newRecord);
         toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
@@ -160,11 +166,10 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
     resetAndClose();
   };
 
-
   const dialogTitle = isEditing ? "Modifier le document" : "Ajouter un nouveau document";
   const dialogDescription = isEditing 
-    ? "Modifiez le titre, la catégorie ou ajoutez/supprimez des fichiers pour ce dossier."
-    : "Importez des bilans, des ordonnances ou d'autres documents importants (images ou PDF).";
+    ? "Modifiez les informations ou ajoutez de nouveaux fichiers à ce dossier."
+    : "Importez des bilans, des ordonnances ou d'autres documents (images ou PDF).";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -177,8 +182,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => {
-        // Prevent closing if form is dirty
-        if(form.formState.isDirty || documents.length > 0) {
+        if(form.formState.isDirty || documentFiles.length > 0) {
           e.preventDefault();
         }
       }}>
@@ -243,16 +247,16 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
               </FormControl>
             </FormItem>
 
-            {documents.length > 0 && (
+            {documentFiles.length > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                    {documents.map((doc, index) => (
+                    {documentFiles.map((file, index) => (
                         <div key={index} className="relative group">
-                            {doc.mimeType.startsWith('image/') ? (
-                                <Image src={doc.dataUrl} alt={`preview ${index}`} width={150} height={150} className="rounded-md object-cover aspect-square border" />
+                            {file.type.startsWith('image/') ? (
+                                <Image src={previewUrls[index]} alt={`preview ${index}`} width={150} height={150} className="rounded-md object-cover aspect-square border" />
                             ) : (
                                 <div className="rounded-md object-cover aspect-square border bg-secondary flex flex-col items-center justify-center p-2">
                                     <FileText className="size-8 text-secondary-foreground"/>
-                                    <span className="text-xs text-secondary-foreground text-center truncate w-full mt-1">{doc.name}</span>
+                                    <span className="text-xs text-secondary-foreground text-center truncate w-full mt-1">{file.name}</span>
                                 </div>
                             )}
                             <Button

@@ -27,9 +27,9 @@ export const UserProfileSchema = z.object({
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
 export type HealthDocument = {
-  dataUrl: string; // base64 data URI
-  mimeType: string;
+  id: string; // Unique ID for IndexedDB
   name: string;
+  mimeType: string;
 };
 
 export type HealthRecord = {

@@ -7,11 +7,12 @@ import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileImage, FileKey2, Pencil } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
+import { getFile } from '@/services/db-service';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { AddDocumentDialog } from '@/components/record/add-document-dialog';
@@ -74,6 +75,59 @@ const categoryIcons = {
     'Autre': <FileText className="h-5 w-5 text-gray-500" />,
 }
 
+function DocumentPreview({ doc }: { doc: {id: string, name: string, mimeType: string} }) {
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        let objectUrl: string;
+        async function loadFile() {
+            const file = await getFile(doc.id);
+            if(file) {
+                objectUrl = URL.createObjectURL(file);
+                setPreviewUrl(objectUrl);
+            }
+        }
+        loadFile();
+        
+        return () => {
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+        }
+    }, [doc.id]);
+
+
+    if (!previewUrl) {
+        return <div className="size-20 rounded-md bg-muted animate-pulse" />;
+    }
+
+    return (
+        <a 
+            href={previewUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-20 group"
+        >
+            {doc.mimeType.startsWith('image/') ? (
+                <Image
+                    src={previewUrl}
+                    alt={doc.name}
+                    fill
+                    className="rounded-md object-cover border"
+                />
+            ) : (
+                <div className="w-full h-full rounded-md border bg-secondary flex flex-col items-center justify-center p-2 text-center">
+                    <FileText className="size-8 text-secondary-foreground"/>
+                    <span className="text-xs text-secondary-foreground truncate w-full mt-1">{doc.name}</span>
+                </div>
+            )}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Eye className="text-white size-6" />
+            </div>
+        </a>
+    )
+}
+
 export default function HealthRecordPage() {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -88,8 +142,8 @@ export default function HealthRecordPage() {
     setIsMounted(true);
   }, []);
 
-  const handleDeleteRecord = (id: string) => {
-    deleteHealthRecord(id);
+  const handleDeleteRecord = async (id: string) => {
+    await deleteHealthRecord(id);
     refreshRecords();
     toast({
         title: "Dossier supprimé",
@@ -182,30 +236,7 @@ export default function HealthRecordPage() {
                                         <p className="font-semibold text-sm mb-2">Documents ({record.documents.length}) :</p>
                                         <div className="flex flex-wrap gap-2">
                                             {record.documents.map((doc, index) => (
-                                                <a 
-                                                    key={index}
-                                                    href={doc.dataUrl} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-20 group"
-                                                >
-                                                    {doc.mimeType.startsWith('image/') ? (
-                                                        <Image
-                                                            src={doc.dataUrl}
-                                                            alt={doc.name}
-                                                            fill
-                                                            className="rounded-md object-cover border"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full rounded-md border bg-secondary flex flex-col items-center justify-center p-2 text-center">
-                                                            <FileText className="size-8 text-secondary-foreground"/>
-                                                            <span className="text-xs text-secondary-foreground truncate w-full mt-1">{doc.name}</span>
-                                                        </div>
-                                                    )}
-                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <span className="text-white text-xs font-bold">Ouvrir</span>
-                                                    </div>
-                                                </a>
+                                                <DocumentPreview key={index} doc={doc} />
                                             ))}
                                         </div>
                                     </>
