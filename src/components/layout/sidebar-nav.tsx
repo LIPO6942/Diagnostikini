@@ -85,18 +85,6 @@ export function SidebarNav() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={isActive("/find-doctor")}
-              tooltip="Trouver un médecin"
-            >
-              <Link href="/find-doctor">
-                <MapPin />
-                <span>Trouver un médecin</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
               isActive={isActive("/emergency")}
               tooltip="Urgence"
             >
