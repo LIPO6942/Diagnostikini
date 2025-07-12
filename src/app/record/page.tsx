@@ -1,12 +1,13 @@
 /**
- * @fileoverview Health record page component.
+ * @fileoverview Health record page component with smart symptom tracking.
  */
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookHeart, FileText } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { BookHeart, FileText, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getHealthRecords } from '@/services/health-record-service';
@@ -46,6 +47,18 @@ function EmptyState() {
     );
 }
 
+function RecurringSymptomAlert({ symptom }: { symptom: string }) {
+    return (
+        <Alert variant="destructive">
+            <TriangleAlert className="h-4 w-4" />
+            <AlertTitle>Suivi Intelligent</AlertTitle>
+            <AlertDescription>
+                Nous avons remarqué que le symptôme <span className="font-semibold">"{symptom}"</span> a été enregistré plusieurs fois récemment. Si ce problème persiste, veuillez consulter un professionnel de santé.
+            </AlertDescription>
+        </Alert>
+    )
+}
+
 export default function HealthRecordPage() {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -54,6 +67,25 @@ export default function HealthRecordPage() {
     setRecords(getHealthRecords());
     setIsMounted(true);
   }, []);
+
+  const recurringSymptom = useMemo(() => {
+    if (records.length < 2) return null;
+    
+    const symptomCounts: Record<string, number> = {};
+    const recentRecords = records.slice(0, 5); // Check last 5 records
+
+    for (const record of recentRecords) {
+        // Use diagnosis as the key for recurrence check
+        const key = record.diagnosis;
+        symptomCounts[key] = (symptomCounts[key] || 0) + 1;
+        if (symptomCounts[key] >= 2) { // Trigger alert on 2nd occurrence
+            return key;
+        }
+    }
+    
+    return null;
+  }, [records]);
+
 
   if (!isMounted) {
     return <HealthRecordSkeleton />;
@@ -67,13 +99,15 @@ export default function HealthRecordPage() {
           <p className="text-muted-foreground">Un journal de vos consultations passées.</p>
         </div>
       </div>
+
+      {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
       
       {records.length === 0 ? (
         <EmptyState />
       ) : (
         <div className="space-y-4">
           {records.map(record => (
-            <Card key={record.id}>
+            <Card key={record.id} className={record.diagnosis === recurringSymptom ? "border-destructive" : ""}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
@@ -89,6 +123,9 @@ export default function HealthRecordPage() {
                 <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
                 <p className="text-muted-foreground text-sm">{record.summary}</p>
               </CardContent>
+              <CardFooter>
+                 <Button variant="link" size="sm" className="p-0 h-auto">Ajouter un rappel</Button>
+              </CardFooter>
             </Card>
           ))}
         </div>

@@ -9,12 +9,15 @@ import type { SymptomNode } from "@/lib/types";
 import { symptomTree } from "@/constants/symptom-tree";
 import { SymptomSelection } from "./symptom-selection";
 import { SymptomAnalysis } from "./symptom-analysis";
+import { ProfilePrompt } from "./profile-prompt";
+import { useProfile } from "@/contexts/profile-context";
 
 export default function SymptomChecker() {
   const [currentNode, setCurrentNode] = useState<SymptomNode[]>(symptomTree);
   const [history, setHistory] = useState<SymptomNode[][]>([symptomTree]);
   const [selectedPath, setSelectedPath] = useState<SymptomNode[]>([]);
   const [analysis, setAnalysis] = useState<string | null>(null);
+  const { isProfileComplete } = useProfile();
 
   const handleSelectNode = (node: SymptomNode) => {
     const newPath = [...selectedPath, node];
@@ -57,6 +60,11 @@ export default function SymptomChecker() {
   };
   
   const canGoBack = analysis ? true : history.length > 1;
+
+  if (isProfileComplete === false) { // Check for false explicitly to handle initial undefined state
+      return <ProfilePrompt />;
+  }
+
 
   return (
     <div className="mx-auto max-w-2xl w-full py-8 px-4 sm:px-0">

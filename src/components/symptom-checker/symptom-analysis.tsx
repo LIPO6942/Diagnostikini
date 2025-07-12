@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AssistantResponse } from "@/components/assistant/assistant-response";
 import { LoaderCircle, ArrowLeft, RotateCcw, BrainCircuit } from "lucide-react";
+import { useProfile } from "@/contexts/profile-context";
 
 interface SymptomAnalysisProps {
   symptomDescription: string;
@@ -25,13 +26,17 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { profile, isProfileComplete } = useProfile();
 
   useEffect(() => {
     const getAnalysis = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const { output } = await analyzeSymptoms({ symptomsDescription: symptomDescription });
+        const { output } = await analyzeSymptoms({ 
+            symptomsDescription: symptomDescription,
+            userProfile: isProfileComplete && profile ? profile : undefined
+        });
         if (output) {
           setAnalysisResult(output);
         } else {
@@ -45,7 +50,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
       }
     };
     getAnalysis();
-  }, [symptomDescription]);
+  }, [symptomDescription, profile, isProfileComplete]);
 
   const handleSaveRecord = async (symptoms: string, diagnosis: string) => {
     try {

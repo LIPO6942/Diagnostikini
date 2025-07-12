@@ -8,7 +8,7 @@ import {
   HeartPulse,
   Siren,
   Sparkles,
-  Stethoscope,
+  User,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -20,7 +20,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
+import { Stethoscope } from "lucide-react"
 
 export function SidebarNav() {
   const pathname = usePathname()
@@ -91,6 +93,22 @@ export function SidebarNav() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
+       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive("/profile")}
+              tooltip="Profil"
+            >
+              <Link href="/profile">
+                <User />
+                <span>Profil</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }
