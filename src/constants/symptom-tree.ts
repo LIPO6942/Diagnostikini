@@ -2,7 +2,7 @@
  * @fileoverview Defines the interactive symptom tree structure.
  */
 import type { SymptomNode } from "@/lib/types";
-import { PersonStanding, Wind, Thermometer, Waves, Ear, BrainCircuit, Bone, Eye, Sheet, Activity } from "lucide-react";
+import { PersonStanding, Wind, Thermometer, Waves, Ear, BrainCircuit, Bone, Eye, Sheet, Activity, Droplet } from "lucide-react";
 
 export const symptomTree: SymptomNode[] = [
   {
@@ -289,7 +289,63 @@ export const symptomTree: SymptomNode[] = [
         { id: "ecoulement-oeil", label: "Écoulement oculaire", description: "Larmoiement excessif ou écoulement purulent", descriptionTunisian: "عينيك تدمّع" },
         { id: "sensibilite-lumiere", label: "Sensibilité à la lumière", description: "La lumière vive est douloureuse ou gênante", descriptionTunisian: "تتقلق من الضوء"},
     ]
+  },
+  {
+    id: "genito-urinaire",
+    label: "Génito-urinaire",
+    descriptionTunisian: "مشاكل بولية أو تناسلية",
+    icon: Droplet,
+    children: [
+      { 
+        id: "brulure-urinaire", 
+        label: "Brûlure en urinant", 
+        descriptionTunisian: "حرقان في البول",
+        children: [
+          { id: "brulure-urinaire-fievre", label: "Avec fièvre", description: "Brûlure en urinant accompagnée de fièvre", descriptionTunisian: "مع السخانة" },
+          { id: "brulure-urinaire-sans-fievre", label: "Sans fièvre", description: "Brûlure en urinant sans fièvre", descriptionTunisian: "بلاش سخانة" },
+        ]
+      },
+      { 
+        id: "frequence-urinaire", 
+        label: "Envie fréquente d'uriner",
+        descriptionTunisian: "تمشي للتوالات برشة",
+        children: [
+          { id: "frequence-urinaire-petite", label: "Petites quantités", description: "Envie fréquente d'uriner de petites quantités", descriptionTunisian: "كميات صغيرة" },
+          { id: "frequence-urinaire-grande", label: "Grandes quantités", description: "Envie fréquente d'uriner de grandes quantités", descriptionTunisian: "كميات كبيرة" },
+        ]
+      },
+      { id: "sang-urines", label: "Sang dans les urines", description: "Présence de sang dans les urines", descriptionTunisian: "دم في البول" },
+      { id: "douleur-reins", label: "Douleur bas du dos / reins", description: "Douleur dans la région lombaire", descriptionTunisian: "وجيعة في أسفل الظهر / الكلاوي" },
+      { id: "ecoulement-inhabituel", label: "Écoulement inhabituel", description: "Écoulement génital qui n'est pas normal", descriptionTunisian: "إفرازات غير عادية" },
+    ]
+  },
+  {
+    id: "bucco-dentaire",
+    label: "Bucco-dentaire",
+    descriptionTunisian: "وجيعة السنين",
+    icon: Activity,
+    children: [
+      { 
+        id: "douleur-dent", 
+        label: "Douleur dentaire",
+        descriptionTunisian: "وجيعة في السن",
+        children: [
+          { id: "douleur-dent-froid-chaud", label: "Sensibilité au chaud/froid", description: "Douleur dentaire au contact du chaud ou du froid", descriptionTunisian: "حساسية للسخون والبارد" },
+          { id: "douleur-dent-mastication", label: "Douleur en mâchant", description: "Douleur dentaire lors de la mastication", descriptionTunisian: "وجيعة كي تمضغ" },
+          { id: "douleur-dent-spontanee", label: "Douleur spontanée / pulsatile", description: "Douleur dentaire qui survient sans raison apparente et qui bat", descriptionTunisian: "وجيعة وحدها وتنبض" },
+        ]
+      },
+      { 
+        id: "gencives", 
+        label: "Problème de gencives",
+        descriptionTunisian: "مشكلة في اللثة",
+        children: [
+          { id: "gencives-saignement", label: "Saignement des gencives", description: "Gencives qui saignent facilement", descriptionTunisian: "اللثة تنزف بالدم" },
+          { id: "gencives-gonflees", label: "Gencives rouges / gonflées", description: "Gencives enflammées, rouges et enflées", descriptionTunisian: "اللثة حمراء ومنفوخة" },
+        ]
+      },
+      { id: "aphtes", label: "Aphtes / Lésions", description: "Présence d'ulcérations dans la bouche", descriptionTunisian: "أفت في الفم" },
+      { id: "mauvaise-haleine", label: "Mauvaise haleine persistante", description: "Halitose qui ne part pas", descriptionTunisian: "ريحة فم خايبة" },
+    ]
   }
 ];
-
-    
