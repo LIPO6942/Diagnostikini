@@ -654,47 +654,6 @@ const SidebarMenuBadge = React.forwardRef<
 ))
 SidebarMenuBadge.displayName = "SidebarMenuBadge"
 
-const SidebarMenuSkeleton = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<"button"> & {
-    showIcon?: boolean;
-    size?: "default" | "sm" | "lg";
-  }
->(({ className, showIcon = false, size = "default", ...props }, ref) => {
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
-
-  return (
-    <button
-        ref={ref}
-        disabled
-        data-sidebar="menu-button"
-        className={cn(sidebarMenuButtonVariants({ size }), "cursor-default", className)}
-        {...props}
-    >
-        <div className="flex h-full w-full items-center gap-2" data-sidebar="menu-skeleton">
-            {showIcon && (
-                <Skeleton
-                className="size-5 md:size-6"
-                data-sidebar="menu-skeleton-icon"
-                />
-            )}
-            <Skeleton
-                className="h-4 flex-1 max-w-[--skeleton-width]"
-                data-sidebar="menu-skeleton-text"
-                style={
-                {
-                    "--skeleton-width": width,
-                } as React.CSSProperties
-                }
-            />
-        </div>
-    </button>
-  )
-})
-SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
-
 const SidebarMenuSub = React.forwardRef<
   HTMLUListElement,
   React.ComponentProps<"ul">
@@ -764,7 +723,6 @@ export {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,

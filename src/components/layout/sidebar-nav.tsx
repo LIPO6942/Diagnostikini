@@ -20,60 +20,14 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarMenuSkeleton,
 } from "@/components/ui/sidebar"
-
-function SidebarNavSkeleton() {
-  return (
-     <Sidebar>
-      <SidebarHeader>
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Stethoscope className="size-6" />
-          </div>
-          <h1 className="font-headline text-xl font-bold">Diagnostikini</h1>
-        </Link>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu className="gap-4">
-            <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon size="lg" />
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon size="lg" />
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon size="lg" />
-            </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarContent>
-       <SidebarFooter>
-        <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon />
-            </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
-  )
-}
 
 
 export function SidebarNav() {
   const pathname = usePathname()
-  const [isClient, setIsClient] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
-
 
   const isActive = (path: string) => {
     return pathname === path
-  }
-
-  if (!isClient) {
-    return <SidebarNavSkeleton />;
   }
 
   return (
