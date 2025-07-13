@@ -37,13 +37,13 @@ function SidebarNavSkeleton() {
       <SidebarContent>
         <SidebarMenu className="gap-4">
             <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon />
+              <SidebarMenuSkeleton showIcon size="lg" />
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon />
+              <SidebarMenuSkeleton showIcon size="lg" />
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuSkeleton showIcon />
+              <SidebarMenuSkeleton showIcon size="lg" />
             </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>

@@ -655,38 +655,42 @@ const SidebarMenuBadge = React.forwardRef<
 SidebarMenuBadge.displayName = "SidebarMenuBadge"
 
 const SidebarMenuSkeleton = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    showIcon?: boolean
+  HTMLButtonElement,
+  React.ComponentProps<"button"> & {
+    showIcon?: boolean;
+    size?: "default" | "sm" | "lg";
   }
->(({ className, showIcon = false, ...props }, ref) => {
+>(({ className, showIcon = false, size = "default", ...props }, ref) => {
   const width = React.useMemo(() => {
     return `${Math.floor(Math.random() * 40) + 50}%`
   }, [])
 
   return (
-    <div
-      ref={ref}
-      className={cn("flex h-full w-full items-center gap-2", className)}
-      data-sidebar="menu-skeleton"
-      {...props}
+    <button
+        ref={ref}
+        disabled
+        data-sidebar="menu-button"
+        className={cn(sidebarMenuButtonVariants({ size }), "cursor-default", className)}
+        {...props}
     >
-      {showIcon && (
-        <Skeleton
-          className="size-4 rounded-md"
-          data-sidebar="menu-skeleton-icon"
-        />
-      )}
-      <Skeleton
-        className="h-4 flex-1 max-w-[--skeleton-width]"
-        data-sidebar="menu-skeleton-text"
-        style={
-          {
-            "--skeleton-width": width,
-          } as React.CSSProperties
-        }
-      />
-    </div>
+        <div className="flex h-full w-full items-center gap-2" data-sidebar="menu-skeleton">
+            {showIcon && (
+                <Skeleton
+                className="size-5 md:size-6"
+                data-sidebar="menu-skeleton-icon"
+                />
+            )}
+            <Skeleton
+                className="h-4 flex-1 max-w-[--skeleton-width]"
+                data-sidebar="menu-skeleton-text"
+                style={
+                {
+                    "--skeleton-width": width,
+                } as React.CSSProperties
+                }
+            />
+        </div>
+    </button>
   )
 })
 SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
