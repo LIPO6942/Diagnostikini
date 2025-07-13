@@ -81,7 +81,7 @@ export default function SymptomChecker() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl w-full px-4 sm:px-0">
+    <div className="mx-auto max-w-2xl w-full">
       {analysis ? (
         <SymptomAnalysis 
             symptomDescription={analysis}
