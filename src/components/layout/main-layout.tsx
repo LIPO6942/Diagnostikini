@@ -21,7 +21,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                 <Button asChild variant="outline">
                   <Link href="/find-doctor">
                     <MapPin className="mr-2" />
-                    Trouver un médecin
+                    Médecin
                   </Link>
                 </Button>
                  <Button asChild variant="destructive">

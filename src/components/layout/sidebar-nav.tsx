@@ -41,7 +41,7 @@ export function SidebarNav() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu className="gap-4">
+        <SidebarMenu className="gap-6">
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
