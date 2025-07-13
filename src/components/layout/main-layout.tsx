@@ -15,10 +15,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <SidebarProvider>
           <SidebarNav />
           <SidebarInset className="bg-background">
-            <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
+            <header className="sticky top-0 z-10 flex h-14 items-center justify-start gap-4 border-b bg-background px-4 sm:px-6">
               <div className="flex items-center gap-2">
                  <SidebarTrigger className="lg:hidden" />
-                 <Button asChild variant="outline">
+                 <Button asChild>
                   <Link href="/find-doctor">
                     <MapPin className="mr-2" />
                     Médecin
