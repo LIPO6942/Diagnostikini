@@ -6,12 +6,9 @@ import { usePathname } from "next/navigation"
 import {
   BookHeart,
   HeartPulse,
-  Siren,
   Sparkles,
   User,
   Stethoscope,
-  RotateCcw,
-  MapPin,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -22,16 +19,53 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
   SidebarFooter,
+  SidebarMenuSkeleton,
 } from "@/components/ui/sidebar"
-import { Button } from "../ui/button"
+
+function SidebarNavSkeleton() {
+  return (
+     <Sidebar>
+      <SidebarHeader>
+        <Link href="/" className="flex items-center gap-2">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Stethoscope className="size-6" />
+          </div>
+          <h1 className="font-headline text-xl font-bold">Diagnostikini</h1>
+        </Link>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu className="gap-4">
+          <SidebarMenuSkeleton showIcon />
+          <SidebarMenuSkeleton showIcon />
+          <SidebarMenuSkeleton showIcon />
+        </SidebarMenu>
+      </SidebarContent>
+       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuSkeleton showIcon />
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  )
+}
+
 
 export function SidebarNav() {
   const pathname = usePathname()
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const isActive = (path: string) => {
     return pathname === path
+  }
+
+  if (!isClient) {
+    return <SidebarNavSkeleton />;
   }
 
   return (
