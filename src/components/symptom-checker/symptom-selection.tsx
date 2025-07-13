@@ -51,17 +51,17 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
             )}
         </div>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <CardContent className="grid grid-cols-2 gap-3">
         {nodes.map((node) => (
           <Button
             key={node.id}
             variant="outline"
-            className="h-auto p-4 flex flex-col gap-2 items-center justify-center text-center group transition-all duration-200 ease-in-out hover:bg-primary/10 hover:border-primary"
+            className="h-auto p-3 flex flex-col gap-2 items-center justify-center text-center group transition-all duration-200 ease-in-out hover:bg-primary/10 hover:border-primary"
             onClick={() => onSelect(node)}
           >
             {node.icon && <node.icon className="size-8 text-primary mb-2 transition-transform duration-200 group-hover:scale-110" />}
             <div className="flex flex-col items-center">
-                <span className="text-base font-medium">{node.label}</span>
+                <span className="text-sm font-bold">{node.label}</span>
                 {node.descriptionTunisian && (
                     <span className="text-xs text-muted-foreground font-normal mt-1">
                         ({node.descriptionTunisian})

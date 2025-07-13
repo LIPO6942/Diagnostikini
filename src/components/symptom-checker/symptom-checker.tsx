@@ -16,7 +16,7 @@ import { Skeleton } from "../ui/skeleton";
 function SymptomCheckerSkeleton() {
   return (
     <div className="flex flex-col items-center w-full">
-      <Skeleton className="h-96 w-full max-w-2xl" />
+      <Skeleton className="h-96 w-full max-w-lg" />
     </div>
   )
 }
@@ -81,7 +81,7 @@ export default function SymptomChecker() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg">
+    <div className="mx-auto w-full max-w-md px-2 sm:px-0">
       {analysis ? (
         <SymptomAnalysis 
             symptomDescription={analysis}
