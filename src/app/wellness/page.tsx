@@ -26,28 +26,49 @@ type StoredChallenges = {
 };
 
 function DailyChallenges() {
-  const [challenges, setChallenges] = useState<ChallengeStatus>({});
+  const [challenges, setChallenges] = useState<ChallengeStatus | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
+  const initializeChallenges = () => {
+    const initialChallenges: ChallengeStatus = {};
+    dailyChallenges.forEach(c => initialChallenges[c.id] = false);
+    return initialChallenges;
+  };
+
   useEffect(() => {
+    setIsMounted(true);
+
     const todayStr = new Date().toISOString().split("T")[0];
     const storedData = localStorage.getItem(WELLNESS_CHALLENGES_KEY);
-
+    
     if (storedData) {
-      const parsed: StoredChallenges = JSON.parse(storedData);
-      if (parsed.date === todayStr) {
-        setChallenges(parsed.statuses);
-      } else {
-        // New day, reset challenges
-        resetChallenges();
+      try {
+        const parsed: StoredChallenges = JSON.parse(storedData);
+        if (parsed.date === todayStr) {
+          setChallenges(parsed.statuses);
+        } else {
+          // New day, reset challenges
+          const newChallenges = initializeChallenges();
+          setChallenges(newChallenges);
+          localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
+        }
+      } catch (e) {
+        // Data is corrupted, reset
+        const newChallenges = initializeChallenges();
+        setChallenges(newChallenges);
+        localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
       }
     } else {
-         resetChallenges();
+      // No data, initialize for today
+      const newChallenges = initializeChallenges();
+      setChallenges(newChallenges);
+      localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
     }
-    setIsMounted(true);
   }, []);
 
   const updateChallengeStatus = (id: string, completed: boolean) => {
+    if (!challenges) return;
+
     const newChallenges: ChallengeStatus = { ...challenges, [id]: completed };
     setChallenges(newChallenges);
 
@@ -60,23 +81,32 @@ function DailyChallenges() {
   };
   
   const resetChallenges = () => {
-    const initialChallenges: ChallengeStatus = {};
-    dailyChallenges.forEach(c => initialChallenges[c.id] = false);
-    setChallenges(initialChallenges);
+    const newChallenges = initializeChallenges();
+    setChallenges(newChallenges);
     const todayStr = new Date().toISOString().split("T")[0];
-    const dataToStore: StoredChallenges = { date: todayStr, statuses: initialChallenges };
-    localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify(dataToStore));
+    localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
   }
 
-  if (!isMounted) {
+  if (!isMounted || !challenges) {
     return (
-      <Card>
+      <Card className="bg-primary/5 border-primary/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Award className="h-6 w-6 text-primary" />
             Chargement des défis...
           </CardTitle>
         </CardHeader>
+         <CardContent className="space-y-4">
+          {dailyChallenges.map((challenge) => (
+             <div key={challenge.id} className="flex items-start gap-4 p-4 rounded-lg bg-card animate-pulse">
+                <div className="size-6 mt-1 bg-muted rounded"></div>
+                 <div className="grid gap-2 w-full">
+                    <div className="h-4 w-1/2 bg-muted rounded"></div>
+                    <div className="h-3 w-full bg-muted rounded"></div>
+                 </div>
+             </div>
+          ))}
+        </CardContent>
       </Card>
     );
   }
@@ -108,8 +138,9 @@ function DailyChallenges() {
                 checked={isCompleted}
                 onCheckedChange={(checked) => updateChallengeStatus(challenge.id, !!checked)}
                 className="size-6 mt-1"
+                aria-label={challenge.title}
               />
-              <div className="grid gap-1.5">
+              <div className="grid gap-1.5 flex-1">
                 <label
                   htmlFor={challenge.id}
                   className={cn(
