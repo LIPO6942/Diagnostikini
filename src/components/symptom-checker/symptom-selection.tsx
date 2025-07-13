@@ -56,7 +56,7 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
           <Button
             key={node.id}
             variant="outline"
-            className="h-auto p-3 flex flex-col gap-2 items-center justify-center text-center group transition-all duration-200 ease-in-out hover:bg-primary/10 hover:border-primary"
+            className="h-auto whitespace-normal p-3 flex flex-col gap-2 items-center justify-center text-center group transition-all duration-200 ease-in-out hover:bg-primary/10 hover:border-primary"
             onClick={() => onSelect(node)}
           >
             {node.icon && <node.icon className="size-8 text-primary mb-2 transition-transform duration-200 group-hover:scale-110" />}
