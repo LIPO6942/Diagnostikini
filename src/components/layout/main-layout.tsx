@@ -11,7 +11,7 @@ import { MapPin, Siren } from "lucide-react";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full flex-col overflow-hidden">
+    <div className="flex min-h-screen w-full flex-col">
       <SidebarProvider>
           <SidebarNav />
           <SidebarInset className="bg-background">
