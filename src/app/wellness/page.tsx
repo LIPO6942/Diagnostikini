@@ -7,14 +7,12 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
 import { wellnessTips } from "@/constants/wellness";
 import { dailyChallenges } from "@/constants/wellness-challenges";
-import { wellnessVideos } from "@/constants/wellness-videos";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Award, Youtube } from "lucide-react";
+import { Award } from "lucide-react";
 import Image from 'next/image';
 import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const WELLNESS_CHALLENGES_KEY = "wellnessChallenges";
 
@@ -133,49 +131,6 @@ function DailyChallenges() {
   )
 }
 
-function WellnessVideoLibrary() {
-    const videosByCategory = wellnessVideos.reduce((acc, video) => {
-        (acc[video.category] = acc[video.category] || []).push(video);
-        return acc;
-    }, {} as Record<string, typeof wellnessVideos>);
-
-    return (
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold font-headline">Vidéothèque Bien-être</h2>
-                <p className="text-muted-foreground">Des ressources pour vous accompagner.</p>
-            </div>
-            <Accordion type="single" collapsible className="w-full">
-                {Object.entries(videosByCategory).map(([category, videos]) => (
-                    <AccordionItem key={category} value={category}>
-                        <AccordionTrigger className="text-xl font-semibold">{category}</AccordionTrigger>
-                        <AccordionContent>
-                             <div className="grid md:grid-cols-2 gap-4 pt-4">
-                                {videos.map(video => (
-                                    <Card key={video.url} className="flex flex-col">
-                                        <CardHeader>
-                                            <CardTitle>{video.title}</CardTitle>
-                                            <CardDescription>{video.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardFooter className="mt-auto">
-                                            <Button asChild>
-                                                <a href={video.url} target="_blank" rel="noopener noreferrer">
-                                                    <Youtube className="mr-2" />
-                                                    Regarder
-                                                </a>
-                                            </Button>
-                                        </CardFooter>
-                                    </Card>
-                                ))}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                ))}
-            </Accordion>
-        </div>
-    )
-}
-
 export default function WellnessPage() {
   return (
     <div className="space-y-8">
@@ -186,10 +141,6 @@ export default function WellnessPage() {
 
       <DailyChallenges />
       
-      <Separator />
-
-      <WellnessVideoLibrary />
-
       <Separator />
 
       <div>

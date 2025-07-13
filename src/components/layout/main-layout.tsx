@@ -11,30 +11,32 @@ import { MapPin, Siren } from "lucide-react";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-        <SidebarNav />
-        <SidebarInset className="bg-background">
-          <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:justify-end sm:px-6">
-            <SidebarTrigger className="lg:hidden" />
-            <div className="flex items-center gap-2">
-              <Button asChild variant="outline">
-                <Link href="/find-doctor">
-                  <MapPin className="mr-2" />
-                  Trouver un médecin
-                </Link>
-              </Button>
-               <Button asChild variant="destructive">
-                <Link href="/emergency">
-                  <Siren className="mr-2" />
-                  Urgence
-                </Link>
-              </Button>
-            </div>
-          </header>
-          <main className="p-4 sm:p-6 lg:p-8">
-            {children}
-          </main>
-        </SidebarInset>
-    </SidebarProvider>
+    <div className="flex min-h-screen w-full flex-col">
+      <SidebarProvider>
+          <SidebarNav />
+          <SidebarInset className="bg-background">
+            <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:justify-end sm:px-6">
+              <SidebarTrigger className="lg:hidden" />
+              <div className="flex items-center gap-2">
+                <Button asChild variant="outline">
+                  <Link href="/find-doctor">
+                    <MapPin className="mr-2" />
+                    Trouver un médecin
+                  </Link>
+                </Button>
+                 <Button asChild variant="destructive">
+                  <Link href="/emergency">
+                    <Siren className="mr-2" />
+                    Urgence
+                  </Link>
+                </Button>
+              </div>
+            </header>
+            <main className="p-4 sm:p-6 lg:p-8">
+              {children}
+            </main>
+          </SidebarInset>
+      </SidebarProvider>
+    </div>
   );
 }
