@@ -37,7 +37,7 @@ function HealthRecordSkeleton() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ onRecordUpdate }: { onRecordUpdate: () => void }) {
     return (
         <Card className="text-center p-8">
             <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-secondary text-secondary-foreground">
@@ -45,8 +45,8 @@ function EmptyState() {
             </div>
             <h3 className="text-xl font-semibold">Aucun dossier trouvé</h3>
             <p className="text-muted-foreground mt-2">L'historique de vos consultations et documents apparaîtra ici.</p>
-            <div className="flex justify-center gap-2 mt-4">
-                <AddDocumentDialog onRecordUpdate={() => { /* This will be handled by the parent component's refresh logic */ }} />
+            <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
+                <AddDocumentDialog onRecordUpdate={onRecordUpdate} />
                 <Button asChild variant="outline">
                     <Link href="/">Démarrer une consultation IA</Link>
                 </Button>
@@ -197,7 +197,7 @@ export default function HealthRecordPage() {
       {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
       
       {records.length === 0 ? (
-        <EmptyState />
+        <EmptyState onRecordUpdate={refreshRecords} />
       ) : (
         <div className="space-y-8">
           {categories.map(category => (
