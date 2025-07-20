@@ -112,14 +112,21 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const isEditing = !!existingRecord;
+  
+  const defaultFormValues = {
+    title: "",
+    category: "Bilan" as const,
+    doctorName: "",
+    treatmentDate: undefined,
+  };
 
   const form = useForm<AddDocumentForm>({
     resolver: zodResolver(addDocumentSchema),
-    defaultValues: { title: "", category: "Bilan", doctorName: "", treatmentDate: undefined },
+    defaultValues: defaultFormValues,
   });
   
   const resetState = () => {
-    form.reset({ title: "", category: "Bilan", doctorName: "", treatmentDate: undefined });
+    form.reset(defaultFormValues);
     setNewFiles([]);
     newFilePreviews.forEach(url => URL.revokeObjectURL(url));
     setNewFilePreviews([]);
@@ -130,16 +137,18 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   };
   
   useEffect(() => {
-    if (open && isEditing) {
+    if (open) {
+      if (isEditing) {
         form.reset({
-            title: existingRecord.title,
-            category: existingRecord.category,
+            title: existingRecord.title || "",
+            category: existingRecord.category || "Bilan",
             doctorName: existingRecord.doctorName || "",
             treatmentDate: existingRecord.treatmentDate ? new Date(existingRecord.treatmentDate) : undefined,
         });
         setExistingDocuments(existingRecord.documents || []);
-    } else if (open) {
-        form.reset({ title: "", category: "Bilan" });
+      } else {
+        form.reset(defaultFormValues);
+      }
     }
   }, [open, existingRecord, isEditing, form]);
 
