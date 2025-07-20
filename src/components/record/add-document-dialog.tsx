@@ -230,8 +230,17 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
 
   const allDocsCount = existingDocuments.length + newFiles.length;
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isProcessing) return;
+    if (!isOpen) {
+      resetState();
+    }
+    setOpen(isOpen);
+  };
+
+
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isProcessing) setOpen(isOpen); }}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {triggerButton ? triggerButton : (
           <Button>
@@ -242,7 +251,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => {
         if(form.formState.isDirty || newFiles.length > 0 || isProcessing) e.preventDefault();
-      }} onExited={resetState}>
+      }}>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
