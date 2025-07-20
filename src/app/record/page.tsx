@@ -76,17 +76,26 @@ const categoryIcons = {
 
 function DocumentPreview({ doc }: { doc: HealthDocument }) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (doc.mimeType.startsWith('image/')) {
-            // For images, we can use the dataUrl directly for a small preview
-            const dataUrl = getDocumentDataUrl(doc.id);
-            setPreviewUrl(dataUrl);
+        let isMounted = true;
+        async function loadPreview() {
+            if (doc.mimeType.startsWith('image/')) {
+                const url = await getDocumentDataUrl(doc.id);
+                if (isMounted && url) {
+                    setPreviewUrl(url);
+                }
+            }
+            if(isMounted) setIsLoading(false);
         }
+        loadPreview();
+
+        return () => { isMounted = false };
     }, [doc.id, doc.mimeType]);
 
-    const handleOpenDocument = () => {
-        const dataUrl = getDocumentDataUrl(doc.id);
+    const handleOpenDocument = async () => {
+        const dataUrl = await getDocumentDataUrl(doc.id);
         if (dataUrl) {
             const newWindow = window.open();
             if (newWindow) {
@@ -106,7 +115,11 @@ function DocumentPreview({ doc }: { doc: HealthDocument }) {
             onClick={handleOpenDocument}
             className="relative focus:outline-none focus:ring-2 focus:ring-ring rounded-md size-20 group text-left"
         >
-            {doc.mimeType.startsWith('image/') && previewUrl ? (
+            {isLoading ? (
+                 <div className="w-full h-full rounded-md border bg-secondary flex items-center justify-center animate-pulse">
+                    <FileText className="size-8 text-secondary-foreground/50"/>
+                 </div>
+            ) : previewUrl ? (
                 <Image
                     src={previewUrl}
                     alt={doc.name}
@@ -132,7 +145,6 @@ export default function HealthRecordPage() {
   const { toast } = useToast();
 
   const refreshRecords = () => {
-    // getHealthRecords reads from localStorage, which is safe
     setRecords(getHealthRecords());
   }
 
@@ -155,12 +167,12 @@ export default function HealthRecordPage() {
     
     const aiConsultations = records.filter(r => r.category === 'Consultation IA');
     const diagnosisCounts: Record<string, number> = {};
-    const recentRecords = aiConsultations.slice(0, 5); // Check last 5 AI records
+    const recentRecords = aiConsultations.slice(0, 5);
 
     for (const record of recentRecords) {
         if(record.title){
             diagnosisCounts[record.title] = (diagnosisCounts[record.title] || 0) + 1;
-            if (diagnosisCounts[record.title] >= 2) { // Trigger alert on 2nd occurrence
+            if (diagnosisCounts[record.title] >= 2) {
                 return record.title;
             }
         }

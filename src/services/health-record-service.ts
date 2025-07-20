@@ -1,13 +1,13 @@
 /**
- * @fileoverview Service for managing health records and document data in localStorage.
+ * @fileoverview Service for managing health records metadata in localStorage and document data in IndexedDB.
  */
 'use client';
 import type { HealthRecord } from '@/lib/types';
+import { setDocument, getDocument, deleteDocument } from './db-service';
 
 const HEALTH_RECORDS_KEY = 'healthRecords';
-const DOC_STORAGE_PREFIX = 'doc_';
 
-// Health Record Management
+// Health Record Management (Metadata in localStorage)
 
 export function getHealthRecords(): HealthRecord[] {
   if (typeof window === 'undefined') {
@@ -17,7 +17,6 @@ export function getHealthRecords(): HealthRecord[] {
   if (storedRecords) {
     try {
         const parsedRecords = JSON.parse(storedRecords);
-        // Sort by date, most recent first
         return parsedRecords.sort((a: HealthRecord, b: HealthRecord) => new Date(b.id).getTime() - new Date(a.id).getTime());
     } catch(e) {
         console.error("Failed to parse health records", e);
@@ -46,7 +45,6 @@ export function updateHealthRecord(updatedRecord: HealthRecord): void {
     const recordIndex = existingRecords.findIndex(record => record.id === updatedRecord.id);
   
     if (recordIndex === -1) {
-      // If for some reason the record doesn't exist, add it as a new one.
       saveHealthRecord(updatedRecord);
       return;
     }
@@ -64,10 +62,9 @@ export async function deleteHealthRecord(id: string): Promise<void> {
   const existingRecords = getHealthRecords();
   const recordToDelete = existingRecords.find(record => record.id === id);
 
-  // Delete associated document data from localStorage
   if (recordToDelete?.documents) {
     for (const doc of recordToDelete.documents) {
-      deleteDocumentDataUrl(doc.id);
+      await deleteDocument(doc.id);
     }
   }
   
@@ -76,24 +73,22 @@ export async function deleteHealthRecord(id: string): Promise<void> {
 }
 
 
-// Document Data Management
+// Document Data Management (using IndexedDB via db-service)
 
-export function saveDocumentDataUrl(id: string, dataUrl: string) {
-    if (typeof window === 'undefined') return;
+export async function saveDocumentDataUrl(id: string, dataUrl: string): Promise<void> {
     try {
-        localStorage.setItem(`${DOC_STORAGE_PREFIX}${id}`, dataUrl);
+        await setDocument(id, dataUrl);
     } catch (e) {
-        console.error("Failed to save document to localStorage. It might be too large.", e);
-        // Optionally, inform the user about the storage limit.
+        console.error("Failed to save document to IndexedDB.", e);
+        throw e;
     }
 }
 
-export function getDocumentDataUrl(id: string): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem(`${DOC_STORAGE_PREFIX}${id}`);
+export async function getDocumentDataUrl(id: string): Promise<string | null> {
+    const data = await getDocument(id);
+    return data || null;
 }
 
-export function deleteDocumentDataUrl(id: string) {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(`${DOC_STORAGE_PREFIX}${id}`);
+export async function deleteDocumentDataUrl(id: string): Promise<void> {
+    await deleteDocument(id);
 }

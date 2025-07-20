@@ -61,6 +61,42 @@ interface AddDocumentDialogProps {
     triggerButton?: React.ReactNode;
 }
 
+function ExistingDocPreview({doc, onRemove}: {doc: HealthDocument, onRemove: (id: string) => void}) {
+    const [previewUrl, setPreviewUrl] = useState<string|null>(null);
+
+    useEffect(() => {
+        async function loadUrl() {
+            if(doc.mimeType.startsWith('image/')) {
+                const url = await getDocumentDataUrl(doc.id);
+                setPreviewUrl(url);
+            }
+        }
+        loadUrl();
+    }, [doc.id, doc.mimeType]);
+
+    return (
+         <div className="relative group">
+            {previewUrl ? (
+                <Image src={previewUrl} alt={doc.name} width={150} height={150} className="rounded-md object-cover aspect-square border" />
+            ) : (
+                <div className="rounded-md object-cover aspect-square border bg-secondary flex flex-col items-center justify-center p-2">
+                    <FileText className="size-8 text-secondary-foreground"/>
+                    <span className="text-xs text-secondary-foreground text-center truncate w-full mt-1">{doc.name}</span>
+                </div>
+            )}
+            <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                onClick={() => onRemove(doc.id)}
+            >
+                <X className="h-4 w-4"/>
+            </Button>
+        </div>
+    )
+}
+
 export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButton }: AddDocumentDialogProps) {
   const [open, setOpen] = useState(false);
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -84,6 +120,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
     setExistingDocuments([]);
     setDocsToDelete([]);
     setOpen(false);
+    setIsProcessing(false);
   };
   
   useEffect(() => {
@@ -93,6 +130,8 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
             category: existingRecord.category,
         });
         setExistingDocuments(existingRecord.documents || []);
+    } else if (open) {
+        form.reset({ title: "", category: "Bilan" });
     }
   }, [open, existingRecord, isEditing, form]);
 
@@ -108,7 +147,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   };
 
   const removeNewFile = (index: number) => {
-    URL.revokeObjectURL(newFilePreviews[index]); // Clean up memory
+    URL.revokeObjectURL(newFilePreviews[index]);
     setNewFiles(prev => prev.filter((_, i) => i !== index));
     setNewFilePreviews(prev => prev.filter((_, i) => i !== index));
   }
@@ -119,61 +158,57 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   }
 
   const onSubmit = async (values: AddDocumentForm) => {
-    if (newFiles.length === 0 && !isEditing) {
+    if (newFiles.length === 0 && existingDocuments.length === 0) {
         toast({ variant: "destructive", title: "Veuillez ajouter au moins un document." });
         return;
     }
     
     setIsProcessing(true);
 
-    // Delete documents marked for deletion
-    docsToDelete.forEach(docId => deleteDocumentDataUrl(docId));
+    try {
+        await Promise.all(docsToDelete.map(docId => deleteDocumentDataUrl(docId)));
 
-    // Process and save new files
-    const newDocuments: HealthDocument[] = [];
-    for (const file of newFiles) {
-        try {
+        const newDocuments: HealthDocument[] = [];
+        for (const file of newFiles) {
             const dataUrl = await fileToDataUrl(file);
             const docId = crypto.randomUUID();
-            saveDocumentDataUrl(docId, dataUrl);
+            await saveDocumentDataUrl(docId, dataUrl);
             newDocuments.push({
                 id: docId,
                 name: file.name,
                 mimeType: file.type,
             });
-        } catch (error) {
-            console.error("Error processing file:", file.name, error);
-            toast({ variant: "destructive", title: `Erreur lors du traitement du fichier ${file.name}` });
-            setIsProcessing(false);
-            return;
         }
-    }
-    
-    if (isEditing) {
-        const updatedRecord: HealthRecord = {
-          ...existingRecord,
-          title: values.title,
-          category: values.category,
-          documents: [...existingDocuments, ...newDocuments],
-        };
-        updateHealthRecord(updatedRecord);
-        toast({ title: "Document mis à jour", description: "Votre document a été modifié avec succès." });
+        
+        if (isEditing) {
+            const updatedRecord: HealthRecord = {
+              ...existingRecord,
+              title: values.title,
+              category: values.category,
+              documents: [...existingDocuments, ...newDocuments],
+            };
+            updateHealthRecord(updatedRecord);
+            toast({ title: "Document mis à jour", description: "Votre document a été modifié avec succès." });
 
-    } else {
-        const newRecord: HealthRecord = {
-            id: new Date().toISOString(),
-            date: new Date().toLocaleDateString('fr-FR'),
-            title: values.title,
-            category: values.category,
-            documents: newDocuments,
-        };
-        saveHealthRecord(newRecord);
-        toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
+        } else {
+            const newRecord: HealthRecord = {
+                id: new Date().toISOString(),
+                date: new Date().toLocaleDateString('fr-FR'),
+                title: values.title,
+                category: values.category,
+                documents: newDocuments,
+            };
+            saveHealthRecord(newRecord);
+            toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
+        }
+        
+        onRecordUpdate();
+        resetState();
+    } catch(error) {
+        console.error("Error processing files:", error);
+        toast({ variant: "destructive", title: `Erreur lors de la sauvegarde` });
+        setIsProcessing(false);
     }
-    
-    setIsProcessing(false);
-    onRecordUpdate();
-    resetState();
   };
 
   const dialogTitle = isEditing ? "Modifier le document" : "Ajouter un nouveau document";
@@ -181,10 +216,10 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
     ? "Modifiez les informations ou ajoutez/supprimez des fichiers pour ce dossier."
     : "Importez des bilans, des ordonnances ou d'autres documents (images ou PDF).";
 
-  const allDocs = [...existingDocuments, ...newFiles];
+  const allDocsCount = existingDocuments.length + newFiles.length;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} onExited={resetState}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isProcessing) setOpen(isOpen); }}>
       <DialogTrigger asChild>
         {triggerButton ? triggerButton : (
           <Button>
@@ -194,8 +229,8 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px]" onInteractOutside={(e) => {
-        if(form.formState.isDirty || newFiles.length > 0) e.preventDefault();
-      }}>
+        if(form.formState.isDirty || newFiles.length > 0 || isProcessing) e.preventDefault();
+      }} onExited={resetState}>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
@@ -249,39 +284,18 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                             <span>{isProcessing ? "Traitement..." : "Téléchargez un ou plusieurs fichiers"}</span>
                             <input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*,application/pdf" onChange={handleFileChange} disabled={isProcessing} />
                         </div>
-                        <p className="text-xs text-muted-foreground">PNG, JPG, PDF jusqu'à 5MB</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, PDF jusqu'à 10MB</p>
                     </div>
                   </label>
-                  {isProcessing && <LoaderCircle className="animate-spin mt-2" />}
                 </div>
               </FormControl>
             </FormItem>
 
-            {allDocs.length > 0 && (
+            {allDocsCount > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                    {/* Existing Docs */}
                     {existingDocuments.map((doc) => (
-                         <div key={doc.id} className="relative group">
-                            {doc.mimeType.startsWith('image/') ? (
-                                <Image src={getDocumentDataUrl(doc.id) || ''} alt={doc.name} width={150} height={150} className="rounded-md object-cover aspect-square border" />
-                            ) : (
-                                <div className="rounded-md object-cover aspect-square border bg-secondary flex flex-col items-center justify-center p-2">
-                                    <FileText className="size-8 text-secondary-foreground"/>
-                                    <span className="text-xs text-secondary-foreground text-center truncate w-full mt-1">{doc.name}</span>
-                                </div>
-                            )}
-                            <Button
-                                type="button"
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                onClick={() => removeExistingDoc(doc.id)}
-                            >
-                                <X className="h-4 w-4"/>
-                            </Button>
-                        </div>
+                         <ExistingDocPreview key={doc.id} doc={doc} onRemove={removeExistingDoc} />
                     ))}
-                    {/* New Files */}
                     {newFiles.map((file, index) => (
                         <div key={file.name + index} className="relative group">
                             {file.type.startsWith('image/') ? (
@@ -307,8 +321,10 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
             )}
 
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={resetState}>Annuler</Button>
-                <Button type="submit" disabled={isProcessing}>{isProcessing ? "Sauvegarde..." : isEditing ? "Mettre à jour" : "Sauvegarder"}</Button>
+                <Button type="button" variant="outline" onClick={resetState} disabled={isProcessing}>Annuler</Button>
+                <Button type="submit" disabled={isProcessing}>
+                    {isProcessing ? <><LoaderCircle className="animate-spin mr-2" />Sauvegarde...</> : isEditing ? "Mettre à jour" : "Sauvegarder"}
+                </Button>
             </DialogFooter>
           </form>
         </Form>
