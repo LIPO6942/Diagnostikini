@@ -17,7 +17,8 @@ export function getHealthRecords(): HealthRecord[] {
   if (storedRecords) {
     try {
         const parsedRecords = JSON.parse(storedRecords);
-        return parsedRecords.sort((a: HealthRecord, b: HealthRecord) => new Date(b.id).getTime() - new Date(a.id).getTime());
+        // Sort by ID (ISO date string) descending
+        return parsedRecords.sort((a: HealthRecord, b: HealthRecord) => b.id.localeCompare(a.id));
     } catch(e) {
         console.error("Failed to parse health records", e);
         return [];
@@ -45,6 +46,7 @@ export function updateHealthRecord(updatedRecord: HealthRecord): void {
     const recordIndex = existingRecords.findIndex(record => record.id === updatedRecord.id);
   
     if (recordIndex === -1) {
+      // This case should ideally not happen if called from edit, but as a fallback, save as new.
       saveHealthRecord(updatedRecord);
       return;
     }
@@ -64,6 +66,7 @@ export async function deleteHealthRecord(id: string): Promise<void> {
 
   if (recordToDelete?.documents) {
     for (const doc of recordToDelete.documents) {
+      // No need to wait for each one, can run in parallel
       await deleteDocument(doc.id);
     }
   }

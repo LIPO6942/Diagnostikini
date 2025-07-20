@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye, Search, CalendarIcon, User, Undo2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -16,6 +16,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { AddDocumentDialog } from '@/components/record/add-document-dialog';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
+import { fr } from 'date-fns/locale';
 
 function HealthRecordSkeleton() {
   return (
@@ -71,6 +76,10 @@ const categoryIcons = {
     'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
     'Bilan': <FileText className="h-5 w-5 text-blue-500" />,
     'Ordonnance': <FileText className="h-5 w-5 text-green-500" />,
+    'Radio': <FileText className="h-5 w-5 text-purple-500" />,
+    'Scanner': <FileText className="h-5 w-5 text-purple-500" />,
+    'IRM': <FileText className="h-5 w-5 text-purple-500" />,
+    'Échographie': <FileText className="h-5 w-5 text-purple-500" />,
     'Autre': <FileText className="h-5 w-5 text-gray-500" />,
 }
 
@@ -140,18 +149,48 @@ function DocumentPreview({ doc }: { doc: HealthDocument }) {
 }
 
 export default function HealthRecordPage() {
-  const [records, setRecords] = useState<HealthRecord[]>([]);
+  const [allRecords, setAllRecords] = useState<HealthRecord[]>([]);
+  const [filteredRecords, setFilteredRecords] = useState<HealthRecord[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
+  
+  const [doctorFilter, setDoctorFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+
 
   const refreshRecords = () => {
-    setRecords(getHealthRecords());
+    const records = getHealthRecords();
+    setAllRecords(records);
+    setFilteredRecords(records);
   }
 
   useEffect(() => {
     refreshRecords();
     setIsMounted(true);
   }, []);
+
+  const handleResetFilters = () => {
+    setDoctorFilter('');
+    setDateFilter(undefined);
+    setFilteredRecords(allRecords);
+  }
+
+  useEffect(() => {
+    let records = [...allRecords];
+    if (doctorFilter) {
+      records = records.filter(record => 
+        record.doctorName?.toLowerCase().includes(doctorFilter.toLowerCase())
+      );
+    }
+    if (dateFilter) {
+      const formattedDateFilter = format(dateFilter, 'yyyy-MM-dd');
+      records = records.filter(record => 
+        record.treatmentDate && format(new Date(record.treatmentDate), 'yyyy-MM-dd') === formattedDateFilter
+      );
+    }
+    setFilteredRecords(records);
+
+  }, [doctorFilter, dateFilter, allRecords]);
 
   const handleDeleteRecord = async (id: string) => {
     await deleteHealthRecord(id);
@@ -163,9 +202,9 @@ export default function HealthRecordPage() {
   };
 
   const recurringSymptom = useMemo(() => {
-    if (records.length < 2) return null;
+    if (allRecords.length < 2) return null;
     
-    const aiConsultations = records.filter(r => r.category === 'Consultation IA');
+    const aiConsultations = allRecords.filter(r => r.category === 'Consultation IA');
     const diagnosisCounts: Record<string, number> = {};
     const recentRecords = aiConsultations.slice(0, 5);
 
@@ -179,21 +218,21 @@ export default function HealthRecordPage() {
     }
     
     return null;
-  }, [records]);
+  }, [allRecords]);
 
 
   if (!isMounted) {
     return <HealthRecordSkeleton />;
   }
 
-  const groupedRecords = records.reduce((acc, record) => {
+  const groupedRecords = filteredRecords.reduce((acc, record) => {
     const category = record.category || 'Autre';
     if(!acc[category]) acc[category] = [];
     acc[category].push(record);
     return acc;
   }, {} as Record<string, HealthRecord[]>);
   
-  const categories = ['Consultation IA', 'Bilan', 'Ordonnance', 'Autre'];
+  const categories = ['Consultation IA', 'Ordonnance', 'Bilan', 'Radio', 'Scanner', 'IRM', 'Échographie', 'Autre'];
 
 
   return (
@@ -205,11 +244,63 @@ export default function HealthRecordPage() {
         </div>
         <AddDocumentDialog onRecordUpdate={refreshRecords} />
       </div>
+      
+      <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Filtrer les dossiers
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                <Input 
+                    placeholder="Filtrer par médecin..."
+                    value={doctorFilter}
+                    onChange={(e) => setDoctorFilter(e.target.value)}
+                    className="pl-9"
+                />
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className="w-full sm:w-auto justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dateFilter}
+                  onSelect={setDateFilter}
+                  initialFocus
+                  locale={fr}
+                />
+              </PopoverContent>
+            </Popover>
+             <Button onClick={handleResetFilters} variant="ghost" size="icon">
+                <Undo2 className="h-4 w-4" />
+                <span className="sr-only">Réinitialiser</span>
+             </Button>
+        </CardContent>
+      </Card>
 
       {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
       
-      {records.length === 0 ? (
+      {allRecords.length === 0 ? (
         <EmptyState onRecordUpdate={refreshRecords} />
+      ) : filteredRecords.length === 0 ? (
+         <Card className="text-center p-8">
+            <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-secondary text-secondary-foreground">
+                <Search className="size-8" />
+            </div>
+            <h3 className="text-xl font-semibold">Aucun dossier ne correspond</h3>
+            <p className="text-muted-foreground mt-2">Essayez d'ajuster vos filtres de recherche.</p>
+        </Card>
       ) : (
         <div className="space-y-8">
           {categories.map(category => (
@@ -220,12 +311,18 @@ export default function HealthRecordPage() {
                         {groupedRecords[category].map(record => (
                             <Card key={record.id} className={record.title === recurringSymptom ? "border-destructive" : ""}>
                             <CardHeader>
-                                <div className="flex items-center justify-between">
-                                <CardTitle className="flex items-center gap-2">
-                                    {categoryIcons[record.category as keyof typeof categoryIcons] || categoryIcons['Autre']}
-                                    {record.title}
-                                </CardTitle>
-                                <CardDescription>{record.date}</CardDescription>
+                                <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                        <CardTitle className="flex items-center gap-2">
+                                            {categoryIcons[record.category as keyof typeof categoryIcons] || categoryIcons['Autre']}
+                                            {record.title}
+                                        </CardTitle>
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
+                                            {record.doctorName && <div className="flex items-center gap-1.5"><User className="size-3" />Dr. {record.doctorName}</div>}
+                                            {record.treatmentDate && <div className="flex items-center gap-1.5"><CalendarIcon className="size-3" />{format(new Date(record.treatmentDate), "d MMMM yyyy", { locale: fr })}</div>}
+                                        </div>
+                                    </div>
+                                    <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
                                 </div>
                             </CardHeader>
                             <CardContent>

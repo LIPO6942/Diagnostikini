@@ -33,13 +33,15 @@ export type HealthDocument = {
 };
 
 export type HealthRecord = {
-  id: string;
-  date: string;
-  category: 'Consultation IA' | 'Bilan' | 'Ordonnance' | 'Autre';
+  id: string; // Unique ID, also used for sorting (new Date().toISOString())
+  date: string; // Deprecated, but kept for backward compatibility. Use ID for sorting.
+  category: 'Consultation IA' | 'Bilan' | 'Ordonnance' | 'Radio' | 'Scanner' | 'IRM' | 'Échographie' | 'Autre';
   title: string;
-  symptoms?: string; // Optional: for AI consultations
-  summary?: string; // Optional: for AI consultations
-  documents?: HealthDocument[]; // Optional: for uploaded documents
+  symptoms?: string;
+  summary?: string;
+  documents?: HealthDocument[];
+  doctorName?: string;
+  treatmentDate?: string; // ISO String
 };
 
 export type ChatMessage = {

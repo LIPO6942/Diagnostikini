@@ -33,15 +33,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText, CalendarIcon } from "lucide-react";
 import type { HealthRecord, HealthDocument } from "@/lib/types";
 import { saveHealthRecord, updateHealthRecord, saveDocumentDataUrl, getDocumentDataUrl, deleteDocumentDataUrl } from "@/services/health-record-service";
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
+import { format } from "date-fns";
+import { fr } from 'date-fns/locale';
 
 const addDocumentSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
-  category: z.enum(["Bilan", "Ordonnance", "Autre"]),
+  category: z.enum(["Bilan", "Ordonnance", "Radio", "Scanner", "IRM", "Échographie", "Autre"]),
+  doctorName: z.string().optional(),
+  treatmentDate: z.date().optional(),
 });
 
 type AddDocumentForm = z.infer<typeof addDocumentSchema>;
@@ -109,11 +115,11 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
 
   const form = useForm<AddDocumentForm>({
     resolver: zodResolver(addDocumentSchema),
-    defaultValues: { title: "", category: "Bilan" },
+    defaultValues: { title: "", category: "Bilan", doctorName: "", treatmentDate: undefined },
   });
   
   const resetState = () => {
-    form.reset({ title: "", category: "Bilan" });
+    form.reset({ title: "", category: "Bilan", doctorName: "", treatmentDate: undefined });
     setNewFiles([]);
     newFilePreviews.forEach(url => URL.revokeObjectURL(url));
     setNewFilePreviews([]);
@@ -128,6 +134,8 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         form.reset({
             title: existingRecord.title,
             category: existingRecord.category,
+            doctorName: existingRecord.doctorName || "",
+            treatmentDate: existingRecord.treatmentDate ? new Date(existingRecord.treatmentDate) : undefined,
         });
         setExistingDocuments(existingRecord.documents || []);
     } else if (open) {
@@ -158,7 +166,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   }
 
   const onSubmit = async (values: AddDocumentForm) => {
-    if (newFiles.length === 0 && existingDocuments.length === 0) {
+    if (!isEditing && newFiles.length === 0) {
         toast({ variant: "destructive", title: "Veuillez ajouter au moins un document." });
         return;
     }
@@ -180,12 +188,18 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
             });
         }
         
+        const recordData = {
+          title: values.title,
+          category: values.category,
+          doctorName: values.doctorName,
+          treatmentDate: values.treatmentDate?.toISOString(),
+          documents: [...existingDocuments, ...newDocuments],
+        };
+
         if (isEditing) {
             const updatedRecord: HealthRecord = {
               ...existingRecord,
-              title: values.title,
-              category: values.category,
-              documents: [...existingDocuments, ...newDocuments],
+              ...recordData,
             };
             updateHealthRecord(updatedRecord);
             toast({ title: "Document mis à jour", description: "Votre document a été modifié avec succès." });
@@ -193,10 +207,8 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         } else {
             const newRecord: HealthRecord = {
                 id: new Date().toISOString(),
-                date: new Date().toLocaleDateString('fr-FR'),
-                title: values.title,
-                category: values.category,
-                documents: newDocuments,
+                date: new Date().toISOString(),
+                ...recordData
             };
             saveHealthRecord(newRecord);
             toast({ title: "Document ajouté", description: "Votre document a été sauvegardé avec succès." });
@@ -214,7 +226,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   const dialogTitle = isEditing ? "Modifier le document" : "Ajouter un nouveau document";
   const dialogDescription = isEditing 
     ? "Modifiez les informations ou ajoutez/supprimez des fichiers pour ce dossier."
-    : "Importez des bilans, des ordonnances ou d'autres documents (images ou PDF).";
+    : "Importez des bilans, ordonnances, radios, etc. (images ou PDF).";
 
   const allDocsCount = existingDocuments.length + newFiles.length;
 
@@ -250,6 +262,59 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                 </FormItem>
               )}
             />
+            <div className="grid grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="doctorName"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Médecin traitant (optionnel)</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Ex: Dr. Ben Foulen" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="treatmentDate"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                    <FormLabel>Date (optionnel)</FormLabel>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <FormControl>
+                            <Button
+                            variant={"outline"}
+                            className="font-normal"
+                            >
+                            {field.value ? (
+                                format(field.value, "PPP", { locale: fr })
+                            ) : (
+                                <span>Choisir une date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                        </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                        />
+                        </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="category"
@@ -263,8 +328,12 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Bilan">Bilan</SelectItem>
                       <SelectItem value="Ordonnance">Ordonnance</SelectItem>
+                      <SelectItem value="Bilan">Bilan</SelectItem>
+                      <SelectItem value="Radio">Radio</SelectItem>
+                      <SelectItem value="Scanner">Scanner</SelectItem>
+                      <SelectItem value="IRM">IRM</SelectItem>
+                      <SelectItem value="Échographie">Échographie</SelectItem>
                       <SelectItem value="Autre">Autre</SelectItem>
                     </SelectContent>
                   </Select>
