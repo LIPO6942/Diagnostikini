@@ -7,7 +7,7 @@ import { ProfileProvider } from '@/contexts/profile-context';
 export const metadata: Metadata = {
   title: 'Diagnostikini',
   description: 'Votre assistant de santé personnel IA.',
-  manifest: '/manifest.webmanifest'
+  manifest: '/manifest.json'
 };
 
 export default function RootLayout({
