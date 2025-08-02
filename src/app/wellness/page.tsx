@@ -202,7 +202,7 @@ export default function WellnessPage() {
             {wellnessTips.map((item) => (
             <Card key={item.category} className="overflow-hidden">
                 <div className="relative h-48 w-full">
-                <Image src={item.image.src} alt={item.category} fill objectFit="cover" data-ai-hint={item.image.hint} />
+                <Image src={item.image.src} alt={item.category} fill className="object-cover" data-ai-hint={item.image.hint} />
                 </div>
                 <CardHeader>
                 <CardTitle className="flex items-center gap-2">
