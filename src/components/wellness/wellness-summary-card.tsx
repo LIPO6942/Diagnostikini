@@ -7,10 +7,11 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import type { StoredChallengeHistory } from '@/app/wellness/page';
-import type { Challenge } from '@/constants/wellness-challenges';
-import { Sun, Cloud, CloudSun, Zap, Wind } from 'lucide-react';
-import { format, subDays } from 'date-fns';
+import { weekdayChallenges, saturdayChallenges, sundayChallenges, type Challenge } from '@/constants/wellness-challenges';
+import { Sun, Cloud, CloudSun, Zap, Wind, TrendingUp, Award, Activity } from 'lucide-react';
+import { format, subDays, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Separator } from '../ui/separator';
 
 interface WellnessSummaryCardProps {
     history: StoredChallengeHistory[];
@@ -59,31 +60,79 @@ const getWellnessWeather = (completedCount: number, totalChallenges: number) => 
     };
 }
 
+const getWeeklyMotivation = (average: number) => {
+    if (average >= 75) return { 
+        Icon: Award,
+        message: "Quelle constance impressionnante !",
+        color: "text-primary"
+    };
+    if (average >= 50) return { 
+        Icon: TrendingUp,
+        message: "Vous construisez une routine solide. Continuez !",
+        color: "text-green-500"
+    };
+     if (average > 0) return { 
+        Icon: Activity,
+        message: "Chaque jour compte. Beau début de routine !",
+        color: "text-blue-500"
+    };
+    return { 
+        Icon: Activity,
+        message: "Prêt à démarrer une nouvelle semaine ?",
+        color: "text-muted-foreground"
+    };
+}
+
 
 export function WellnessSummaryCard({ history, dailyChallenges }: WellnessSummaryCardProps) {
 
     const totalChallenges = dailyChallenges.length;
 
-    const chartData = useMemo(() => {
+    const { chartData, weeklyAverage } = useMemo(() => {
+        let totalCompleted = 0;
+        let totalPossible = 0;
+
         const last7Days = Array.from({ length: 7 }).map((_, i) => {
             const d = subDays(new Date(), 6 - i);
-            return format(d, 'yyyy-MM-dd');
+            return {
+                date: d,
+                dateStr: format(d, 'yyyy-MM-dd'),
+                dayOfWeek: getDay(d) // 0 for Sunday, 6 for Saturday
+            }
         });
 
-        return last7Days.map(dateStr => {
-            const entry = history.find(h => h.date === dateStr);
+        const chartPoints = last7Days.map(dayInfo => {
+            let challengesForDay: Challenge[];
+            if (dayInfo.dayOfWeek === 6) { // Saturday
+                challengesForDay = saturdayChallenges;
+            } else if (dayInfo.dayOfWeek === 0) { // Sunday
+                challengesForDay = sundayChallenges;
+            } else { // Weekday
+                challengesForDay = weekdayChallenges;
+            }
+            totalPossible += challengesForDay.length;
+
+            const entry = history.find(h => h.date === dayInfo.dateStr);
             const completed = entry ? Object.values(entry.statuses).filter(Boolean).length : 0;
+            totalCompleted += completed;
+
             return {
-                name: format(new Date(dateStr), "EEE", { locale: fr }),
+                name: format(dayInfo.date, "EEE", { locale: fr }),
                 défis: completed
             }
-        })
+        });
+
+        const average = totalPossible > 0 ? (totalCompleted / totalPossible) * 100 : 0;
+
+        return { chartData: chartPoints, weeklyAverage: average };
     }, [history]);
     
     const todayStr = new Date().toISOString().split("T")[0];
     const todaysEntry = history.find(h => h.date === todayStr);
     const completedToday = todaysEntry ? Object.values(todaysEntry.statuses).filter(Boolean).length : 0;
+    
     const { Icon, message, description, color } = getWellnessWeather(completedToday, totalChallenges);
+    const { Icon: WeeklyIcon, message: weeklyMessage, color: weeklyColor } = getWeeklyMotivation(weeklyAverage);
 
 
     return (
@@ -120,7 +169,7 @@ export function WellnessSummaryCard({ history, dailyChallenges }: WellnessSummar
                                 tickLine={false}
                                 axisLine={false}
                                 allowDecimals={false}
-                                domain={[0, totalChallenges > 0 ? totalChallenges : 4]}
+                                domain={[0, Math.max(4, ...chartData.map(d => d.défis))]}
                             />
                              <Tooltip 
                                 cursor={{fill: 'hsl(var(--muted))'}}
@@ -133,6 +182,17 @@ export function WellnessSummaryCard({ history, dailyChallenges }: WellnessSummar
                             <Bar dataKey="défis" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
+                </div>
+                <Separator className="my-4" />
+                <div className="flex items-center justify-center gap-4 text-center">
+                    <div className="flex flex-col items-center">
+                        <p className="text-2xl font-bold">{Math.round(weeklyAverage)}%</p>
+                        <p className="text-xs text-muted-foreground">Constance (7j)</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                        <WeeklyIcon className={`size-5 ${weeklyColor}`} />
+                        <span className="font-medium">{weeklyMessage}</span>
+                    </div>
                 </div>
             </CardContent>
         </Card>
