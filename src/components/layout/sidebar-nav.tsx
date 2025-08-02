@@ -47,11 +47,11 @@ export function SidebarNav() {
               asChild
               size="lg"
               isActive={isActive("/")}
-              tooltip="Assistant IA"
+              tooltip="Consultini IA"
             >
               <Link href="/">
                 <Sparkles />
-                <span>Assistant IA</span>
+                <span>Consultini IA</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
