@@ -7,19 +7,25 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import type { StoredChallengeHistory } from '@/app/wellness/page';
-import { dailyChallenges } from '@/constants/wellness-challenges';
-import { Sun, Cloud, CloudSun, CloudRain, Zap, CheckCircle, Wind } from 'lucide-react';
+import type { Challenge } from '@/constants/wellness-challenges';
+import { Sun, Cloud, CloudSun, Zap, Wind } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface WellnessSummaryCardProps {
     history: StoredChallengeHistory[];
+    dailyChallenges: Challenge[];
 }
 
-const totalChallenges = dailyChallenges.length;
+const getWellnessWeather = (completedCount: number, totalChallenges: number) => {
+    if (totalChallenges === 0) return { 
+        Icon: Wind,
+        message: `Un nouveau jour se lève.`,
+        description: "Prêt(e) à relever votre premier défi de bien-être ?",
+        color: "text-muted-foreground"
+    };
 
-const getWellnessWeather = (completedCount: number) => {
-    const percentage = totalChallenges > 0 ? (completedCount / totalChallenges) * 100 : 0;
+    const percentage = (completedCount / totalChallenges) * 100;
     
     if (percentage === 100) return { 
         Icon: Zap,
@@ -54,7 +60,9 @@ const getWellnessWeather = (completedCount: number) => {
 }
 
 
-export function WellnessSummaryCard({ history }: WellnessSummaryCardProps) {
+export function WellnessSummaryCard({ history, dailyChallenges }: WellnessSummaryCardProps) {
+
+    const totalChallenges = dailyChallenges.length;
 
     const chartData = useMemo(() => {
         const last7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -75,7 +83,7 @@ export function WellnessSummaryCard({ history }: WellnessSummaryCardProps) {
     const todayStr = new Date().toISOString().split("T")[0];
     const todaysEntry = history.find(h => h.date === todayStr);
     const completedToday = todaysEntry ? Object.values(todaysEntry.statuses).filter(Boolean).length : 0;
-    const { Icon, message, description, color } = getWellnessWeather(completedToday);
+    const { Icon, message, description, color } = getWellnessWeather(completedToday, totalChallenges);
 
 
     return (
@@ -112,7 +120,7 @@ export function WellnessSummaryCard({ history }: WellnessSummaryCardProps) {
                                 tickLine={false}
                                 axisLine={false}
                                 allowDecimals={false}
-                                domain={[0, totalChallenges]}
+                                domain={[0, totalChallenges > 0 ? totalChallenges : 4]}
                             />
                              <Tooltip 
                                 cursor={{fill: 'hsl(var(--muted))'}}

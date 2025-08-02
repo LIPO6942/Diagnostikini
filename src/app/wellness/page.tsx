@@ -6,14 +6,15 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { wellnessTips } from "@/constants/wellness";
-import { dailyChallenges } from "@/constants/wellness-challenges";
+import { weekdayChallenges, saturdayChallenges, sundayChallenges, type Challenge } from "@/constants/wellness-challenges";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Award } from "lucide-react";
+import { Award, HelpCircle, Info } from "lucide-react";
 import Image from 'next/image';
 import { Separator } from "@/components/ui/separator";
 import { WellnessSummaryCard } from "@/components/wellness/wellness-summary-card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const WELLNESS_HISTORY_KEY = "wellnessHistory";
 const HISTORY_LENGTH_DAYS = 7;
@@ -27,9 +28,22 @@ export type StoredChallengeHistory = {
   statuses: ChallengeStatus;
 };
 
+function getChallengesForToday(): Challenge[] {
+    const dayOfWeek = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    if(dayOfWeek === 6) { // Saturday
+        return saturdayChallenges;
+    }
+    if(dayOfWeek === 0) { // Sunday
+        return sundayChallenges;
+    }
+    return weekdayChallenges;
+}
+
 function DailyChallenges() {
   const [history, setHistory] = useState<StoredChallengeHistory[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const dailyChallenges = useMemo(() => getChallengesForToday(), []);
+
 
   // Helper to get today's date string
   const getTodayStr = () => new Date().toISOString().split("T")[0];
@@ -66,7 +80,7 @@ function DailyChallenges() {
     
     setHistory(recentHistory);
 
-  }, []);
+  }, [dailyChallenges]);
 
   const updateChallengeStatus = (id: string, completed: boolean) => {
     const todayStr = getTodayStr();
@@ -132,7 +146,7 @@ function DailyChallenges() {
 
   return (
     <>
-      <WellnessSummaryCard history={history} />
+      <WellnessSummaryCard history={history} dailyChallenges={dailyChallenges} />
       <Card className="bg-primary/5 border-primary/20">
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -146,19 +160,21 @@ function DailyChallenges() {
         <CardContent className="space-y-4">
           {dailyChallenges.map((challenge) => {
             const isCompleted = todayChallenges ? todayChallenges[challenge.id] || false : false;
+            const GuideIcon = challenge.guide.icon;
+
             return (
               <div
                 key={challenge.id}
                 className={cn(
-                  "flex items-start gap-4 p-4 rounded-lg transition-all",
-                  isCompleted ? "bg-primary/10 text-muted-foreground" : "bg-card"
+                  "flex items-center gap-4 p-4 rounded-lg transition-all",
+                  isCompleted ? "bg-primary/10 " : "bg-card"
                 )}
               >
                 <Checkbox
                   id={challenge.id}
                   checked={isCompleted}
                   onCheckedChange={(checked) => updateChallengeStatus(challenge.id, !!checked)}
-                  className="size-6 mt-1"
+                  className="size-6"
                   aria-label={challenge.title}
                 />
                 <div className="grid gap-1.5 flex-1">
@@ -166,7 +182,7 @@ function DailyChallenges() {
                     htmlFor={challenge.id}
                     className={cn(
                       "font-semibold cursor-pointer",
-                      isCompleted && "line-through"
+                      isCompleted && "line-through text-muted-foreground"
                     )}
                   >
                     {challenge.title}
@@ -175,6 +191,26 @@ function DailyChallenges() {
                     {challenge.description}
                   </p>
                 </div>
+                 <Dialog>
+                    <DialogTrigger asChild>
+                         <Button variant="ghost" size="icon" className="text-muted-foreground">
+                            <HelpCircle className="size-5" />
+                         </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <div className="flex items-center flex-col gap-4 text-center">
+                                <div className="p-3 rounded-full bg-primary/10">
+                                   <GuideIcon className="size-10 text-primary" />
+                                </div>
+                                <DialogTitle>{challenge.title}</DialogTitle>
+                                <DialogDescription className="text-base">
+                                    {challenge.guide.text}
+                                </DialogDescription>
+                            </div>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
               </div>
             );
           })}
