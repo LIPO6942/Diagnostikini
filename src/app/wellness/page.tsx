@@ -3,8 +3,8 @@
  */
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
+import { useState, useEffect, useMemo } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { wellnessTips } from "@/constants/wellness";
 import { dailyChallenges } from "@/constants/wellness-challenges";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,81 +13,100 @@ import { cn } from "@/lib/utils";
 import { Award } from "lucide-react";
 import Image from 'next/image';
 import { Separator } from "@/components/ui/separator";
+import { WellnessSummaryCard } from "@/components/wellness/wellness-summary-card";
 
-const WELLNESS_CHALLENGES_KEY = "wellnessChallenges";
+const WELLNESS_HISTORY_KEY = "wellnessHistory";
+const HISTORY_LENGTH_DAYS = 7;
 
-type ChallengeStatus = {
+export type ChallengeStatus = {
   [key: string]: boolean;
 };
 
-type StoredChallenges = {
-  date: string;
+export type StoredChallengeHistory = {
+  date: string; // YYYY-MM-DD
   statuses: ChallengeStatus;
 };
 
 function DailyChallenges() {
-  const [challenges, setChallenges] = useState<ChallengeStatus | null>(null);
+  const [history, setHistory] = useState<StoredChallengeHistory[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  const initializeChallenges = () => {
-    const initialChallenges: ChallengeStatus = {};
-    dailyChallenges.forEach(c => initialChallenges[c.id] = false);
-    return initialChallenges;
-  };
+  // Helper to get today's date string
+  const getTodayStr = () => new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     setIsMounted(true);
-
-    const todayStr = new Date().toISOString().split("T")[0];
-    const storedData = localStorage.getItem(WELLNESS_CHALLENGES_KEY);
-    
-    if (storedData) {
-      try {
-        const parsed: StoredChallenges = JSON.parse(storedData);
-        if (parsed.date === todayStr) {
-          setChallenges(parsed.statuses);
-        } else {
-          // New day, reset challenges
-          const newChallenges = initializeChallenges();
-          setChallenges(newChallenges);
-          localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
-        }
-      } catch (e) {
-        // Data is corrupted, reset
-        const newChallenges = initializeChallenges();
-        setChallenges(newChallenges);
-        localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
-      }
-    } else {
-      // No data, initialize for today
-      const newChallenges = initializeChallenges();
-      setChallenges(newChallenges);
-      localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
+    let storedData: StoredChallengeHistory[] = [];
+    try {
+      const item = localStorage.getItem(WELLNESS_HISTORY_KEY);
+      storedData = item ? JSON.parse(item) : [];
+      if (!Array.isArray(storedData)) storedData = [];
+    } catch (e) {
+      storedData = [];
     }
+
+    const todayStr = getTodayStr();
+    
+    // Prune old history
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - (HISTORY_LENGTH_DAYS -1));
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split("T")[0];
+
+    const recentHistory = storedData.filter(item => item.date >= sevenDaysAgoStr);
+
+    // Check if today's entry exists
+    let todayEntry = recentHistory.find(item => item.date === todayStr);
+
+    if (!todayEntry) {
+      const initialChallenges: ChallengeStatus = {};
+      dailyChallenges.forEach(c => initialChallenges[c.id] = false);
+      todayEntry = { date: todayStr, statuses: initialChallenges };
+      recentHistory.push(todayEntry);
+    }
+    
+    setHistory(recentHistory);
+
   }, []);
 
   const updateChallengeStatus = (id: string, completed: boolean) => {
-    if (!challenges) return;
+    const todayStr = getTodayStr();
+    
+    setHistory(prevHistory => {
+      const newHistory = prevHistory.map(item => {
+        if (item.date === todayStr) {
+          const newStatuses = { ...item.statuses, [id]: completed };
+          return { ...item, statuses: newStatuses };
+        }
+        return item;
+      });
 
-    const newChallenges: ChallengeStatus = { ...challenges, [id]: completed };
-    setChallenges(newChallenges);
-
-    const todayStr = new Date().toISOString().split("T")[0];
-    const dataToStore: StoredChallenges = {
-      date: todayStr,
-      statuses: newChallenges,
-    };
-    localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify(dataToStore));
+      localStorage.setItem(WELLNESS_HISTORY_KEY, JSON.stringify(newHistory));
+      return newHistory;
+    });
   };
   
   const resetChallenges = () => {
-    const newChallenges = initializeChallenges();
-    setChallenges(newChallenges);
-    const todayStr = new Date().toISOString().split("T")[0];
-    localStorage.setItem(WELLNESS_CHALLENGES_KEY, JSON.stringify({ date: todayStr, statuses: newChallenges }));
+     const todayStr = getTodayStr();
+     setHistory(prevHistory => {
+        const newHistory = prevHistory.map(item => {
+           if (item.date === todayStr) {
+             const initialChallenges: ChallengeStatus = {};
+             dailyChallenges.forEach(c => initialChallenges[c.id] = false);
+             return { ...item, statuses: initialChallenges };
+           }
+           return item;
+        });
+        localStorage.setItem(WELLNESS_HISTORY_KEY, JSON.stringify(newHistory));
+        return newHistory;
+     });
   }
 
-  if (!isMounted || !challenges) {
+  const todayChallenges = useMemo(() => {
+    const todayStr = getTodayStr();
+    return history.find(item => item.date === todayStr)?.statuses || null;
+  }, [history]);
+
+  if (!isMounted || !todayChallenges) {
     return (
       <Card className="bg-primary/5 border-primary/20">
         <CardHeader>
@@ -112,53 +131,56 @@ function DailyChallenges() {
   }
 
   return (
-     <Card className="bg-primary/5 border-primary/20">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-6 w-6 text-primary" />
-            Vos défis bien-être du jour
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={resetChallenges}>Réinitialiser</Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {dailyChallenges.map((challenge) => {
-          const isCompleted = challenges[challenge.id] || false;
-          return (
-            <div
-              key={challenge.id}
-              className={cn(
-                "flex items-start gap-4 p-4 rounded-lg transition-all",
-                isCompleted ? "bg-primary/10 text-muted-foreground" : "bg-card"
-              )}
-            >
-              <Checkbox
-                id={challenge.id}
-                checked={isCompleted}
-                onCheckedChange={(checked) => updateChallengeStatus(challenge.id, !!checked)}
-                className="size-6 mt-1"
-                aria-label={challenge.title}
-              />
-              <div className="grid gap-1.5 flex-1">
-                <label
-                  htmlFor={challenge.id}
-                  className={cn(
-                    "font-semibold cursor-pointer",
-                    isCompleted && "line-through"
-                  )}
-                >
-                  {challenge.title}
-                </label>
-                <p className="text-sm text-muted-foreground">
-                  {challenge.description}
-                </p>
+    <>
+      <WellnessSummaryCard history={history} />
+      <Card className="bg-primary/5 border-primary/20">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-6 w-6 text-primary" />
+              Vos défis bien-être du jour
+            </CardTitle>
+            <Button variant="ghost" size="sm" onClick={resetChallenges}>Réinitialiser</Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {dailyChallenges.map((challenge) => {
+            const isCompleted = todayChallenges ? todayChallenges[challenge.id] || false : false;
+            return (
+              <div
+                key={challenge.id}
+                className={cn(
+                  "flex items-start gap-4 p-4 rounded-lg transition-all",
+                  isCompleted ? "bg-primary/10 text-muted-foreground" : "bg-card"
+                )}
+              >
+                <Checkbox
+                  id={challenge.id}
+                  checked={isCompleted}
+                  onCheckedChange={(checked) => updateChallengeStatus(challenge.id, !!checked)}
+                  className="size-6 mt-1"
+                  aria-label={challenge.title}
+                />
+                <div className="grid gap-1.5 flex-1">
+                  <label
+                    htmlFor={challenge.id}
+                    className={cn(
+                      "font-semibold cursor-pointer",
+                      isCompleted && "line-through"
+                    )}
+                  >
+                    {challenge.title}
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    {challenge.description}
+                  </p>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </CardContent>
-    </Card>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </>
   )
 }
 
@@ -180,7 +202,7 @@ export default function WellnessPage() {
             {wellnessTips.map((item) => (
             <Card key={item.category} className="overflow-hidden">
                 <div className="relative h-48 w-full">
-                <Image src={item.image.src} alt={item.category} layout="fill" objectFit="cover" data-ai-hint={item.image.hint} />
+                <Image src={item.image.src} alt={item.category} fill objectFit="cover" data-ai-hint={item.image.hint} />
                 </div>
                 <CardHeader>
                 <CardTitle className="flex items-center gap-2">

@@ -11,16 +11,16 @@ export const dailyChallenges = [
   {
     id: "stretch",
     title: "Pause Étirements",
-    description: "Prenez 10 minutes pour étirer votre corps, surtout si vous êtes resté assis longtemps.",
+    description: "Prenez 5-10 minutes pour étirer votre corps, surtout si vous êtes resté assis longtemps.",
   },
   {
     id: "mindful-break",
-    title: "Micro-Méditation de 5 minutes",
-    description: "Asseyez-vous, fermez les yeux et concentrez-vous uniquement sur votre respiration pendant 5 minutes.",
+    title: "Respiration Consciente",
+    description: "Prenez une minute pour vous concentrer uniquement sur 5 respirations lentes et profondes.",
   },
   {
     id: "screen-break",
     title: "Repos des Yeux",
-    description: "Toutes les 20 minutes, regardez un objet à 6 mètres de distance pendant au moins 20 secondes.",
+    description: "Détournez le regard de votre écran et fixez un objet au loin pendant 20 secondes.",
   },
 ];
