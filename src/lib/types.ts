@@ -39,6 +39,7 @@ export type HealthRecord = {
   title: string;
   symptoms?: string;
   summary?: string;
+  prescription?: string;
   documents?: HealthDocument[];
   doctorName?: string;
   treatmentDate?: string; // ISO String

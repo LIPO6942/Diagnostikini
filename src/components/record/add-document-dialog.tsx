@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText, CalendarIcon } from "lucide-react";
@@ -48,6 +49,7 @@ const addDocumentSchema = z.object({
   category: z.enum(["Bilan", "Ordonnance", "Radio", "Scanner", "IRM", "Échographie", "Autre"]),
   doctorName: z.string().optional(),
   treatmentDate: z.date().optional(),
+  prescription: z.string().optional(),
 });
 
 type AddDocumentForm = z.infer<typeof addDocumentSchema>;
@@ -113,11 +115,12 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   const { toast } = useToast();
   const isEditing = !!existingRecord;
   
-  const defaultFormValues = {
+  const defaultFormValues: AddDocumentForm = {
     title: "",
     category: "Bilan" as const,
     doctorName: "",
     treatmentDate: undefined,
+    prescription: "",
   };
 
   const form = useForm<AddDocumentForm>({
@@ -144,6 +147,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
             category: existingRecord.category || "Bilan",
             doctorName: existingRecord.doctorName || "",
             treatmentDate: existingRecord.treatmentDate ? new Date(existingRecord.treatmentDate) : undefined,
+            prescription: existingRecord.prescription || "",
         });
         setExistingDocuments(existingRecord.documents || []);
       } else {
@@ -202,6 +206,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
           category: values.category,
           doctorName: values.doctorName,
           treatmentDate: values.treatmentDate?.toISOString(),
+          prescription: values.prescription,
           documents: [...existingDocuments, ...newDocuments],
         };
 
@@ -288,7 +293,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                     <FormItem>
                     <FormLabel>Médecin traitant (optionnel)</FormLabel>
                     <FormControl>
-                        <Input placeholder="Ex: Dr. Ben Foulen" {...field} />
+                        <Input placeholder="Ex: Dr. Ben Foulen" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -360,6 +365,24 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
               )}
             />
             
+            <FormField
+              control={form.control}
+              name="prescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Prescription / Notes (optionnel)</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Ex: Paracétamol 1g, 3 fois par jour pendant 5 jours..."
+                      {...field}
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormItem>
               <FormLabel>Fichiers (Images ou PDF)</FormLabel>
               <FormControl>

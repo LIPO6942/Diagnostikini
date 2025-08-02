@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye, Search, CalendarIcon, User, Undo2 } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -75,7 +75,7 @@ function RecurringSymptomAlert({ symptom }: { symptom: string }) {
 const categoryIcons = {
     'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
     'Bilan': <FileText className="h-5 w-5 text-blue-500" />,
-    'Ordonnance': <FileText className="h-5 w-5 text-green-500" />,
+    'Ordonnance': <Pill className="h-5 w-5 text-green-500" />,
     'Radio': <FileText className="h-5 w-5 text-purple-500" />,
     'Scanner': <FileText className="h-5 w-5 text-purple-500" />,
     'IRM': <FileText className="h-5 w-5 text-purple-500" />,
@@ -325,17 +325,23 @@ export default function HealthRecordPage() {
                                     <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
                                 </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="space-y-4">
                                 {record.symptoms && (
                                 <>
                                     <p className="font-semibold text-sm">Symptômes signalés :</p>
-                                    <p className="text-muted-foreground text-sm mb-4">{record.symptoms}</p>
+                                    <p className="text-muted-foreground text-sm">{record.symptoms}</p>
                                 </>
                                 )}
                                 {record.summary && (
                                 <>
                                     <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
                                     <p className="text-muted-foreground text-sm">{record.summary}</p>
+                                </>
+                                )}
+                                {record.prescription && (
+                                <>
+                                    <p className="font-semibold text-sm">Prescription / Notes :</p>
+                                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{record.prescription}</p>
                                 </>
                                 )}
                                 {record.documents && record.documents.length > 0 && (
