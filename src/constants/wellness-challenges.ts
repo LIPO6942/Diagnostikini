@@ -2,7 +2,7 @@
  * @fileoverview This file contains the daily wellness challenges data.
  */
 
-import { Coffee, Droplets, Moon, Pilcrow, Waves, Wind, Apple, StretchVertical, BrainCircuit, Eye, Walk, BookOpen, MessageSquare, Sun, Music } from "lucide-react";
+import { Coffee, Droplets, Moon, Pilcrow, Waves, Wind, Apple, StretchVertical, BrainCircuit, Eye, Footprints, BookOpen, MessageSquare, Sun, Music } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type Challenge = {
@@ -60,7 +60,7 @@ export const saturdayChallenges: Challenge[] = [
         title: "Balade du Samedi",
         description: "Faites une petite promenade de 15 minutes à l'extérieur pour vous aérer l'esprit.",
         guide: {
-            icon: Walk,
+            icon: Footprints,
             text: "Sortez et marchez à un rythme confortable. Concentrez-vous sur votre environnement, les sons, les odeurs. Pas besoin de performance, juste le plaisir de bouger."
         }
     },
