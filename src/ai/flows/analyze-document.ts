@@ -23,11 +23,12 @@ const AnalysisItemSchema = z.object({
   value: z.string().describe("La valeur mesurée, incluant l'unité (ex: 1.05 g/L)."),
   normalRange: z.string().describe("L'intervalle de valeurs normales indiqué sur le document (ex: 0.70 - 1.10 g/L)."),
   isAbnormal: z.boolean().describe("Vrai si la valeur est en dehors de l'intervalle normal, sinon faux."),
+  interpretation: z.string().describe("Une brève interprétation de ce résultat spécifique, en termes simples. Si la valeur est normale, mentionnez-le simplement. Si elle est anormale, expliquez ce que cela pourrait signifier en tenant compte du profil de l'utilisateur."),
 });
 
 const AnalyzeDocumentOutputSchema = z.object({
   analysisItems: z.array(AnalysisItemSchema).describe("Une liste des éléments d'analyse détectés dans le document."),
-  summary: z.string().describe("Un bref résumé interprétatif des résultats, en termes simples. Mentionnez les valeurs anormales et ce qu'elles pourraient signifier, tout en conseillant de consulter un médecin."),
+  summary: z.string().describe("Uniquement si des valeurs anormales sont détectées, rédigez un bref résumé global qui mentionne les points clés et conclut TOUJOURS en recommandant de consulter un médecin. Si tout est normal, laissez ce champ vide."),
 });
 export type AnalyzeDocumentOutput = z.infer<typeof AnalyzeDocumentOutputSchema>;
 
@@ -39,20 +40,19 @@ const prompt = ai.definePrompt({
   name: 'analyzeDocumentPrompt',
   input: { schema: AnalyzeDocumentInputSchema },
   output: { schema: AnalyzeDocumentOutputSchema },
-  prompt: `Vous êtes un assistant médical IA spécialisé dans l'analyse de documents de santé en français. Votre tâche est d'analyser le texte extrait d'un document (comme un bilan sanguin) pour un utilisateur. Vous devez identifier les mesures, leurs valeurs, les seuils normaux, et déterminer si les valeurs sont anormales.
+  prompt: `Vous êtes un assistant médical IA spécialisé dans l'analyse de documents de santé en français. Votre tâche est d'analyser le texte extrait d'un document (comme un bilan sanguin) et de fournir une interprétation claire et personnalisée.
 
   Tâches :
   1.  Parcourez le texte du document fourni : {{{documentText}}}.
-  2.  Identifiez chaque ligne correspondant à une mesure médicale (ex: "Glycémie", "Cholestérol", "Leucocytes").
-  3.  Pour chaque mesure, extrayez son nom, sa valeur avec l'unité, et l'intervalle de normalité.
-  4.  Comparez la valeur de l'utilisateur à l'intervalle de normalité pour déterminer si elle est anormale ('isAbnormal').
-  5.  Remplissez le tableau 'analysisItems' avec toutes les mesures que vous avez pu identifier.
-  6.  Rédigez un résumé simple et clair. Si des valeurs sont anormales, mentionnez-les en priorité et expliquez brièvement ce que cela pourrait indiquer, en termes simples.
-  7.  Très important : Concluez TOUJOURS le résumé en recommandant à l'utilisateur de consulter son médecin pour une interprétation professionnelle.
-  8.  Si le profil de l'utilisateur est fourni, prenez-le en compte pour affiner votre résumé. Par exemple, une glycémie légèrement élevée est plus préoccupante chez un patient diabétique.
+  2.  Pour chaque mesure médicale identifiable (ex: "Glycémie", "Cholestérol", "TSH"), extrayez son nom, sa valeur, et l'intervalle de normalité.
+  3.  Pour CHAQUE mesure, fournissez une 'interpretation' concise.
+      - Si la valeur est NORMALE, indiquez simplement ce qu'elle représente et que le résultat est dans la norme.
+      - Si la valeur est ANORMALE (haute ou basse), expliquez brièvement ce que cela pourrait signifier en termes simples, en utilisant le profil de l'utilisateur si disponible pour personnaliser l'analyse (ex: "légèrement élevé, ce qui chez un patient diabétique connu nécessite une surveillance...").
+  4.  Remplissez le tableau 'analysisItems' avec toutes les mesures et leurs interprétations.
+  5.  Générez un 'summary' global UNIQUEMENT si une ou plusieurs valeurs sont anormales. Ce résumé doit mentionner les points les plus importants et TOUJOURS se terminer en recommandant de consulter un médecin pour un avis professionnel. Si tout est normal, laissez le champ 'summary' vide.
 
   {{#if userProfile}}
-  Profil de l'utilisateur à prendre en compte :
+  Profil de l'utilisateur à prendre en compte pour l'interprétation :
   - Âge : {{#if userProfile.age}}{{userProfile.age}}{{else}}Non spécifié{{/if}}
   - Sexe : {{#if userProfile.sex}}{{userProfile.sex}}{{else}}Non spécifié{{/if}}
   - Antécédents : {{#if userProfile.medicalHistory.conditions}}{{#each userProfile.medicalHistory.conditions}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Aucun{{/if}}{{#if userProfile.medicalHistory.other}}, {{userProfile.medicalHistory.other}}{{/if}}
@@ -62,6 +62,7 @@ const prompt = ai.definePrompt({
   {{media url=documentImage}}
   `,
 });
+
 
 const analyzeDocumentFlow = ai.defineFlow(
   {

@@ -12,17 +12,19 @@ import { createWorker } from 'tesseract.js';
 import { useProfile } from '@/contexts/profile-context';
 import { analyzeDocument, type AnalyzeDocumentInput, type AnalyzeDocumentOutput } from '@/ai/flows/analyze-document';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
-import { FileScan, BrainCircuit, LoaderCircle, Sparkles, AlertTriangle, FilePlus2, ListChecks, FlaskConical, Stethoscope, Upload, Camera, Zap } from 'lucide-react';
-import { saveHealthRecord, saveDocumentDataUrl } from '@/services/health-record-service';
+import { FileScan, BrainCircuit, LoaderCircle, Sparkles, AlertTriangle, FilePlus2, ListChecks, FlaskConical, Stethoscope, Upload, Camera, Zap, MessageSquare } from 'lucide-react';
+import { saveHealthRecord } from '@/services/health-record-service';
 import { Skeleton } from '@/components/ui/skeleton';
 import { analysisTypeOptions } from '@/constants/profile-options';
+import { saveDocumentDataUrl } from '@/services/health-record-service';
+import { Separator } from '@/components/ui/separator';
 
 const analysisFormSchema = z.object({
   analysisType: z.string({ required_error: "Le type d'analyse est requis." }),
@@ -54,48 +56,47 @@ function AnalysisResult({ result, onSave, isLoading }: { result: AnalyzeDocument
           <ListChecks className="text-primary" />
           Résultats de l'analyse
         </CardTitle>
-        {hasAbnormalValues && (
-           <Alert variant="destructive" className="mt-2">
+        {hasAbnormalValues && result.summary && (
+           <Alert variant="destructive" className="mt-4">
             <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Des valeurs hors normes ont été détectées !</AlertTitle>
+            <AlertTitle>Résumé : Des valeurs hors normes ont été détectées !</AlertTitle>
             <AlertDescription>
-              Consultez votre médecin pour discuter de ces résultats. Ceci n'est pas un diagnostic.
+              {result.summary}
             </AlertDescription>
           </Alert>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
           {result.analysisItems.map((item, index) => (
-            <Card key={index} className={item.isAbnormal ? 'border-destructive' : ''}>
-              <CardHeader className="p-4">
+            <Card key={index} className={item.isAbnormal ? 'border-destructive bg-destructive/5' : 'bg-muted/30'}>
+              <CardHeader className="p-4 pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <FlaskConical className="size-4" />
+                  <FlaskConical className="size-4 text-primary" />
                   {item.name}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 pt-0 text-sm">
+              <CardContent className="p-4 pt-2 text-sm space-y-2">
                 <p><strong>Valeur :</strong> {item.value}</p>
                 <p className="text-muted-foreground"><strong>Seuil normal :</strong> {item.normalRange}</p>
-                {item.isAbnormal && <p className="font-semibold text-destructive mt-1">Hors norme</p>}
+                 <Separator />
+                 <div className="flex items-start gap-2 text-muted-foreground">
+                    <MessageSquare className="size-4 mt-0.5 shrink-0 text-primary/80" />
+                    <p className="flex-1">
+                        <span className="font-semibold text-foreground">Interprétation de l'IA :</span> {item.interpretation}
+                    </p>
+                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
-
-        {result.summary && (
-          <div className="pt-4 border-t">
-            <h4 className="font-semibold mb-2">Résumé de l'IA</h4>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{result.summary}</p>
-          </div>
-        )}
       </CardContent>
-      <CardContent>
-         <Button onClick={onSave} disabled={isLoading}>
+      <CardFooter className="border-t pt-6">
+         <Button onClick={onSave} disabled={isLoading} className="w-full">
             {isLoading ? <LoaderCircle className="mr-2 animate-spin" /> : <FilePlus2 className="mr-2" />}
-            Sauvegarder au dossier
+            Sauvegarder au dossier de santé
           </Button>
-      </CardContent>
+      </CardFooter>
     </Card>
   )
 }
@@ -104,18 +105,20 @@ function AnalysisSkeleton() {
   return (
     <Card>
        <CardHeader>
-        <Skeleton className="h-6 w-1/2" />
+        <Skeleton className="h-8 w-1/2" />
+        <Skeleton className="h-5 w-3/4 mt-2" />
       </CardHeader>
        <CardContent className="space-y-4">
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[...Array(4)].map((_, i) => (
+         <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
              <Card key={i}>
                 <CardHeader className="p-4">
-                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-6 w-1/2" />
                 </CardHeader>
                 <CardContent className="p-4 pt-0 space-y-2">
-                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-10 w-full mt-2" />
                 </CardContent>
             </Card>
           ))}
@@ -268,11 +271,11 @@ export default function AnalyzeDocumentPage() {
         id: new Date().toISOString(),
         date: new Date().toISOString(),
         category: values.analysisType as any,
-        title: values.analysisType,
+        title: `Analyse de ${values.analysisType}`,
         doctorName: "Analyse IA",
         treatmentDate: new Date(values.analysisDate).toISOString(),
-        summary: analysisResult.summary,
-        prescription: analysisResult.analysisItems.map(item => `${item.name}: ${item.value} (Normal: ${item.normalRange})`).join('\n'),
+        summary: analysisResult.summary || "Aucun résumé. Toutes les valeurs étaient dans la norme.",
+        prescription: analysisResult.analysisItems.map(item => `${item.name}: ${item.value} (Normal: ${item.normalRange})\nInterprétation: ${item.interpretation}`).join('\n\n'),
         documents: [{
           id: docId,
           name: originalFileName,
@@ -405,7 +408,7 @@ export default function AnalyzeDocumentPage() {
                   <CardDescription>Après la lecture du texte, cliquez pour obtenir une interprétation.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button onClick={onSubmit} disabled={isOcrLoading || isAiLoading || !extractedText} className="w-full">
+                  <Button onClick={onSubmit} disabled={isOcrLoading || isAiLoading || !extractedText || !form.getValues("analysisType") || !form.getValues("analysisDate")} className="w-full">
                     {isOcrLoading && <><LoaderCircle className="mr-2 animate-spin" />Lecture du texte...</>}
                     {isAiLoading && <><BrainCircuit className="mr-2 animate-spin" />Analyse en cours...</>}
                     {!isOcrLoading && !isAiLoading && <><Sparkles className="mr-2" />Analyser avec l'IA</>}
