@@ -43,6 +43,8 @@ import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 import { format } from "date-fns";
 import { fr } from 'date-fns/locale';
+import { analysisTypeOptions } from "@/constants/profile-options";
+
 
 const addDocumentSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
@@ -351,13 +353,9 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Ordonnance">Ordonnance</SelectItem>
-                      <SelectItem value="Bilan">Bilan</SelectItem>
-                      <SelectItem value="Radio">Radio</SelectItem>
-                      <SelectItem value="Scanner">Scanner</SelectItem>
-                      <SelectItem value="IRM">IRM</SelectItem>
-                      <SelectItem value="Échographie">Échographie</SelectItem>
-                      <SelectItem value="Autre">Autre</SelectItem>
+                      {analysisTypeOptions.filter(o => o !== 'Consultation IA').map(option => (
+                        <SelectItem key={option} value={option}>{option}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
