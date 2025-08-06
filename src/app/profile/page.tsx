@@ -3,6 +3,7 @@
  */
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -38,6 +39,7 @@ import {
   treatmentOptions,
   additionalSymptomOptions,
 } from "@/constants/profile-options";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formFields = [
   { name: 'medicalHistory', label: 'Antécédents médicaux', options: medicalHistoryOptions, formKey: 'conditions' },
@@ -46,23 +48,67 @@ const formFields = [
   { name: 'additionalSymptoms', label: 'Symptômes généraux supplémentaires', options: additionalSymptomOptions, formKey: 'symptoms' }
 ] as const;
 
+function ProfileFormSkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-1/3" />
+                <Skeleton className="h-4 w-2/3" />
+            </CardHeader>
+            <CardContent className="space-y-8">
+                <div className="grid md:grid-cols-3 gap-8">
+                    <div className="space-y-2"><Skeleton className="h-4 w-16" /><Skeleton className="h-10 w-full" /></div>
+                    <div className="space-y-2"><Skeleton className="h-4 w-16" /><Skeleton className="h-10 w-full" /></div>
+                    <div className="space-y-2"><Skeleton className="h-4 w-16" /><Skeleton className="h-10 w-full" /></div>
+                </div>
+                <div className="space-y-4">
+                    <Skeleton className="h-6 w-1/4" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-full" />
+                    </div>
+                </div>
+                 <div className="space-y-4">
+                    <Skeleton className="h-6 w-1/4" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-full" />
+                    </div>
+                </div>
+                <Skeleton className="h-10 w-48" />
+            </CardContent>
+        </Card>
+    )
+}
+
 export default function ProfilePage() {
-  const { profile, saveProfile } = useProfile();
+  const { profile, saveProfile, isProfileComplete } = useProfile();
   const { toast } = useToast();
   const router = useRouter();
   
   const form = useForm<UserProfile>({
     resolver: zodResolver(UserProfileSchema),
-    defaultValues: profile || {
-      age: '',
-      sex: 'ne-specifie-pas',
-      weight: '',
-      medicalHistory: { conditions: [], other: '' },
-      allergies: { items: [], other: '' },
-      currentTreatments: { medications: [], other: '' },
-      additionalSymptoms: { symptoms: [], other: '' }
-    },
+    // We'll set default values in an effect to avoid hydration issues
   });
+
+  useEffect(() => {
+    if (isProfileComplete !== undefined) {
+       form.reset(profile || {
+          age: '',
+          sex: 'ne-specifie-pas',
+          weight: '',
+          medicalHistory: { conditions: [], other: '' },
+          allergies: { items: [], other: '' },
+          currentTreatments: { medications: [], other: '' },
+          additionalSymptoms: { symptoms: [], other: '' }
+        });
+    }
+  }, [profile, form, isProfileComplete])
+
 
   function onSubmit(values: UserProfile) {
     saveProfile(values);
@@ -71,6 +117,23 @@ export default function ProfilePage() {
       description: "Vos informations ont été mises à jour. Vous allez être redirigé.",
     });
     router.push('/');
+  }
+
+  if (isProfileComplete === undefined) {
+      return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold font-headline flex items-center gap-2">
+                        <User className="w-8 h-8 text-primary" />
+                        Votre Profil
+                    </h1>
+                    <p className="text-muted-foreground">Ces informations aident l'IA à fournir des analyses plus pertinentes.</p>
+                </div>
+            </div>
+            <ProfileFormSkeleton />
+        </div>
+      )
   }
 
   return (
@@ -112,7 +175,7 @@ export default function ProfilePage() {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Sexe</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                             <FormControl>
                             <SelectTrigger>
                                 <SelectValue placeholder="Sélectionnez..." />
