@@ -64,7 +64,7 @@ export function SidebarNav() {
               tooltip="Consultations"
             >
               <Link href="/consultations">
-                <BookHeart />
+                <FileKey2 />
                 <span>Consultations</span>
               </Link>
             </SidebarMenuButton>
@@ -73,12 +73,12 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               size="lg"
-              isActive={isActive("/analyzed-documents")}
-              tooltip="Documents Analysés"
+              isActive={isActive("/health-records")}
+              tooltip="Dossier Santé"
             >
-              <Link href="/analyzed-documents">
-                <FileKey2 />
-                <span>Doc Analysés</span>
+              <Link href="/health-records">
+                <BookHeart />
+                <span>Dossier Santé</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

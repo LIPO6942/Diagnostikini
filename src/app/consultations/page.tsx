@@ -1,5 +1,5 @@
 /**
- * @fileoverview Health record page component with smart symptom tracking and document management.
+ * @fileoverview Page for managing and viewing AI consultations.
  */
 "use client";
 
@@ -42,11 +42,11 @@ function HealthRecordSkeleton() {
   );
 }
 
-function EmptyState({ onRecordUpdate }: { onRecordUpdate: () => void }) {
+function EmptyState() {
     return (
         <Card className="text-center p-8">
             <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-secondary text-secondary-foreground">
-                <BookHeart className="size-8" />
+                <FileKey2 className="size-8" />
             </div>
             <h3 className="text-xl font-semibold">Aucune consultation trouvée</h3>
             <p className="text-muted-foreground mt-2">L'historique de vos consultations IA apparaîtra ici.</p>
@@ -69,17 +69,6 @@ function RecurringSymptomAlert({ symptom }: { symptom: string }) {
             </AlertDescription>
         </Alert>
     )
-}
-
-const categoryIcons = {
-    'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
-    'Bilan': <FileText className="h-5 w-5 text-blue-500" />,
-    'Ordonnance': <Pill className="h-5 w-5 text-green-500" />,
-    'Radio': <FileText className="h-5 w-5 text-purple-500" />,
-    'Scanner': <FileText className="h-5 w-5 text-purple-500" />,
-    'IRM': <FileText className="h-5 w-5 text-purple-500" />,
-    'Échographie': <FileText className="h-5 w-5 text-purple-500" />,
-    'Autre': <FileText className="h-5 w-5 text-gray-500" />,
 }
 
 export default function ConsultationsPage() {
@@ -212,7 +201,7 @@ export default function ConsultationsPage() {
       {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
       
       {allRecords.length === 0 ? (
-        <EmptyState onRecordUpdate={refreshRecords} />
+        <EmptyState />
       ) : filteredRecords.length === 0 ? (
          <Card className="text-center p-8">
             <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-secondary text-secondary-foreground">
@@ -229,7 +218,7 @@ export default function ConsultationsPage() {
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
                             <CardTitle className="flex items-center gap-2">
-                                {categoryIcons[record.category as keyof typeof categoryIcons] || categoryIcons['Autre']}
+                                <FileKey2 className="h-5 w-5 text-primary" />
                                 {record.title}
                             </CardTitle>
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
