@@ -161,40 +161,44 @@ export default function ConsultationsPage() {
                 Filtrer les consultations
             </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto] gap-4 items-end">
+            <div className="relative">
+                 <FormLabel className="text-xs text-muted-foreground">Diagnostic</FormLabel>
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground mt-2"/>
                 <Input 
                     placeholder="Filtrer par diagnostic..."
                     value={titleFilter}
                     onChange={(e) => setTitleFilter(e.target.value)}
-                    className="pl-9"
+                    className="pl-9 mt-1"
                 />
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className="w-full sm:w-auto justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={dateFilter}
-                  onSelect={setDateFilter}
-                  initialFocus
-                  locale={fr}
-                />
-              </PopoverContent>
-            </Popover>
-             <Button onClick={handleResetFilters} variant="ghost" size="icon">
-                <Undo2 className="h-4 w-4" />
-                <span className="sr-only">Réinitialiser</span>
-             </Button>
+            <div className="w-full">
+                <FormLabel className="text-xs text-muted-foreground">Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className="w-full justify-start text-left font-normal mt-1"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={dateFilter}
+                      onSelect={setDateFilter}
+                      initialFocus
+                      locale={fr}
+                    />
+                  </PopoverContent>
+                </Popover>
+            </div>
+            <Button onClick={handleResetFilters} variant="ghost">
+                <Undo2 className="h-4 w-4 mr-2" />
+                Réinitialiser
+            </Button>
         </CardContent>
       </Card>
 

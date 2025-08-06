@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { fr } from 'date-fns/locale';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { FormLabel } from '@/components/ui/form';
 
 function HealthRecordSkeleton() {
   return (
@@ -224,37 +225,43 @@ export default function HealthRecordsPage() {
                 Filtrer les dossiers
             </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
-            <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
-                <Input 
-                    placeholder="Filtrer par médecin..."
-                    value={doctorFilter}
-                    onChange={(e) => setDoctorFilter(e.target.value)}
-                    className="pl-9"
-                />
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-4 items-end">
+            <div>
+                <FormLabel className="text-xs text-muted-foreground">Médecin</FormLabel>
+                <div className="relative mt-1">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                    <Input 
+                        placeholder="Filtrer par médecin..."
+                        value={doctorFilter}
+                        onChange={(e) => setDoctorFilter(e.target.value)}
+                        className="pl-9"
+                    />
+                </div>
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={dateFilter}
-                  onSelect={setDateFilter}
-                  initialFocus
-                  locale={fr}
-                />
-              </PopoverContent>
-            </Popover>
-            <div className="flex gap-2">
+            <div>
+                 <FormLabel className="text-xs text-muted-foreground">Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className="w-full justify-start text-left font-normal mt-1"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={dateFilter}
+                      onSelect={setDateFilter}
+                      initialFocus
+                      locale={fr}
+                    />
+                  </PopoverContent>
+                </Popover>
+            </div>
+            <div className="flex gap-2 items-center">
                  <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" className="w-full">
                     <BrainCircuit className="mr-2 h-4 w-4" />
                     Analyse IA
