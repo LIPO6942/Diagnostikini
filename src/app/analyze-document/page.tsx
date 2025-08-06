@@ -132,6 +132,7 @@ export default function AnalyzeDocumentPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalyzeDocumentOutput | null>(null);
   const [isOcrLoading, setIsOcrLoading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
   const { profile } = useProfile();
   
@@ -251,15 +252,20 @@ export default function AnalyzeDocumentPage() {
     }
   };
   
-  const handleSaveToRecord = () => {
+  const handleSaveToRecord = async () => {
     const values = form.getValues();
-    if (!analysisResult || !imagePreview) return;
+    if (!analysisResult || !imagePreview || !values.analysisType) {
+        toast({variant: 'destructive', title: 'Informations manquantes', description: 'Veuillez sélectionner un type d\'analyse.'});
+        return;
+    }
+    
+    setIsSaving(true);
     
     const newRecord = {
       id: new Date().toISOString(),
       date: new Date().toISOString(),
       category: values.analysisType as any,
-      title: `Analyse: ${values.analysisType}`,
+      title: values.analysisType,
       doctorName: "Analyse IA",
       treatmentDate: new Date(values.analysisDate).toISOString(),
       summary: analysisResult.summary,
@@ -271,8 +277,15 @@ export default function AnalyzeDocumentPage() {
       }]
     };
 
-    saveHealthRecord(newRecord, imagePreview);
-    toast({ title: "Analyse sauvegardée", description: "Le document et son analyse ont été ajoutés à votre dossier de santé." });
+    try {
+      await saveHealthRecord(newRecord, imagePreview);
+      toast({ title: "Analyse sauvegardée", description: "Le document et son analyse ont été ajoutés à votre dossier de santé." });
+    } catch(e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: 'La sauvegarde a échoué.' });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
 
@@ -409,12 +422,10 @@ export default function AnalyzeDocumentPage() {
 
               {isAiLoading && <AnalysisSkeleton />}
               
-              {analysisResult && <AnalysisResult result={analysisResult} onSave={handleSaveToRecord} isLoading={false} />}
+              {analysisResult && <AnalysisResult result={analysisResult} onSave={handleSaveToRecord} isLoading={isSaving} />}
             </div>
         </div>
       )}
     </div>
   );
 }
-
-    
