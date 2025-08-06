@@ -95,7 +95,6 @@ export default function ConsultationsPage() {
   const refreshRecords = () => {
     const records = getHealthRecords().filter(r => r.category === 'Consultation IA');
     setAllRecords(records);
-    setFilteredRecords(records);
   }
 
   useEffect(() => {
@@ -106,7 +105,6 @@ export default function ConsultationsPage() {
   const handleResetFilters = () => {
     setTitleFilter('');
     setDateFilter(undefined);
-    setFilteredRecords(allRecords);
   }
 
   useEffect(() => {

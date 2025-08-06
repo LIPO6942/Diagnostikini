@@ -148,7 +148,6 @@ export default function AnalyzedDocumentsPage() {
   const refreshRecords = () => {
     const records = getHealthRecords().filter(r => r.category !== 'Consultation IA');
     setAllRecords(records);
-    setFilteredRecords(records);
   }
 
   useEffect(() => {
@@ -159,7 +158,6 @@ export default function AnalyzedDocumentsPage() {
   const handleResetFilters = () => {
     setDoctorFilter('');
     setDateFilter(undefined);
-    setFilteredRecords(allRecords);
   }
 
   useEffect(() => {
