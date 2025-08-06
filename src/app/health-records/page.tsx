@@ -59,7 +59,7 @@ function EmptyState({ onRecordUpdate }: { onRecordUpdate: () => void }) {
     );
 }
 
-const categoryIcons = {
+const categoryIcons:  Record<HealthRecord['category'], JSX.Element> = {
     'Bilan': <FileText className="h-5 w-5 text-blue-500" />,
     'Ordonnance': <Pill className="h-5 w-5 text-green-500" />,
     'Radio': <FileText className="h-5 w-5 text-purple-500" />,
@@ -67,8 +67,14 @@ const categoryIcons = {
     'IRM': <FileText className="h-5 w-5 text-purple-500" />,
     'Échographie': <FileText className="h-5 w-5 text-purple-500" />,
     'Autre': <FileText className="h-5 w-5 text-gray-500" />,
-    // Fallback Icon - Not supposed to be visible
     'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
+    "Bilan sanguin": <FileText className="h-5 w-5 text-blue-500" />,
+    "Analyse d'urine": <FileText className="h-5 w-5 text-yellow-500" />,
+    "Rapport de radiographie": <FileText className="h-5 w-5 text-indigo-500" />,
+    "Rapport de scanner": <FileText className="h-5 w-5 text-indigo-500" />,
+    "Rapport d'IRM": <FileText className="h-5 w-5 text-indigo-500" />,
+    "Rapport d'échographie": <FileText className="h-5 w-5 text-pink-500" />,
+    "Autre document médical": <FileText className="h-5 w-5 text-gray-500" />,
 }
 
 function DocumentPreview({ doc }: { doc: HealthDocument }) {
@@ -198,7 +204,7 @@ export default function HealthRecordsPage() {
     return acc;
   }, {} as Record<string, HealthRecord[]>);
   
-  const categories = ['Ordonnance', 'Bilan', 'Radio', 'Scanner', 'IRM', 'Échographie', 'Autre'];
+  const categories = Array.from(new Set(allRecords.map(r => r.category)));
 
   return (
     <div className="space-y-6">
@@ -291,8 +297,8 @@ export default function HealthRecordsPage() {
                             <CardContent className="space-y-4">
                                 {record.summary && (
                                 <>
-                                    <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
-                                    <p className="text-muted-foreground text-sm">{record.summary}</p>
+                                    <p className="font-semibold text-sm">Résumé / Diagnostic :</p>
+                                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{record.summary}</p>
                                 </>
                                 )}
                                 {record.prescription && (

@@ -32,10 +32,27 @@ export type HealthDocument = {
   mimeType: string;
 };
 
+export type HealthRecordCategory = 
+  | 'Consultation IA'
+  | 'Bilan'
+  | 'Ordonnance'
+  | 'Radio'
+  | 'Scanner'
+  | 'IRM'
+  | 'Échographie'
+  | 'Autre'
+  | 'Bilan sanguin'
+  | "Analyse d'urine"
+  | "Rapport de radiographie"
+  | "Rapport de scanner"
+  | "Rapport d'IRM"
+  | "Rapport d'échographie"
+  | "Autre document médical";
+
 export type HealthRecord = {
   id: string; // Unique ID, also used for sorting (new Date().toISOString())
   date: string; // Deprecated, but kept for backward compatibility. Use ID for sorting.
-  category: 'Consultation IA' | 'Bilan' | 'Ordonnance' | 'Radio' | 'Scanner' | 'IRM' | 'Échographie' | 'Autre';
+  category: HealthRecordCategory;
   title: string;
   symptoms?: string;
   summary?: string;
