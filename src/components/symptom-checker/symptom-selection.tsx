@@ -74,7 +74,7 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
        {path.length === 0 && (
          <CardFooter className="flex-col items-start gap-4 border-t pt-6">
             <p className="text-sm text-muted-foreground">Vous pouvez recommencer le questionnaire ou mettre à jour votre profil.</p>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={onReset}>
                     <RotateCcw className="mr-2" />
                     Recommencer
