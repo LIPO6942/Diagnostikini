@@ -54,8 +54,8 @@ const prompt = ai.definePrompt({
   {{#if userProfile}}
   Profil de l'utilisateur à prendre en compte :
   - Âge : {{#if userProfile.age}}{{userProfile.age}}{{else}}Non spécifié{{/if}}
-  - Sexe : {{#if userProfile.sex}}{{userofile.sex}}{{else}}Non spécifié{{/if}}
-  - Antécédents : {{#if userProfile.medicalHistory.conditions}}{{join userProfile.medicalHistory.conditions ", "}}{{else}}Aucun{{/if}}{{#if userProfile.medicalHistory.other}}, {{userProfile.medicalHistory.other}}{{/if}}
+  - Sexe : {{#if userProfile.sex}}{{userProfile.sex}}{{else}}Non spécifié{{/if}}
+  - Antécédents : {{#if userProfile.medicalHistory.conditions}}{{#each userProfile.medicalHistory.conditions}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Aucun{{/if}}{{#if userProfile.medicalHistory.other}}, {{userProfile.medicalHistory.other}}{{/if}}
   {{/if}}
   
   Image du document pour référence visuelle (ne pas l'analyser directement, se baser sur le texte) :
