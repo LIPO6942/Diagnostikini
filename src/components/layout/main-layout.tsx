@@ -20,22 +20,22 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                  <SidebarTrigger className="lg:hidden" />
                  <Button asChild>
                   <Link href="/find-doctor">
-                    <MapPin className="mr-2" />
-                    Médecin
+                    <MapPin />
+                    <span className="hidden sm:inline">Médecin</span>
                   </Link>
                 </Button>
                  <Button asChild variant="destructive">
                   <Link href="/emergency">
-                    <Siren className="mr-2" />
-                    Urgence
+                    <Siren />
+                    <span className="hidden sm:inline">Urgence</span>
                   </Link>
                 </Button>
               </div>
                <Button asChild variant="accent">
                   <Link href="/analyze-document">
                     <>
-                      <FileScan className="mr-2" />
-                      Analyser
+                      <FileScan />
+                      <span className="hidden sm:inline">Analyser</span>
                     </>
                   </Link>
                 </Button>
