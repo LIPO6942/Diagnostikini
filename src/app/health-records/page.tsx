@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill, FileKey2, BrainCircuit } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -76,7 +76,6 @@ const categoryIcons:  Record<string, JSX.Element> = {
     "Rapport d'IRM": <FileText className="h-5 w-5 text-indigo-500" />,
     "Rapport d'échographie": <FileText className="h-5 w-5 text-pink-500" />,
     "Autre document médical": <FileText className="h-5 w-5 text-gray-500" />,
-    'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
 }
 
 function DocumentPreview({ doc }: { doc: HealthDocument }) {
@@ -206,7 +205,7 @@ export default function HealthRecordsPage() {
     return acc;
   }, {} as Record<string, HealthRecord[]>);
   
-  const categories = Array.from(new Set(allRecords.map(r => r.category)));
+  const categories = Array.from(new Set(allRecords.map(r => r.category || 'Autre')));
 
   return (
     <div className="space-y-6">
@@ -227,10 +226,11 @@ export default function HealthRecordsPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-4 items-end">
             <div>
-                <Label className="text-xs text-muted-foreground">Médecin</Label>
+                <Label htmlFor="doctor-filter" className="text-xs text-muted-foreground">Médecin</Label>
                 <div className="relative mt-1">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
                     <Input 
+                        id="doctor-filter"
                         placeholder="Filtrer par médecin..."
                         value={doctorFilter}
                         onChange={(e) => setDoctorFilter(e.target.value)}
@@ -239,7 +239,7 @@ export default function HealthRecordsPage() {
                 </div>
             </div>
             <div>
-                 <Label className="text-xs text-muted-foreground">Date</Label>
+                <Label className="text-xs text-muted-foreground">Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -261,14 +261,14 @@ export default function HealthRecordsPage() {
                   </PopoverContent>
                 </Popover>
             </div>
-            <div className="flex gap-2 items-center">
-                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" className="w-full">
+            <div className="flex flex-wrap gap-2 items-center justify-start lg:justify-end">
+                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" size="sm">
                     <BrainCircuit className="mr-2 h-4 w-4" />
                     Analyse IA
                  </Button>
-                 <Button onClick={handleResetFilters} variant="ghost" size="icon">
-                    <Undo2 className="h-4 w-4" />
-                    <span className="sr-only">Réinitialiser</span>
+                 <Button onClick={handleResetFilters} variant="ghost" size="sm">
+                    <Undo2 className="h-4 w-4 mr-2" />
+                    Réinitialiser
                  </Button>
             </div>
         </CardContent>
@@ -285,14 +285,14 @@ export default function HealthRecordsPage() {
             <p className="text-muted-foreground mt-2">Essayez d'ajuster vos filtres de recherche.</p>
         </Card>
       ) : (
-        <Accordion type="multiple" className="w-full space-y-4">
+        <Accordion type="multiple" className="w-full space-y-4" defaultValue={categories}>
           {categories.map(category => (
             groupedRecords[category] && (
                 <AccordionItem value={category} key={category} className="border-none">
                     <Card>
                     <AccordionTrigger className="p-6 text-xl font-semibold hover:no-underline">
                         <div className="flex items-center gap-3">
-                            {categoryIcons[category as keyof typeof categoryIcons] || categoryIcons['Autre']}
+                            {categoryIcons[category as keyof typeof categoryIcons] || <FileText className="h-5 w-5 text-gray-500" />}
                             {category} ({groupedRecords[category].length})
                         </div>
                     </AccordionTrigger>

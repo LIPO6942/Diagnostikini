@@ -55,6 +55,7 @@ export type HealthRecord = {
   category: HealthRecordCategory;
   title: string;
   symptoms?: string;
+  diagnosis?: string;
   summary?: string;
   prescription?: string;
   documents?: HealthDocument[];
