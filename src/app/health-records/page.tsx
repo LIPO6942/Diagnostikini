@@ -290,7 +290,7 @@ export default function HealthRecordsPage() {
             <p className="text-muted-foreground mt-2">Essayez d'ajuster vos filtres de recherche.</p>
         </Card>
       ) : (
-        <Accordion type="multiple" className="w-full space-y-4" defaultValue={categories}>
+        <Accordion type="multiple" className="w-full space-y-4">
           {categories.map(category => (
             groupedRecords[category] && (
                 <AccordionItem value={category} key={category} className="border-none">
