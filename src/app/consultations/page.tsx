@@ -98,6 +98,7 @@ export default function ConsultationsPage() {
   }
 
   useEffect(() => {
+    if (!isMounted) return;
     let records = [...allRecords];
     if (titleFilter) {
       records = records.filter(record => 
@@ -112,7 +113,7 @@ export default function ConsultationsPage() {
     }
     setFilteredRecords(records);
 
-  }, [titleFilter, dateFilter, allRecords]);
+  }, [titleFilter, dateFilter, allRecords, isMounted]);
 
   const handleDeleteRecord = async (id: string) => {
     await deleteHealthRecord(id);
@@ -164,9 +165,10 @@ export default function ConsultationsPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto] gap-4 items-end">
             <div className="relative">
-                 <Label className="text-xs text-muted-foreground">Diagnostic</Label>
+                 <label htmlFor="title-filter" className="text-xs text-muted-foreground">Diagnostic</label>
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground mt-2"/>
                 <Input 
+                    id="title-filter"
                     placeholder="Filtrer par diagnostic..."
                     value={titleFilter}
                     onChange={(e) => setTitleFilter(e.target.value)}
@@ -174,7 +176,7 @@ export default function ConsultationsPage() {
                 />
             </div>
             <div className="w-full">
-                <Label className="text-xs text-muted-foreground">Date</Label>
+                <label className="text-xs text-muted-foreground">Date</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button

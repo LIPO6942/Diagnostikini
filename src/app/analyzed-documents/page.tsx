@@ -97,6 +97,7 @@ export default function ConsultationsPage() {
   }
 
   useEffect(() => {
+    if (!isMounted) return;
     let records = [...allRecords];
     if (titleFilter) {
       records = records.filter(record => 
@@ -111,7 +112,7 @@ export default function ConsultationsPage() {
     }
     setFilteredRecords(records);
 
-  }, [titleFilter, dateFilter, allRecords]);
+  }, [titleFilter, dateFilter, allRecords, isMounted]);
 
   const handleDeleteRecord = async (id: string) => {
     await deleteHealthRecord(id);

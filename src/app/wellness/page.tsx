@@ -49,7 +49,6 @@ function DailyChallenges() {
   const getTodayStr = () => new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    setIsMounted(true);
     let storedData: StoredChallengeHistory[] = [];
     try {
       const item = localStorage.getItem(WELLNESS_HISTORY_KEY);
@@ -79,6 +78,7 @@ function DailyChallenges() {
     }
     
     setHistory(recentHistory);
+    setIsMounted(true);
 
   }, [dailyChallenges]);
 
@@ -120,7 +120,7 @@ function DailyChallenges() {
     return history.find(item => item.date === todayStr)?.statuses || null;
   }, [history]);
 
-  if (!isMounted || !todayChallenges) {
+  if (!isMounted) {
     return (
       <Card className="bg-primary/5 border-primary/20">
         <CardHeader>

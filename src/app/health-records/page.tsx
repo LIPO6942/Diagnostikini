@@ -169,6 +169,7 @@ export default function HealthRecordsPage() {
   }
 
   useEffect(() => {
+    if (!isMounted) return;
     let records = [...allRecords];
     if (doctorFilter) {
       records = records.filter(record => 
@@ -183,7 +184,7 @@ export default function HealthRecordsPage() {
     }
     setFilteredRecords(records);
 
-  }, [doctorFilter, dateFilter, allRecords]);
+  }, [doctorFilter, dateFilter, allRecords, isMounted]);
 
   const handleDeleteRecord = async (id: string) => {
     await deleteHealthRecord(id);
@@ -226,49 +227,51 @@ export default function HealthRecordsPage() {
                 Filtrer les dossiers
             </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-4 items-end">
-            <div>
-                <Label htmlFor="doctor-filter" className="text-xs text-muted-foreground">Médecin</Label>
-                <div className="relative mt-1">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
-                    <Input 
-                        id="doctor-filter"
-                        placeholder="Filtrer par médecin..."
-                        value={doctorFilter}
-                        onChange={(e) => setDoctorFilter(e.target.value)}
-                        className="pl-9"
-                    />
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto] gap-4 items-end">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label htmlFor="doctor-filter" className="text-xs text-muted-foreground">Médecin</label>
+                    <div className="relative mt-1">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                        <Input 
+                            id="doctor-filter"
+                            placeholder="Filtrer par médecin..."
+                            value={doctorFilter}
+                            onChange={(e) => setDoctorFilter(e.target.value)}
+                            className="pl-9"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label className="text-xs text-muted-foreground">Date</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className="w-full justify-start text-left font-normal mt-1"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={dateFilter}
+                          onSelect={setDateFilter}
+                          initialFocus
+                          locale={fr}
+                        />
+                      </PopoverContent>
+                    </Popover>
                 </div>
             </div>
-            <div>
-                <Label className="text-xs text-muted-foreground">Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className="w-full justify-start text-left font-normal mt-1"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={dateFilter}
-                      onSelect={setDateFilter}
-                      initialFocus
-                      locale={fr}
-                    />
-                  </PopoverContent>
-                </Popover>
-            </div>
             <div className="flex flex-wrap gap-2 items-center justify-start lg:justify-end">
-                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" size="sm" className="w-auto">
+                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" size="sm" className="w-auto px-3">
                     <BrainCircuit className="mr-2 h-4 w-4" />
                     Analyse IA
                  </Button>
-                 <Button onClick={handleResetFilters} variant="ghost" size="sm">
+                 <Button onClick={handleResetFilters} variant="ghost" size="sm" className="w-auto px-3">
                     <Undo2 className="h-4 w-4 mr-2" />
                     Réinitialiser
                  </Button>
