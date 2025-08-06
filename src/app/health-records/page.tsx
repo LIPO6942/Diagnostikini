@@ -269,7 +269,7 @@ export default function HealthRecordsPage() {
             <div className="flex flex-wrap gap-2 items-center justify-start lg:justify-end">
                  <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" size="sm" className="w-auto px-3">
                     <BrainCircuit className="mr-2 h-4 w-4" />
-                    Analyse IA
+                    Docs Analysés IA
                  </Button>
                  <Button onClick={handleResetFilters} variant="ghost" size="sm" className="w-auto px-3">
                     <Undo2 className="h-4 w-4 mr-2" />
