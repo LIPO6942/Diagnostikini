@@ -9,6 +9,7 @@ import {
   Sparkles,
   User,
   Stethoscope,
+  FileKey2,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -59,12 +60,25 @@ export function SidebarNav() {
             <SidebarMenuButton
               asChild
               size="lg"
-              isActive={isActive("/record")}
-              tooltip="Dossier de Santé"
+              isActive={isActive("/consultations")}
+              tooltip="Consultations"
             >
-              <Link href="/record">
+              <Link href="/consultations">
                 <BookHeart />
-                <span>Dossier Santé</span>
+                <span>Consultations</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              size="lg"
+              isActive={isActive("/analyzed-documents")}
+              tooltip="Documents Analysés"
+            >
+              <Link href="/analyzed-documents">
+                <FileKey2 />
+                <span>Doc Analysés</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

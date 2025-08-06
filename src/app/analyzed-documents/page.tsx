@@ -1,13 +1,12 @@
 /**
- * @fileoverview Health record page component with smart symptom tracking and document management.
+ * @fileoverview Page for managing and viewing analyzed health documents.
  */
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -48,28 +47,16 @@ function EmptyState({ onRecordUpdate }: { onRecordUpdate: () => void }) {
             <div className="mb-4 inline-flex items-center justify-center size-16 rounded-full bg-secondary text-secondary-foreground">
                 <BookHeart className="size-8" />
             </div>
-            <h3 className="text-xl font-semibold">Aucun dossier trouvé</h3>
-            <p className="text-muted-foreground mt-2">L'historique de vos consultations et documents apparaîtra ici.</p>
+            <h3 className="text-xl font-semibold">Aucun document trouvé</h3>
+            <p className="text-muted-foreground mt-2">L'historique de vos documents analysés apparaîtra ici.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
                 <AddDocumentDialog onRecordUpdate={onRecordUpdate} />
                 <Button asChild variant="outline">
-                    <Link href="/">Démarrer une consultation IA</Link>
+                    <Link href="/analyze-document">Analyser un nouveau document</Link>
                 </Button>
             </div>
         </Card>
     );
-}
-
-function RecurringSymptomAlert({ symptom }: { symptom: string }) {
-    return (
-        <Alert variant="destructive">
-            <TriangleAlert className="h-4 w-4" />
-            <AlertTitle>Suivi Intelligent</AlertTitle>
-            <AlertDescription>
-                Nous avons remarqué que le symptôme <span className="font-semibold">"{symptom}"</span> a été enregistré plusieurs fois récemment. Si ce problème persiste, veuillez consulter un professionnel de santé.
-            </AlertDescription>
-        </Alert>
-    )
 }
 
 const categoryIcons = {
@@ -148,7 +135,7 @@ function DocumentPreview({ doc }: { doc: HealthDocument }) {
     )
 }
 
-export default function HealthRecordPage() {
+export default function AnalyzedDocumentsPage() {
   const [allRecords, setAllRecords] = useState<HealthRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<HealthRecord[]>([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -159,7 +146,7 @@ export default function HealthRecordPage() {
 
 
   const refreshRecords = () => {
-    const records = getHealthRecords();
+    const records = getHealthRecords().filter(r => r.category !== 'Consultation IA');
     setAllRecords(records);
     setFilteredRecords(records);
   }
@@ -201,26 +188,6 @@ export default function HealthRecordPage() {
     });
   };
 
-  const recurringSymptom = useMemo(() => {
-    if (allRecords.length < 2) return null;
-    
-    const aiConsultations = allRecords.filter(r => r.category === 'Consultation IA');
-    const diagnosisCounts: Record<string, number> = {};
-    const recentRecords = aiConsultations.slice(0, 5);
-
-    for (const record of recentRecords) {
-        if(record.title){
-            diagnosisCounts[record.title] = (diagnosisCounts[record.title] || 0) + 1;
-            if (diagnosisCounts[record.title] >= 2) {
-                return record.title;
-            }
-        }
-    }
-    
-    return null;
-  }, [allRecords]);
-
-
   if (!isMounted) {
     return <HealthRecordSkeleton />;
   }
@@ -232,14 +199,13 @@ export default function HealthRecordPage() {
     return acc;
   }, {} as Record<string, HealthRecord[]>);
   
-  const categories = ['Consultation IA', 'Ordonnance', 'Bilan', 'Radio', 'Scanner', 'IRM', 'Échographie', 'Autre'];
-
+  const categories = ['Ordonnance', 'Bilan', 'Radio', 'Scanner', 'IRM', 'Échographie', 'Autre'];
 
   return (
     <div className="space-y-6">
        <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold font-headline">Dossier de santé</h1>
+          <h1 className="text-3xl font-bold font-headline">Documents Analysés</h1>
           <p className="text-muted-foreground">Un journal de vos consultations et documents.</p>
         </div>
         <AddDocumentDialog onRecordUpdate={refreshRecords} />
@@ -289,8 +255,6 @@ export default function HealthRecordPage() {
         </CardContent>
       </Card>
 
-      {recurringSymptom && <RecurringSymptomAlert symptom={recurringSymptom} />}
-      
       {allRecords.length === 0 ? (
         <EmptyState onRecordUpdate={refreshRecords} />
       ) : filteredRecords.length === 0 ? (
@@ -309,7 +273,7 @@ export default function HealthRecordPage() {
                     <h2 className="text-xl font-semibold mb-3">{category}</h2>
                      <div className="space-y-4">
                         {groupedRecords[category].map(record => (
-                            <Card key={record.id} className={record.title === recurringSymptom ? "border-destructive" : ""}>
+                            <Card key={record.id}>
                             <CardHeader>
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1">
@@ -326,12 +290,6 @@ export default function HealthRecordPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {record.symptoms && (
-                                <>
-                                    <p className="font-semibold text-sm">Symptômes signalés :</p>
-                                    <p className="text-muted-foreground text-sm">{record.symptoms}</p>
-                                </>
-                                )}
                                 {record.summary && (
                                 <>
                                     <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
