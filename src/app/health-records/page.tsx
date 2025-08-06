@@ -21,7 +21,7 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { fr } from 'date-fns/locale';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { FormLabel } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
 
 function HealthRecordSkeleton() {
   return (
@@ -227,7 +227,7 @@ export default function HealthRecordsPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-4 items-end">
             <div>
-                <FormLabel className="text-xs text-muted-foreground">Médecin</FormLabel>
+                <Label className="text-xs text-muted-foreground">Médecin</Label>
                 <div className="relative mt-1">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
                     <Input 
@@ -239,7 +239,7 @@ export default function HealthRecordsPage() {
                 </div>
             </div>
             <div>
-                 <FormLabel className="text-xs text-muted-foreground">Date</FormLabel>
+                 <Label className="text-xs text-muted-foreground">Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button

@@ -21,6 +21,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { fr } from 'date-fns/locale';
+import { Label } from '@/components/ui/label';
 
 function HealthRecordSkeleton() {
   return (
@@ -163,7 +164,7 @@ export default function ConsultationsPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto] gap-4 items-end">
             <div className="relative">
-                 <FormLabel className="text-xs text-muted-foreground">Diagnostic</FormLabel>
+                 <Label className="text-xs text-muted-foreground">Diagnostic</Label>
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground mt-2"/>
                 <Input 
                     placeholder="Filtrer par diagnostic..."
@@ -173,7 +174,7 @@ export default function ConsultationsPage() {
                 />
             </div>
             <div className="w-full">
-                <FormLabel className="text-xs text-muted-foreground">Date</FormLabel>
+                <Label className="text-xs text-muted-foreground">Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
