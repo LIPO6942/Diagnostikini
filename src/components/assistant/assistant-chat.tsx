@@ -47,7 +47,7 @@ export default function AssistantChat() {
           summary: summary,
         };
 
-        saveHealthRecord(newRecord);
+        await saveHealthRecord(newRecord);
 
         toast({
           title: "Dossier de santé sauvegardé",

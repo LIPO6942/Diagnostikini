@@ -27,13 +27,13 @@ export function getHealthRecords(): HealthRecord[] {
   return [];
 }
 
-export function saveHealthRecord(newRecord: HealthRecord, dataUrl?: string): void {
+export async function saveHealthRecord(newRecord: HealthRecord, dataUrl?: string): Promise<void> {
   if (typeof window === 'undefined') {
     return;
   }
   
   if (dataUrl && newRecord.documents && newRecord.documents.length > 0) {
-    saveDocumentDataUrl(newRecord.documents[0].id, dataUrl);
+    await saveDocumentDataUrl(newRecord.documents[0].id, dataUrl);
   }
 
   const existingRecords = getHealthRecords();

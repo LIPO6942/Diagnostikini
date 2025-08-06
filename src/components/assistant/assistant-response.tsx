@@ -91,7 +91,7 @@ Suggestions de médicaments:
         summary: `Basé sur les symptômes, les diagnostics potentiels incluent : ${diagnosisSuggestions.join(', ')}. Médicaments suggérés : ${medicationSuggestions.join(', ')}.`,
     };
 
-    saveHealthRecord(newRecord);
+    await saveHealthRecord(newRecord);
     toast({
         title: "Dossier sauvegardé",
         description: "Votre consultation a été sauvegardée avec succès.",
