@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill, FileKey2 } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill, FileKey2, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -224,8 +224,8 @@ export default function HealthRecordsPage() {
                 Filtrer les dossiers
             </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
+            <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
                 <Input 
                     placeholder="Filtrer par médecin..."
@@ -238,7 +238,7 @@ export default function HealthRecordsPage() {
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
-                  className="w-full sm:w-auto justify-start text-left font-normal"
+                  className="w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateFilter ? format(dateFilter, "PPP", { locale: fr }) : <span>Filtrer par date</span>}
@@ -254,10 +254,16 @@ export default function HealthRecordsPage() {
                 />
               </PopoverContent>
             </Popover>
-             <Button onClick={handleResetFilters} variant="ghost" size="icon">
-                <Undo2 className="h-4 w-4" />
-                <span className="sr-only">Réinitialiser</span>
-             </Button>
+            <div className="flex gap-2">
+                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" className="w-full">
+                    <BrainCircuit className="mr-2 h-4 w-4" />
+                    Analyse IA
+                 </Button>
+                 <Button onClick={handleResetFilters} variant="ghost" size="icon">
+                    <Undo2 className="h-4 w-4" />
+                    <span className="sr-only">Réinitialiser</span>
+                 </Button>
+            </div>
         </CardContent>
       </Card>
 
@@ -294,7 +300,7 @@ export default function HealthRecordsPage() {
                                                 {record.title}
                                             </CardTitle>
                                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
-                                                {record.doctorName && <div className="flex items-center gap-1.5"><User className="size-3" />Dr. {record.doctorName}</div>}
+                                                {record.doctorName && <div className="flex items-center gap-1.5"><User className="size-3" />{record.doctorName}</div>}
                                                 {record.treatmentDate && <div className="flex items-center gap-1.5"><CalendarIcon className="size-3" />{format(new Date(record.treatmentDate), "d MMMM yyyy", { locale: fr })}</div>}
                                             </div>
                                         </div>
