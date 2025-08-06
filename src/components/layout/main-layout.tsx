@@ -33,8 +33,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
               </div>
                <Button asChild variant="accent">
                   <Link href="/analyze-document">
-                    <FileScan className="mr-2" />
-                    Analyser
+                    <>
+                      <FileScan className="mr-2" />
+                      Analyser
+                    </>
                   </Link>
                 </Button>
             </header>
