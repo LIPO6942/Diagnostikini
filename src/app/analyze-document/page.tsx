@@ -408,7 +408,7 @@ export default function AnalyzeDocumentPage() {
                   <CardDescription>Après la lecture du texte, cliquez pour obtenir une interprétation.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button onClick={onSubmit} disabled={isOcrLoading || isAiLoading || !extractedText || !form.getValues("analysisType") || !form.getValues("analysisDate")} className="w-full">
+                  <Button onClick={onSubmit} disabled={isOcrLoading || isAiLoading || !extractedText || !form.getValues("analysisType")} className="w-full">
                     {isOcrLoading && <><LoaderCircle className="mr-2 animate-spin" />Lecture du texte...</>}
                     {isAiLoading && <><BrainCircuit className="mr-2 animate-spin" />Analyse en cours...</>}
                     {!isOcrLoading && !isAiLoading && <><Sparkles className="mr-2" />Analyser avec l'IA</>}
