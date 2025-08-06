@@ -3,9 +3,9 @@
  */
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { createWorker } from 'tesseract.js';
@@ -15,17 +15,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
-import { FileScan, Upload, BrainCircuit, LoaderCircle, Sparkles, AlertTriangle, FilePlus2, ListChecks, FlaskConical, Stethoscope } from 'lucide-react';
+import { FileScan, BrainCircuit, LoaderCircle, Sparkles, AlertTriangle, FilePlus2, ListChecks, FlaskConical, Stethoscope, Upload, Camera, Zap } from 'lucide-react';
 import { saveHealthRecord } from '@/services/health-record-service';
 import { Skeleton } from '@/components/ui/skeleton';
+import { analysisTypeOptions } from '@/constants/profile-options';
 
 const analysisFormSchema = z.object({
-  file: z.any().refine(file => file?.length > 0, 'Un fichier est requis.'),
-  analysisType: z.string().min(3, { message: "Le type d'analyse doit avoir au moins 3 caractères." }),
+  analysisType: z.string({ required_error: "Le type d'analyse est requis." }),
   analysisDate: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Date invalide." }),
+  file: z.any().optional(),
 });
 
 type AnalysisFormValues = z.infer<typeof analysisFormSchema>;
@@ -125,6 +127,7 @@ function AnalysisSkeleton() {
 
 export default function AnalyzeDocumentPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [originalFileName, setOriginalFileName] = useState<string>('document.jpg');
   const [extractedText, setExtractedText] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalyzeDocumentOutput | null>(null);
   const [isOcrLoading, setIsOcrLoading] = useState(false);
@@ -132,39 +135,96 @@ export default function AnalyzeDocumentPage() {
   const { toast } = useToast();
   const { profile } = useProfile();
   
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+
   const form = useForm<AnalysisFormValues>({
     resolver: zodResolver(analysisFormSchema),
-    defaultValues: { analysisDate: new Date().toISOString().split('T')[0] }
+    defaultValues: { 
+      analysisDate: new Date().toISOString().split('T')[0],
+      analysisType: undefined,
+    }
   });
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    return () => {
+      // Stop camera stream when component unmounts
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      setHasCameraPermission(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsCameraActive(true);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      setHasCameraPermission(false);
+      toast({
+        variant: 'destructive',
+        title: 'Accès à la caméra refusé',
+        description: 'Veuillez autoriser l\'accès à la caméra dans les paramètres de votre navigateur.',
+      });
+    }
+  };
+
+  const processImage = async (dataUrl: string, fileName: string) => {
+    setImagePreview(dataUrl);
+    setOriginalFileName(fileName);
+    setExtractedText(null);
+    setAnalysisResult(null);
+    setIsOcrLoading(true);
+    toast({ title: 'Lecture du document...', description: 'L\'OCR analyse votre image. Cela peut prendre un moment.' });
+    try {
+      const worker = await createWorker('fra');
+      const { data: { text } } = await worker.recognize(dataUrl);
+      await worker.terminate();
+      setExtractedText(text);
+      toast({ title: 'Texte extrait avec succès !', description: 'Vous pouvez maintenant lancer l\'analyse IA.' });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Erreur OCR', description: 'Impossible de lire le texte du document.' });
+    } finally {
+      setIsOcrLoading(false);
+    }
+  };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
-      reader.onloadend = async () => {
-        setImagePreview(reader.result as string);
-        setExtractedText(null);
-        setAnalysisResult(null);
-        setIsOcrLoading(true);
-        toast({ title: 'Lecture du document...', description: 'L\'OCR analyse votre image. Cela peut prendre un moment.' });
-        try {
-          const worker = await createWorker('fra');
-          const { data: { text } } = await worker.recognize(reader.result as string);
-          await worker.terminate();
-          setExtractedText(text);
-          toast({ title: 'Texte extrait avec succès !', description: 'Vous pouvez maintenant lancer l\'analyse IA.' });
-        } catch(error) {
-          console.error(error);
-          toast({ variant: 'destructive', title: 'Erreur OCR', description: 'Impossible de lire le texte du document.' });
-        } finally {
-          setIsOcrLoading(false);
-        }
-      };
+      reader.onloadend = () => processImage(reader.result as string, file.name);
       reader.readAsDataURL(file);
     } else {
       toast({ variant: 'destructive', title: 'Fichier invalide', description: 'Veuillez sélectionner un fichier image.' });
     }
   };
+  
+  const handleCapture = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        processImage(dataUrl, `capture-${new Date().toISOString()}.jpg`);
+        setIsCameraActive(false);
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    }
+  };
+
 
   const onSubmit = async () => {
     if (!extractedText || !imagePreview) {
@@ -198,7 +258,7 @@ export default function AnalyzeDocumentPage() {
     const newRecord = {
       id: new Date().toISOString(),
       date: new Date().toISOString(),
-      category: 'Bilan' as const,
+      category: values.analysisType as any,
       title: `Analyse: ${values.analysisType}`,
       doctorName: "Analyse IA",
       treatmentDate: new Date(values.analysisDate).toISOString(),
@@ -206,8 +266,8 @@ export default function AnalyzeDocumentPage() {
       prescription: analysisResult.analysisItems.map(item => `${item.name}: ${item.value} (Normal: ${item.normalRange})`).join('\n'),
       documents: [{
         id: crypto.randomUUID(),
-        name: values.file[0].name,
-        mimeType: values.file[0].type
+        name: originalFileName,
+        mimeType: 'image/jpeg'
       }]
     };
 
@@ -228,61 +288,90 @@ export default function AnalyzeDocumentPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>1. Importer le document</CardTitle>
-          <CardDescription>Sélectionnez une image de votre bilan (sanguin, radio, etc.).</CardDescription>
+          <CardTitle>1. Informations sur l'analyse</CardTitle>
+          <CardDescription>Remplissez les détails de base de votre document.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form className="space-y-4">
-               <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="analysisType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type d'analyse</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ex: Bilan sanguin, Rapport de radio..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="analysisDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date de l'analyse</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-               </div>
-               <FormField
-                  control={form.control}
-                  name="file"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fichier</FormLabel>
+            <form className="grid md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="analysisType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type d'analyse</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input type="file" accept="image/*" onChange={e => {
-                          field.onChange(e.target.files);
-                          handleFileChange(e);
-                        }} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez un type..." />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        {analysisTypeOptions.map(option => (
+                          <SelectItem key={option} value={option}>{option}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="analysisDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date de l'analyse</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </form>
           </Form>
         </CardContent>
       </Card>
       
+      <Card>
+        <CardHeader>
+          <CardTitle>2. Fournir le document</CardTitle>
+          <CardDescription>Choisissez une méthode pour importer votre document.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="upload" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="upload"><Upload className="mr-2" />Téléverser</TabsTrigger>
+              <TabsTrigger value="camera" onClick={startCamera}><Camera className="mr-2" />Appareil photo</TabsTrigger>
+            </TabsList>
+            <TabsContent value="upload" className="pt-4">
+              <Input type="file" accept="image/*" onChange={handleFileChange} />
+            </TabsContent>
+            <TabsContent value="camera" className="pt-4">
+              {isCameraActive ? (
+                <div className="space-y-4">
+                  <video ref={videoRef} className="w-full aspect-video rounded-md bg-black" autoPlay muted playsInline />
+                  <Button onClick={handleCapture} className="w-full">
+                    <Zap className="mr-2" /> Capturer
+                  </Button>
+                </div>
+              ) : hasCameraPermission === false ? (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Accès Caméra Refusé</AlertTitle>
+                  <AlertDescription>
+                    L'accès à la caméra est nécessaire. Veuillez l'autoriser dans les paramètres de votre navigateur et rafraîchir la page.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                 <p className="text-sm text-muted-foreground text-center py-4">Cliquez sur l'onglet "Appareil photo" pour activer la caméra.</p>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
       {imagePreview && (
         <div className="grid md:grid-cols-2 gap-6 items-start">
             <Card>
@@ -297,7 +386,7 @@ export default function AnalyzeDocumentPage() {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>2. Lancer l'analyse IA</CardTitle>
+                  <CardTitle>3. Lancer l'analyse IA</CardTitle>
                   <CardDescription>Après la lecture du texte, cliquez pour obtenir une interprétation.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -327,3 +416,5 @@ export default function AnalyzeDocumentPage() {
     </div>
   );
 }
+
+    

@@ -45,3 +45,16 @@ export const additionalSymptomOptions = [
     "Irritabilité",
     "Gonflement des chevilles",
 ];
+
+export const analysisTypeOptions = [
+    "Bilan sanguin",
+    "Analyse d'urine",
+    "Rapport de radiographie",
+    "Rapport de scanner",
+    "Rapport d'IRM",
+    "Rapport d'échographie",
+    "Ordonnance",
+    "Autre document médical",
+];
+
+    
