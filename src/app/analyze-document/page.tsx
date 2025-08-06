@@ -94,7 +94,7 @@ function AnalysisResult({ result, onSave, isLoading }: { result: AnalyzeDocument
       <CardFooter className="border-t pt-6">
          <Button onClick={onSave} disabled={isLoading} className="w-full">
             {isLoading ? <LoaderCircle className="mr-2 animate-spin" /> : <FilePlus2 className="mr-2" />}
-            Sauvegarder au dossier de santé
+            {isLoading ? "Sauvegarde en cours..." : "Sauvegarder au dossier de santé"}
           </Button>
       </CardFooter>
     </Card>
@@ -256,6 +256,8 @@ export default function AnalyzeDocumentPage() {
   };
   
   const handleSaveToRecord = async () => {
+    if (isSaving) return; // Empêche les clics multiples
+
     const values = form.getValues();
     if (!analysisResult || !imagePreview || !values.analysisType) {
         toast({variant: 'destructive', title: 'Informations manquantes', description: 'Veuillez sélectionner un type d\'analyse.'});
@@ -271,7 +273,7 @@ export default function AnalyzeDocumentPage() {
         id: new Date().toISOString(),
         date: new Date().toISOString(),
         category: values.analysisType as any,
-        title: `Analyse de ${values.analysisType}`,
+        title: `${values.analysisType} (Analyse IA)`,
         doctorName: "Analyse IA",
         treatmentDate: new Date(values.analysisDate).toISOString(),
         summary: analysisResult.summary || "Aucun résumé. Toutes les valeurs étaient dans la norme.",
@@ -285,6 +287,7 @@ export default function AnalyzeDocumentPage() {
 
       saveHealthRecord(newRecord);
       toast({ title: "Analyse sauvegardée", description: "Le document et son analyse ont été ajoutés à votre dossier de santé." });
+      setAnalysisResult(null); // Clear the result to prevent re-saving
     } catch(e) {
       console.error(e);
       toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: 'La sauvegarde a échoué.' });
