@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { FileScan, BrainCircuit, LoaderCircle, Sparkles, AlertTriangle, FilePlus2, ListChecks, FlaskConical, Stethoscope, Upload, Camera, Zap } from 'lucide-react';
-import { saveHealthRecord } from '@/services/health-record-service';
+import { saveHealthRecord, saveDocumentDataUrl } from '@/services/health-record-service';
 import { Skeleton } from '@/components/ui/skeleton';
 import { analysisTypeOptions } from '@/constants/profile-options';
 
@@ -260,25 +260,27 @@ export default function AnalyzeDocumentPage() {
     }
     
     setIsSaving(true);
-    
-    const newRecord = {
-      id: new Date().toISOString(),
-      date: new Date().toISOString(),
-      category: values.analysisType as any,
-      title: values.analysisType,
-      doctorName: "Analyse IA",
-      treatmentDate: new Date(values.analysisDate).toISOString(),
-      summary: analysisResult.summary,
-      prescription: analysisResult.analysisItems.map(item => `${item.name}: ${item.value} (Normal: ${item.normalRange})`).join('\n'),
-      documents: [{
-        id: crypto.randomUUID(),
-        name: originalFileName,
-        mimeType: 'image/jpeg'
-      }]
-    };
-
     try {
-      await saveHealthRecord(newRecord, imagePreview);
+      const docId = crypto.randomUUID();
+      await saveDocumentDataUrl(docId, imagePreview);
+      
+      const newRecord = {
+        id: new Date().toISOString(),
+        date: new Date().toISOString(),
+        category: values.analysisType as any,
+        title: values.analysisType,
+        doctorName: "Analyse IA",
+        treatmentDate: new Date(values.analysisDate).toISOString(),
+        summary: analysisResult.summary,
+        prescription: analysisResult.analysisItems.map(item => `${item.name}: ${item.value} (Normal: ${item.normalRange})`).join('\n'),
+        documents: [{
+          id: docId,
+          name: originalFileName,
+          mimeType: 'image/jpeg'
+        }]
+      };
+
+      saveHealthRecord(newRecord);
       toast({ title: "Analyse sauvegardée", description: "Le document et son analyse ont été ajoutés à votre dossier de santé." });
     } catch(e) {
       console.error(e);

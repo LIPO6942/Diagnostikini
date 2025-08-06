@@ -27,15 +27,11 @@ export function getHealthRecords(): HealthRecord[] {
   return [];
 }
 
-export async function saveHealthRecord(newRecord: HealthRecord, dataUrl?: string): Promise<void> {
+export function saveHealthRecord(newRecord: HealthRecord): void {
   if (typeof window === 'undefined') {
     return;
   }
   
-  if (dataUrl && newRecord.documents && newRecord.documents.length > 0) {
-    await saveDocumentDataUrl(newRecord.documents[0].id, dataUrl);
-  }
-
   const existingRecords = getHealthRecords();
   localStorage.setItem(
     HEALTH_RECORDS_KEY,
