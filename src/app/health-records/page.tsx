@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { HealthRecord, HealthDocument } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill } from 'lucide-react';
+import { BookHeart, FileText, PlusCircle, Trash2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill, FileKey2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
