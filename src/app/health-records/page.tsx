@@ -209,12 +209,14 @@ export default function HealthRecordsPage() {
 
   return (
     <div className="space-y-6">
-       <div className="flex items-center justify-between">
+       <div>
         <div>
           <h1 className="text-3xl font-bold font-headline">Dossier Santé</h1>
           <p className="text-muted-foreground">Un journal de vos consultations et documents.</p>
         </div>
-        <AddDocumentDialog onRecordUpdate={refreshRecords} />
+        <div className="mt-4">
+          <AddDocumentDialog onRecordUpdate={refreshRecords} />
+        </div>
       </div>
       
       <Card>
@@ -262,7 +264,7 @@ export default function HealthRecordsPage() {
                 </Popover>
             </div>
             <div className="flex flex-wrap gap-2 items-center justify-start lg:justify-end">
-                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" size="sm">
+                 <Button onClick={() => setDoctorFilter('Analyse IA')} variant="outline" size="sm" className="w-auto">
                     <BrainCircuit className="mr-2 h-4 w-4" />
                     Analyse IA
                  </Button>
