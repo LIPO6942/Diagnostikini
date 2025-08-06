@@ -20,6 +20,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { fr } from 'date-fns/locale';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 function HealthRecordSkeleton() {
   return (
@@ -59,22 +60,22 @@ function EmptyState({ onRecordUpdate }: { onRecordUpdate: () => void }) {
     );
 }
 
-const categoryIcons:  Record<HealthRecord['category'], JSX.Element> = {
+const categoryIcons:  Record<string, JSX.Element> = {
     'Bilan': <FileText className="h-5 w-5 text-blue-500" />,
     'Ordonnance': <Pill className="h-5 w-5 text-green-500" />,
     'Radio': <FileText className="h-5 w-5 text-purple-500" />,
     'Scanner': <FileText className="h-5 w-5 text-purple-500" />,
     'IRM': <FileText className="h-5 w-5 text-purple-500" />,
-    'Échographie': <FileText className="h-5 w-5 text-purple-500" />,
+    'Échographie': <FileText className="h-5 w-5 text-pink-500" />,
     'Autre': <FileText className="h-5 w-5 text-gray-500" />,
-    'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
-    "Bilan sanguin": <FileText className="h-5 w-5 text-blue-500" />,
+    'Bilan sanguin': <FileText className="h-5 w-5 text-red-500" />,
     "Analyse d'urine": <FileText className="h-5 w-5 text-yellow-500" />,
     "Rapport de radiographie": <FileText className="h-5 w-5 text-indigo-500" />,
     "Rapport de scanner": <FileText className="h-5 w-5 text-indigo-500" />,
     "Rapport d'IRM": <FileText className="h-5 w-5 text-indigo-500" />,
     "Rapport d'échographie": <FileText className="h-5 w-5 text-pink-500" />,
     "Autre document médical": <FileText className="h-5 w-5 text-gray-500" />,
+    'Consultation IA': <FileKey2 className="h-5 w-5 text-primary" />,
 }
 
 function DocumentPreview({ doc }: { doc: HealthDocument }) {
@@ -271,95 +272,103 @@ export default function HealthRecordsPage() {
             <p className="text-muted-foreground mt-2">Essayez d'ajuster vos filtres de recherche.</p>
         </Card>
       ) : (
-        <div className="space-y-8">
+        <Accordion type="multiple" className="w-full space-y-4">
           {categories.map(category => (
             groupedRecords[category] && (
-                <div key={category}>
-                    <h2 className="text-xl font-semibold mb-3">{category}</h2>
-                     <div className="space-y-4">
-                        {groupedRecords[category].map(record => (
-                            <Card key={record.id}>
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <CardTitle className="flex items-center gap-2">
-                                            {categoryIcons[record.category as keyof typeof categoryIcons] || categoryIcons['Autre']}
-                                            {record.title}
-                                        </CardTitle>
-                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
-                                            {record.doctorName && <div className="flex items-center gap-1.5"><User className="size-3" />Dr. {record.doctorName}</div>}
-                                            {record.treatmentDate && <div className="flex items-center gap-1.5"><CalendarIcon className="size-3" />{format(new Date(record.treatmentDate), "d MMMM yyyy", { locale: fr })}</div>}
+                <AccordionItem value={category} key={category} className="border-none">
+                    <Card>
+                    <AccordionTrigger className="p-6 text-xl font-semibold hover:no-underline">
+                        <div className="flex items-center gap-3">
+                            {categoryIcons[category as keyof typeof categoryIcons] || categoryIcons['Autre']}
+                            {category} ({groupedRecords[category].length})
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-6">
+                         <div className="space-y-4">
+                            {groupedRecords[category].map(record => (
+                                <Card key={record.id} className="bg-muted/30">
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <CardTitle className="text-lg flex items-center gap-2">
+                                                {record.title}
+                                            </CardTitle>
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
+                                                {record.doctorName && <div className="flex items-center gap-1.5"><User className="size-3" />Dr. {record.doctorName}</div>}
+                                                {record.treatmentDate && <div className="flex items-center gap-1.5"><CalendarIcon className="size-3" />{format(new Date(record.treatmentDate), "d MMMM yyyy", { locale: fr })}</div>}
+                                            </div>
                                         </div>
+                                        <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
                                     </div>
-                                    <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {record.summary && (
-                                <>
-                                    <p className="font-semibold text-sm">Résumé / Diagnostic :</p>
-                                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{record.summary}</p>
-                                </>
-                                )}
-                                {record.prescription && (
-                                <>
-                                    <p className="font-semibold text-sm">Prescription / Notes :</p>
-                                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{record.prescription}</p>
-                                </>
-                                )}
-                                {record.documents && record.documents.length > 0 && (
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {record.summary && (
                                     <>
-                                        <Separator className="my-4" />
-                                        <p className="font-semibold text-sm mb-2">Documents ({record.documents.length}) :</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {record.documents.map((doc, index) => (
-                                                <DocumentPreview key={doc.id || index} doc={doc} />
-                                            ))}
-                                        </div>
+                                        <p className="font-semibold text-sm">Résumé / Diagnostic :</p>
+                                        <p className="text-muted-foreground text-sm whitespace-pre-wrap">{record.summary}</p>
                                     </>
-                                )}
-                            </CardContent>
-                            <CardFooter className="justify-end gap-2">
-                                <AddDocumentDialog 
-                                  existingRecord={record}
-                                  onRecordUpdate={refreshRecords} 
-                                  triggerButton={
-                                    <Button variant="outline" size="sm">
-                                      <Pencil className="mr-2 h-4 w-4" />
-                                      Modifier
-                                    </Button>
-                                  }
-                                />
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                                            <Trash2 className="mr-2 h-4 w-4" />
-                                            Supprimer
+                                    )}
+                                    {record.prescription && (
+                                    <>
+                                        <p className="font-semibold text-sm">Prescription / Notes :</p>
+                                        <p className="text-muted-foreground text-sm whitespace-pre-wrap">{record.prescription}</p>
+                                    </>
+                                    )}
+                                    {record.documents && record.documents.length > 0 && (
+                                        <>
+                                            <Separator className="my-4" />
+                                            <p className="font-semibold text-sm mb-2">Documents ({record.documents.length}) :</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {record.documents.map((doc, index) => (
+                                                    <DocumentPreview key={doc.id || index} doc={doc} />
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </CardContent>
+                                <CardFooter className="justify-end gap-2">
+                                    <AddDocumentDialog 
+                                      existingRecord={record}
+                                      onRecordUpdate={refreshRecords} 
+                                      triggerButton={
+                                        <Button variant="outline" size="sm">
+                                          <Pencil className="mr-2 h-4 w-4" />
+                                          Modifier
                                         </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                Cette action est irréversible. Le dossier de santé sera définitivement supprimé de votre appareil.
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
+                                      }
+                                    />
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                                                <Trash2 className="mr-2 h-4 w-4" />
                                                 Supprimer
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Cette action est irréversible. Le dossier de santé sera définitivement supprimé de votre appareil.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
+                                                    Supprimer
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+                    </AccordionContent>
+                    </Card>
+                </AccordionItem>
             )
           ))}
-        </div>
+        </Accordion>
       )}
     </div>
   );
