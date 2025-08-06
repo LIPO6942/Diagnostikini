@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { MapPin, Siren } from "lucide-react";
+import { FileScan, MapPin, Siren } from "lucide-react";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +15,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <SidebarProvider>
           <SidebarNav />
           <SidebarInset className="bg-background">
-            <header className="sticky top-0 z-10 flex h-14 items-center justify-start gap-4 border-b bg-background px-4 sm:px-6">
+            <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background px-4 sm:px-6">
               <div className="flex items-center gap-2">
                  <SidebarTrigger className="lg:hidden" />
                  <Button asChild>
@@ -31,6 +31,12 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 </Button>
               </div>
+               <Button asChild variant="outline">
+                  <Link href="/analyze-document">
+                    <FileScan className="mr-2" />
+                    Analyser un document
+                  </Link>
+                </Button>
             </header>
             <main className="p-4 sm:p-6 lg:p-8">
               {children}
