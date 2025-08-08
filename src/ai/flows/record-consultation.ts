@@ -21,7 +21,7 @@ export type RecordConsultationInput = z.infer<typeof RecordConsultationInputSche
 
 const RecordConsultationOutputSchema = z.object({
   recordId: z.string().describe("L'ID de l'entrée du dossier de santé."),
-  summary: z.string().describe("Un résumé de la consultation enregistrée dans le dossier de santé."),
+  summary: z.string().describe("Un résumé concis de la consultation, mettant en évidence les termes importants avec des balises ** (par exemple, **migraine**)."),
 });
 export type RecordConsultationOutput = z.infer<typeof RecordConsultationOutputSchema>;
 
@@ -33,13 +33,17 @@ const prompt = ai.definePrompt({
   name: 'recordConsultationPrompt',
   input: {schema: RecordConsultationInputSchema},
   output: {schema: RecordConsultationOutputSchema},
-  prompt: `Vous êtes un assistant de dossier de santé IA. Votre tâche est d'enregistrer les détails d'une consultation avec l'Assistant de Symptômes IA dans le dossier de santé de l'utilisateur, en français.
+  prompt: `Vous êtes un assistant de dossier de santé IA. Votre tâche est de créer un résumé très concis et facile à lire d'une consultation, en français.
 
-  Symptômes : {{{symptoms}}}
-  Diagnostic Différentiel : {{{differentialDiagnosis}}}
-  Recommandations de remèdes : {{{remedyRecommendations}}}
+  Informations de la consultation :
+  - Symptômes : {{{symptoms}}}
+  - Diagnostic Différentiel : {{{differentialDiagnosis}}}
+  - Recommandations : {{{remedyRecommendations}}}
 
-  Générez un résumé de la consultation en français et retournez un ID de dossier pour l'entrée du dossier de santé.
+  Instructions :
+  1. Générez un résumé qui va droit au but. Par exemple : "Pour des symptômes de **fièvre** et **toux**, un diagnostic possible de **grippe** a été suggéré."
+  2. Mettez en évidence les termes médicaux et les diagnostics les plus importants en les entourant de **deux astérisques**. Par exemple : **migraine**, **ibuprofène**.
+  3. Retournez un ID de dossier unique pour cette entrée.
 `,
 });
 

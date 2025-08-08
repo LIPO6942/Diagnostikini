@@ -14,6 +14,7 @@ import { TraditionalRemedyCard } from "./traditional-remedy-card";
 import { saveHealthRecord } from "@/services/health-record-service";
 import type { HealthRecord } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { recordConsultation } from "@/ai/flows/record-consultation";
 
 interface AssistantResponseProps {
   symptoms: string;
@@ -82,20 +83,36 @@ Suggestions de médicaments:
   };
 
   const onSaveRecord = async () => {
-    const newRecord: HealthRecord = {
-        id: new Date().toISOString(),
-        date: new Date().toLocaleDateString('fr-FR'),
-        category: 'Consultation IA',
-        title: potentialDiagnosis,
-        symptoms: symptoms,
-        summary: `Basé sur les symptômes, les diagnostics potentiels incluent : ${diagnosisSuggestions.join(', ')}. Médicaments suggérés : ${medicationSuggestions.join(', ')}.`,
-    };
+    try {
+        const remedyRecs = traditionalRemedies.map(r => r.remedyName).join(', ') || 'Aucune recommandation spécifique.';
+        const result = await recordConsultation({
+            symptoms: symptoms,
+            differentialDiagnosis: diagnosisSuggestions.join(', '),
+            remedyRecommendations: `Médicaments suggérés : ${medicationSuggestions.join(', ')}. Remèdes traditionnels : ${remedyRecs}`
+        });
 
-    await saveHealthRecord(newRecord);
-    toast({
-        title: "Dossier sauvegardé",
-        description: "Votre consultation a été sauvegardée avec succès.",
-    });
+        const newRecord: HealthRecord = {
+            id: result.recordId,
+            date: new Date().toISOString(),
+            category: 'Consultation IA',
+            title: potentialDiagnosis,
+            symptoms: symptoms,
+            summary: result.summary,
+        };
+
+        await saveHealthRecord(newRecord);
+        toast({
+            title: "Dossier sauvegardé",
+            description: "Votre consultation a été sauvegardée avec succès.",
+        });
+    } catch (e) {
+        console.error("Erreur lors de la sauvegarde", e);
+        toast({
+            variant: "destructive",
+            title: "Erreur de sauvegarde",
+            description: "La sauvegarde de la consultation a échoué."
+        });
+    }
   };
 
 

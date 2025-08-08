@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { AssistantResponse } from "@/components/assistant/assistant-response";
 import { ArrowLeft, RotateCcw, BrainCircuit } from "lucide-react";
 import { useProfile } from "@/contexts/profile-context";
+import { recordConsultation } from "@/ai/flows/record-consultation";
 
 interface SymptomAnalysisProps {
   symptomDescription: string;
@@ -46,23 +47,6 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
     };
     getAnalysis();
   }, [symptomDescription, profile, isProfileComplete]);
-
-  const handleSaveRecord = async (symptoms: string, diagnosis: string) => {
-    const newRecord: HealthRecord = {
-      id: new Date().toISOString(),
-      date: new Date().toLocaleDateString('fr-FR'),
-      category: 'Consultation IA',
-      title: diagnosis,
-      symptoms: symptoms,
-      summary: `Basé sur les symptômes, les diagnostics potentiels incluent : ${analysisResult?.diagnosisSuggestions.join(', ')}. Médicaments suggérés : ${analysisResult?.medicationSuggestions.join(', ')}.`,
-    };
-
-    saveHealthRecord(newRecord);
-    toast({
-      title: "Dossier sauvegardé",
-      description: "Votre consultation a été sauvegardée avec succès.",
-    });
-  };
 
   return (
     <Card className="animate-fade-in-up">

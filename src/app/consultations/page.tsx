@@ -21,7 +21,6 @@ import { fr } from 'date-fns/locale';
 import { Label } from '@/components/ui/label';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-
 function HealthRecordSkeleton() {
   return (
     <div className="space-y-4">
@@ -71,6 +70,20 @@ function RecurringSymptomAlert({ symptom }: { symptom: string }) {
     )
 }
 
+function FormattedSummary({ text }: { text: string }) {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return (
+        <p className="text-muted-foreground text-sm">
+            {parts.map((part, index) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={index} className="text-primary font-semibold">{part.slice(2, -2)}</strong>;
+                }
+                return part;
+            })}
+        </p>
+    );
+}
+
 export default function ConsultationsPage() {
   const [allRecords, setAllRecords] = useState<HealthRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<HealthRecord[]>([]);
@@ -87,8 +100,8 @@ export default function ConsultationsPage() {
   }
 
   useEffect(() => {
-    refreshRecords();
     setIsMounted(true);
+    refreshRecords();
   }, []);
 
   const handleResetFilters = () => {
@@ -265,7 +278,7 @@ export default function ConsultationsPage() {
                                             {record.summary && (
                                             <>
                                                 <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
-                                                <p className="text-muted-foreground text-sm">{record.summary}</p>
+                                                <FormattedSummary text={record.summary} />
                                             </>
                                             )}
                                         </CardContent>
