@@ -262,10 +262,10 @@ export default function ConsultationsPage() {
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-1">
                                                     <CardTitle className="flex items-center gap-2 text-base">
-                                                        Consultation du {format(new Date(record.id), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                                                        Consultation du {format(new Date(record.date), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
                                                     </CardTitle>
                                                 </div>
-                                                <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
+                                                <CardDescription>{format(new Date(record.date), "d MMM yy", { locale: fr })}</CardDescription>
                                             </div>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
