@@ -22,7 +22,7 @@ export type AnalyzeSymptomsInput = z.infer<typeof AnalyzeSymptomsInputSchema>;
 const AnalyzeSymptomsOutputSchema = z.object({
   diagnosisSuggestions: z
     .array(z.string())
-    .describe('Une liste de diagnostics potentiels basés sur les symptômes.'),
+    .describe("Une liste de diagnostics potentiels basés sur les symptômes. Les diagnostics doivent être des noms de conditions concis et directs (ex: 'Migraine', 'Gastro-entérite virale') sans justifications supplémentaires dans le titre."),
   clarifyingQuestions: z
     .array(z.string())
     .describe("Une liste de questions de clarification à poser à l'utilisateur pour plus d'informations. Cette liste doit être vide si les informations fournies sont suffisantes."),
@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Votre tâche est de fournir une analyse préliminaire complète basée sur TOUTES les informations fournies.
 
   Tâches :
-  1.  Analysez la description des symptômes et le profil utilisateur (s'il est fourni) pour suggérer quelques diagnostics potentiels.
+  1.  Analysez la description des symptômes et le profil utilisateur (s'il est fourni) pour suggérer quelques diagnostics potentiels. IMPORTANT: Les noms des diagnostics doivent être courts et directs (ex: "Migraine", "Gastro-entérite virale"), sans phrases de justification ajoutées.
   2.  Votre objectif est de fournir un diagnostic si complet que vous n'avez PAS besoin de poser de questions de clarification. La liste 'clarifyingQuestions' doit être vide, sauf si des informations cruciales manquent.
   3.  Suggérez des médicaments en vente libre pertinents qui pourraient soulager les symptômes. Précisez TOUJOURS que l'avis d'un médecin est préférable avant de prendre tout médicament. Par exemple : "Ibuprofène (consultez un médecin avant de le prendre)".
   4.  Pour le diagnostic le plus probable, suggérez des remèdes traditionnels tunisiens (remèdes de grand-mère). Pour chaque remède, spécifiez son statut (approuvé, déconseillé, ou neutre) et fournissez une justification scientifique claire et simple. Par exemple, pour un rhume, "Tisane au thym et au miel (Approuvé : Le thym a des propriétés antiseptiques et le miel adoucit la gorge)".
