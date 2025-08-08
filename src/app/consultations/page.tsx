@@ -4,24 +4,23 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import type { HealthRecord, HealthDocument } from '@/lib/types';
+import type { HealthRecord } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BookHeart, FileText, PlusCircle, TriangleAlert, Trash2, FileKey2, Pencil, Eye, Search, CalendarIcon, User, Undo2, Pill } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { getHealthRecords, deleteHealthRecord, getDocumentDataUrl } from '@/services/health-record-service';
+import { getHealthRecords, deleteHealthRecord } from '@/services/health-record-service';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { AddDocumentDialog } from '@/components/record/add-document-dialog';
-import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { fr } from 'date-fns/locale';
 import { Label } from '@/components/ui/label';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 function HealthRecordSkeleton() {
   return (
@@ -66,7 +65,7 @@ function RecurringSymptomAlert({ symptom }: { symptom: string }) {
             <TriangleAlert className="h-4 w-4" />
             <AlertTitle>Suivi Intelligent</AlertTitle>
             <AlertDescription>
-                Nous avons remarqué que le symptôme <span className="font-semibold">"{symptom}"</span> a été enregistré plusieurs fois récemment. Si ce problème persiste, veuillez consulter un professionnel de santé.
+                Nous avons remarqué que le diagnostic <span className="font-semibold">"{symptom}"</span> a été enregistré plusieurs fois récemment. Si ce problème persiste, veuillez consulter un professionnel de santé.
             </AlertDescription>
         </Alert>
     )
@@ -141,6 +140,20 @@ export default function ConsultationsPage() {
     
     return null;
   }, [allRecords]);
+  
+  const groupedRecords = useMemo(() => {
+    if (filteredRecords.length === 0) return {};
+    return filteredRecords.reduce((acc, record) => {
+      const title = record.title || 'Diagnostic non spécifié';
+      if (!acc[title]) {
+        acc[title] = [];
+      }
+      acc[title].push(record);
+      return acc;
+    }, {} as Record<string, HealthRecord[]>);
+  }, [filteredRecords]);
+
+  const uniqueTitles = Object.keys(groupedRecords);
 
 
   if (!isMounted) {
@@ -218,64 +231,76 @@ export default function ConsultationsPage() {
             <p className="text-muted-foreground mt-2">Essayez d'ajuster vos filtres de recherche.</p>
         </Card>
       ) : (
-        <div className="space-y-4">
-            {filteredRecords.map(record => (
-                <Card key={record.id} className={record.title === recurringSymptom ? "border-destructive" : ""}>
-                <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                            <CardTitle className="flex items-center gap-2">
+        <Accordion type="multiple" className="w-full space-y-4">
+            {uniqueTitles.map(title => (
+                <AccordionItem value={title} key={title} className="border-none">
+                     <Card className={title === recurringSymptom ? "border-destructive" : ""}>
+                        <AccordionTrigger className="p-6 text-xl font-semibold hover:no-underline">
+                             <div className="flex items-center gap-3">
                                 <FileKey2 className="h-5 w-5 text-primary" />
-                                {record.title}
-                            </CardTitle>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mt-2">
-                                {record.date && <div className="flex items-center gap-1.5"><CalendarIcon className="size-3" />{format(new Date(record.date), "d MMMM yyyy", { locale: fr })}</div>}
+                                {title} ({groupedRecords[title].length})
                             </div>
-                        </div>
-                        <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
-                    </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {record.symptoms && (
-                    <>
-                        <p className="font-semibold text-sm">Symptômes signalés :</p>
-                        <p className="text-muted-foreground text-sm">{record.symptoms}</p>
-                    </>
-                    )}
-                    {record.summary && (
-                    <>
-                        <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
-                        <p className="text-muted-foreground text-sm">{record.summary}</p>
-                    </>
-                    )}
-                </CardContent>
-                <CardFooter className="justify-end gap-2">
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Supprimer
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Cette action est irréversible. La consultation sera définitivement supprimée de votre appareil.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
-                                    Supprimer
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </CardFooter>
-                </Card>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-6 pb-6">
+                            <div className="space-y-4">
+                                {groupedRecords[title].map(record => (
+                                    <Card key={record.id} className="bg-muted/30">
+                                        <CardHeader>
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <CardTitle className="flex items-center gap-2 text-base">
+                                                        Consultation du {format(new Date(record.id), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                                                    </CardTitle>
+                                                </div>
+                                                <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            {record.symptoms && (
+                                            <>
+                                                <p className="font-semibold text-sm">Symptômes signalés :</p>
+                                                <p className="text-muted-foreground text-sm">{record.symptoms}</p>
+                                            </>
+                                            )}
+                                            {record.summary && (
+                                            <>
+                                                <p className="font-semibold text-sm">Résumé généré par l'IA :</p>
+                                                <p className="text-muted-foreground text-sm">{record.summary}</p>
+                                            </>
+                                            )}
+                                        </CardContent>
+                                        <CardFooter className="justify-end gap-2">
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        Supprimer
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Cette action est irréversible. La consultation sera définitivement supprimée de votre appareil.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleDeleteRecord(record.id)} className={buttonVariants({ variant: "destructive" })}>
+                                                            Supprimer
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </div>
+                        </AccordionContent>
+                     </Card>
+                </AccordionItem>
             ))}
-        </div>
+        </Accordion>
       )}
     </div>
   );
