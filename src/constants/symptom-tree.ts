@@ -2,7 +2,7 @@
  * @fileoverview Defines the interactive symptom tree structure.
  */
 import type { SymptomNode } from "@/lib/types";
-import { PersonStanding, Wind, Thermometer, Waves, Ear, Brain, Bone, Eye, Sheet, Activity, Droplet, HeartPulse, ShieldAlert, BadgeInfo, BrainCircuit } from "lucide-react";
+import { PersonStanding, Wind, Thermometer, Waves, Ear, Brain, Bone, Eye, Sheet, Activity, Droplet, HeartPulse, ShieldAlert, BadgeInfo, BrainCircuit, Users, Heart, Annoyed } from "lucide-react";
 
 export const symptomTree: SymptomNode[] = [
   {
@@ -11,41 +11,6 @@ export const symptomTree: SymptomNode[] = [
     descriptionTunisian: "وجيعة",
     icon: PersonStanding,
     children: [
-      {
-        id: "tete",
-        label: "Tête",
-        descriptionTunisian: "راس",
-        icon: Brain,
-        children: [
-          { 
-            id: "pulsatile", 
-            label: "Pulsatile",
-            descriptionTunisian: "وجيعة تنبض",
-            children: [
-                { id: "tete-pulsatile-nausee", label: "Avec nausées/vomissements", description: "Douleur à la tête pulsatile, avec nausées ou vomissements", descriptionTunisian: "معاها غثيان و تقيا" },
-                { id: "tete-pulsatile-lumiere-son", label: "Sensibilité lumière/son", description: "Douleur à la tête pulsatile, avec sensibilité à la lumière ou au son", descriptionTunisian: "تتقلق من الضو و الحس" },
-            ]
-          },
-          { 
-            id: "sensation-pression", 
-            label: "Sensation de pression/serrement", 
-            descriptionTunisian: "تحس بضغط على راسك",
-            children: [
-                { id: "tete-pression-stress", label: "Apparaît avec le stress", description: "Sensation de pression à la tête, liée au stress", descriptionTunisian: "تجيك وقت الستراس" },
-                { id: "tete-pression-continue", label: "Continue tout le long de la journée", description: "Sensation de pression à la tête, continue", descriptionTunisian: "تكمل معاك النهار الكل" },
-            ]
-          },
-          { 
-            id: "un-cote", 
-            label: "D'un seul côté",
-            descriptionTunisian: "شيرة برك توجع فيك", 
-            children: [
-                { id: "tete-un-cote-oeil", label: "Derrière l'œil", description: "Douleur d'un seul côté de la tête, derrière l'œil", descriptionTunisian: "وراء العين" },
-                { id: "tete-un-cote-sinus", label: "Au niveau des sinus", description: "Douleur d'un seul côté de la tête, au niveau des sinus", descriptionTunisian: "في الجيوب الأنفية" },
-            ]
-          },
-        ],
-      },
       {
         id: "poitrine",
         label: "Poitrine",
@@ -143,62 +108,31 @@ export const symptomTree: SymptomNode[] = [
     ],
   },
   {
-    id: "fievre",
-    label: "Fièvre / Température",
-    descriptionTunisian: "سخانة",
-    icon: Thermometer,
-    children: [
-      { 
-        id: "fievre-legere", 
-        label: "Légère (37.5-38.4°C)", 
-        descriptionTunisian: "خفيفة",
-        children: [
-            { id: "fievre-legere-courte", label: "Depuis 1-2 jours", description: "Fièvre légère depuis 1 à 2 jours", descriptionTunisian: "عندها يوم أو يومين" },
-            { id: "fievre-legere-longue", label: "Depuis plus de 3 jours", description: "Fièvre légère depuis plus de 3 jours", descriptionTunisian: "أكثر من 3 أيام" },
-        ]
-       },
-      { id: "fievre-moderee", label: "Modérée (38.5-39.4°C)", description: "Fièvre modérée (38.5-39.4°C)", descriptionTunisian: "متوسطة" },
-      { id: "fievre-elevee", label: "Élevée (>39.5°C)", description: "Fièvre élevée (plus de 39.5°C)", descriptionTunisian: "قوية" },
-      { 
-        id: "fievre-frissons", 
-        label: "Avec frissons et sueurs", 
-        descriptionTunisian: "معاها رعشة و عرق",
-        children: [
-          { id: "fievre-frissons-continus", label: "Frissons continus", description: "Fièvre avec des frissons constants", descriptionTunisian: "رعشة متواصلة" },
-          { id: "fievre-sueurs-nocturnes", label: "Sueurs surtout la nuit", description: "Fièvre avec des sueurs principalement nocturnes", descriptionTunisian: "عرق في الليل" },
-        ]
-      },
-    ],
-  },
-  {
-    id: "gorge",
-    label: "Mal de Gorge",
-    descriptionTunisian: "وجيعة قراجم",
-    icon: Activity,
-    children: [
-        { id: "gorge-picotement-brulure", label: "Picotement ou Brûlure", description: "Mal de gorge avec picotements ou sensation de brûlure", descriptionTunisian: "تنميل أو حرقة" },
-        { id: "gorge-difficulte-avaler", label: "Difficulté à avaler", description: "Mal de gorge rendant la déglutition difficile", descriptionTunisian: "صعوبة في البلع" },
-        { id: "gorge-rouge-gonflee", label: "Gorge rouge et/ou gonflée", description: "Gorge d'apparence très rouge ou enflée", descriptionTunisian: "حمراء و/أو منفوخة" },
-        { id: "gorge-points-blancs-caseum", label: "Points blancs / Caséum", description: "Présence de points blancs ou de dépôts jaunâtres sur les amygdales", descriptionTunisian: "نقط بيض أو صفراء" },
-        { id: "gorge-voix-enrouee", label: "Voix enrouée", description: "Modification de la voix, qui devient rauque", descriptionTunisian: "صوت مبحاح" },
-        { id: "gorge-sensation-boule", label: "Sensation de boule dans la gorge", description: "Impression d'avoir quelque chose de coincé dans la gorge", descriptionTunisian: "تحس بكعبة في قرجومك" },
-        { id: "gorge-avec-ganglions", label: "Avec des ganglions gonflés", description: "Mal de gorge avec des ganglions gonflés dans le cou", descriptionTunisian: "مع كعابر (غدد) منفوخة" },
-        { id: "gorge-avec-toux", label: "Avec une toux", description: "Mal de gorge accompagné de toux", descriptionTunisian: "مع الكحة" },
-        { id: "gorge-avec-nez-coule", label: "Avec le nez qui coule", description: "Mal de gorge avec un écoulement nasal", descriptionTunisian: "مع الخشم إللي يجري" },
-    ],
-  },
-  {
-    id: "respiration",
-    label: "Gêne respiratoire",
-    descriptionTunisian: "مشكلة في التنفس",
+    id: "respiratoire",
+    label: "Respiratoire & ORL",
+    descriptionTunisian: "تنفس، خشم، وذننين",
     icon: Wind,
     children: [
-      { id: "essoufflement-effort", label: "Essoufflement à l'effort", description: "Essoufflement lors d'une activité physique", descriptionTunisian: "تتقطع النفس وقت المجهود" },
-      { id: "essoufflement-repos", label: "Essoufflement au repos", description: "Essoufflement sans faire d'effort", descriptionTunisian: "تتقطع النفس في الراحة" },
+      {
+        id: "gorge",
+        label: "Mal de Gorge",
+        descriptionTunisian: "وجيعة قراجم",
+        icon: Activity,
+        children: [
+            { id: "gorge-picotement-brulure", label: "Picotement ou Brûlure", description: "Mal de gorge avec picotements ou sensation de brûlure", descriptionTunisian: "تنميل أو حرقة" },
+            { id: "gorge-difficulte-avaler", label: "Difficulté à avaler", description: "Mal de gorge rendant la déglutition difficile", descriptionTunisian: "صعوبة في البلع" },
+            { id: "gorge-rouge-gonflee", label: "Gorge rouge et/ou gonflée", description: "Gorge d'apparence très rouge ou enflée", descriptionTunisian: "حمراء و/أو منفوخة" },
+            { id: "gorge-points-blancs-caseum", label: "Points blancs / Caséum", description: "Présence de points blancs ou de dépôts jaunâtres sur les amygdales", descriptionTunisian: "نقط بيض أو صفراء" },
+            { id: "gorge-voix-enrouee", label: "Voix enrouée", description: "Modification de la voix, qui devient rauque", descriptionTunisian: "صوت مبحاح" },
+            { id: "gorge-sensation-boule", label: "Sensation de boule dans la gorge", description: "Impression d'avoir quelque chose de coincé dans la gorge", descriptionTunisian: "تحس بكعبة في قرجومك" },
+            { id: "gorge-avec-ganglions", label: "Avec des ganglions gonflés", description: "Mal de gorge avec des ganglions gonflés dans le cou", descriptionTunisian: "مع كعابر (غدد) منفوخة" },
+        ],
+      },
       { 
         id: "toux", 
         label: "Toux",
         descriptionTunisian: "كحة",
+        icon: Wind,
         children: [
             { 
               id: "toux-seche", 
@@ -220,14 +154,104 @@ export const symptomTree: SymptomNode[] = [
             },
         ]
       },
-      { id: "respiration-sifflante", label: "Respiration sifflante", description: "Sifflement audible lors de la respiration", descriptionTunisian: "نفسك يزفر" },
-      { id: "douleur-respiration", label: "Douleur en respirant profondément", description: "Douleur thoracique à l'inspiration profonde", descriptionTunisian: "وجيعة كي تجبد نفس بالقوي"},
+      { 
+        id: "nez", 
+        label: "Nez",
+        descriptionTunisian: "خشم",
+        icon: Wind,
+        children: [
+          { id: "nez-bouche", label: "Nez bouché", description: "Congestion nasale", descriptionTunisian: "خشم مسكر" },
+          { 
+            id: "ecoulement-nasal", 
+            label: "Écoulement nasal", 
+            descriptionTunisian: "خشم يجري",
+            children: [
+              { id: "ecoulement-clair", label: "Clair (comme de l'eau)", description: "Écoulement nasal clair", descriptionTunisian: "صافي كي الماء" },
+              { id: "ecoulement-epais", label: "Épais et coloré", description: "Écoulement nasal épais (jaune/vert)", descriptionTunisian: "خاثر و ملون" },
+            ]
+          },
+          { id: "sinus-douloureux", label: "Douleur aux sinus", description: "Douleur au niveau du front ou des joues", descriptionTunisian: "وجيعة في الجيوب الأنفية"},
+        ]
+      },
+      { 
+        id: "oreilles", 
+        label: "Oreilles",
+        descriptionTunisian: "وذنين",
+        icon: Ear,
+        children: [
+          { id: "douleur-oreille", label: "Douleur d'oreille", description: "Douleur dans une ou les deux oreilles", descriptionTunisian: "وجيعة وذنين" },
+          { id: "oreille-bouchee", label: "Sensation d'oreille bouchée", description: "Diminution de l'audition ou sensation de pression", descriptionTunisian: "تحسها مسكرة" },
+          { id: "ecoulement-oreille", label: "Écoulement de l'oreille", description: "Liquide qui sort du canal auditif", descriptionTunisian: "سائل يخرج من الوذن" },
+        ]
+      },
+      { id: "essoufflement", label: "Essoufflement", description: "Difficulté à respirer ou souffle court", descriptionTunisian: "تتقطع النفس", icon: Wind},
+      { id: "respiration-sifflante", label: "Respiration sifflante", description: "Sifflement audible lors de la respiration", descriptionTunisian: "نفسك يزفر", icon: Wind },
     ],
   },
-   {
-    id: "troubles-digestifs",
-    label: "Troubles digestifs",
-    descriptionTunisian: "مشاكل في الهضم",
+  {
+    id: "neurologique",
+    label: "Neurologique",
+    descriptionTunisian: "الأعصاب و الرأس",
+    icon: Brain,
+    children: [
+      {
+        id: "tete",
+        label: "Maux de tête",
+        descriptionTunisian: "وجيعة راس",
+        icon: Brain,
+        children: [
+          { 
+            id: "pulsatile", 
+            label: "Pulsatile",
+            descriptionTunisian: "وجيعة تنبض",
+            children: [
+                { id: "tete-pulsatile-nausee", label: "Avec nausées/vomissements", description: "Douleur à la tête pulsatile, avec nausées ou vomissements", descriptionTunisian: "معاها غثيان و تقيا" },
+                { id: "tete-pulsatile-lumiere-son", label: "Sensibilité lumière/son", description: "Douleur à la tête pulsatile, avec sensibilité à la lumière ou au son", descriptionTunisian: "تتقلق من الضو و الحس" },
+            ]
+          },
+          { 
+            id: "sensation-pression", 
+            label: "En étau / Pression", 
+            descriptionTunisian: "تحس بضغط على راسك",
+            children: [
+                { id: "tete-pression-stress", label: "Apparaît avec le stress", description: "Sensation de pression à la tête, liée au stress", descriptionTunisian: "تجيك وقت الستراس" },
+                { id: "tete-pression-continue", label: "Continue toute la journée", description: "Sensation de pression à la tête, continue", descriptionTunisian: "تكمل معاك النهار الكل" },
+            ]
+          },
+        ],
+      },
+      { 
+        id: "vertiges-etourdissements", 
+        label: "Vertiges / Étourdissements", 
+        descriptionTunisian: "دوخة",
+        icon: Wind,
+        children: [
+          { id: "vertiges-debout", label: "En se levant", description: "Vertiges en passant de la position assise à debout", descriptionTunisian: "كي تقوم من بلاصتك" },
+          { id: "vertiges-rotatoires", label: "Rotatoires (tout tourne)", description: "Sensation que l'environnement tourne autour de vous", descriptionTunisian: "الدنيا تدور بيك"},
+        ]
+      },
+      { id: "faiblesse-membre", label: "Faiblesse d'un membre", description: "Perte de force dans un bras ou une jambe", descriptionTunisian: "فشلة في عضو", icon: PersonStanding},
+      { id: "fourmillements", label: "Fourmillements / Engourdissement", description: "Picotements ou perte de sensibilité", descriptionTunisian: "تنميل", icon: Waves },
+      { id: "trouble-parole-vision", label: "Trouble de la parole ou de la vision", description: "Difficulté à parler ou vision double/floue soudaine", descriptionTunisian: "مشكلة في الكلام أو النظر", icon: Eye},
+    ]
+  },
+  {
+    id: "cardiovasculaire",
+    label: "Cardio-vasculaire",
+    descriptionTunisian: "القلب و الشرايين",
+    icon: Heart,
+    children: [
+      { id: "palpitations", label: "Palpitations", description: "Battements de cœur rapides, forts ou irréguliers", descriptionTunisian: "تحس بقلبك يخبط", icon: HeartPulse},
+      { id: "douleur-oppression-poitrine", label: "Douleur ou oppression thoracique", description: "Sensation de serrement ou de poids sur la poitrine", descriptionTunisian: "وجيعة أو ضغط في الصدر", icon: ShieldAlert},
+      { id: "essoufflement-cardio", label: "Essoufflement", description: "Souffle court à l'effort ou au repos", descriptionTunisian: "تقطع النفس", icon: Wind},
+      { id: "gonflement-jambes", label: "Gonflement des jambes/chevilles", description: "Œdème au niveau des membres inférieurs", descriptionTunisian: "نفخ في الساقين/الكعب", icon: PersonStanding},
+      { id: "malaise-effort", label: "Malaise à l'effort", description: "Sensation de faiblesse ou d'évanouissement pendant un effort", descriptionTunisian: "تحس روحك خايب وقت المجهود", icon: Annoyed},
+    ]
+  },
+  {
+    id: "digestif",
+    label: "Digestif",
+    descriptionTunisian: "الهضم و الكرش",
     icon: Waves,
     children: [
       { id: "nausees-vomissements", label: "Nausées ou vomissements", description: "Envie de vomir ou vomissements", descriptionTunisian: "غثيان أو تقيء" },
@@ -244,88 +268,6 @@ export const symptomTree: SymptomNode[] = [
       { id: "ballonnements", label: "Ballonnements et gaz", description: "Sensation de ventre gonflé et gaz excessifs", descriptionTunisian: "نفخ و غازات" },
       { id: "perte-appetit", label: "Perte d'appétit", description: "Absence de faim", descriptionTunisian: "شهية مسدودة"},
     ],
-  },
-  {
-    id: "troubles-nez-oreilles",
-    label: "Nez & Oreilles",
-    descriptionTunisian: "خشم و وذنين",
-    icon: Ear,
-    children: [
-      { id: "nez-bouche", label: "Nez bouché", description: "Congestion nasale", descriptionTunisian: "خشم مسكر" },
-      { 
-        id: "ecoulement-nasal", 
-        label: "Écoulement nasal", 
-        descriptionTunisian: "خشم يجري",
-        children: [
-           { id: "ecoulement-clair", label: "Clair (comme de l'eau)", description: "Écoulement nasal clair", descriptionTunisian: "صافي كي الماء" },
-           { id: "ecoulement-epais", label: "Épais et coloré", description: "Écoulement nasal épais (jaune/vert)", descriptionTunisian: "خاثر و ملون" },
-        ]
-      },
-      { id: "douleur-oreille", label: "Douleur d'oreille", description: "Douleur dans une ou les deux oreilles", descriptionTunisian: "وجيعة وذنين" },
-      { id: "sinus-douloureux", label: "Sinus douloureux", description: "Douleur au niveau du front ou des joues", descriptionTunisian: "وجيعة في الجيوب الأنفية"},
-    ],
-  },
-  {
-    id: "peau",
-    label: "Problèmes de peau",
-    descriptionTunisian: "مشاكل جلدة",
-    icon: Sheet,
-    children: [
-      { 
-        id: "eruption-cutanee", 
-        label: "Éruption (boutons, plaques)", 
-        descriptionTunisian: "حبوب، طفح جلدي",
-        children: [
-           { id: "eruption-localisee", label: "Localisée", description: "Éruption sur une zone précise du corps", descriptionTunisian: "في بقعة معينة" },
-           { id: "eruption-generalisee", label: "Généralisée", description: "Éruption sur une grande partie du corps", descriptionTunisian: "منتشرة في البدن الكل" },
-        ]
-      },
-      { id: "demangeaisons", label: "Démangeaisons", description: "Sensation qui pousse à se gratter", descriptionTunisian: "حكة" },
-      { id: "secheresse-peau", label: "Peau sèche ou qui pèle", description: "Peau sèche ou desquamation", descriptionTunisian: "جلدة شايحة تتقشر" },
-      { id: "lesion-inhabituelle", label: "Lésion ou grain de beauté inhabituel", description: "Apparition ou modification d'une lésion cutanée", descriptionTunisian: "ظهور أو تغير في شكل \"خالة\"" },
-    ]
-  },
-   {
-    id: "etat-general",
-    label: "État général / Neurologique",
-    descriptionTunisian: "الحالة العامة / الأعصاب",
-    icon: BrainCircuit,
-    children: [
-      { id: "fatigue-inhabituelle", label: "Fatigue intense et inhabituelle", description: "Grande fatigue qui ne passe pas avec le repos", descriptionTunisian: "تعب كبير غير عادي" },
-      { 
-        id: "vertiges-etourdissements", 
-        label: "Vertiges ou étourdissements", 
-        descriptionTunisian: "دوخة",
-        children: [
-          { id: "vertiges-debout", label: "En se levant", description: "Vertiges en passant de la position assise à debout", descriptionTunisian: "كي تقوم من بلاصتك" },
-          { id: "vertiges-continus", label: "Continus", description: "Vertiges constants", descriptionTunisian: "متواصلة" },
-          { id: "vertiges-rotatoires", label: "Rotatoires (tout tourne)", description: "Sensation que l'environnement tourne autour de vous", descriptionTunisian: "الدنيا تدور بيك"},
-        ]
-      },
-      { id: "somnolence", label: "Somnolence excessive", description: "Envie de dormir constante durant la journée", descriptionTunisian: "تحب ترقد برشة" },
-      { id: "trouble-concentration", label: "Difficulté de concentration", description: "Difficulté à se concentrer ou confusion", descriptionTunisian: "صعوبة في التركيز"},
-    ],
-  },
-  {
-    id: "troubles-yeux",
-    label: "Troubles oculaires",
-    descriptionTunisian: "مشاكل في العينين",
-    icon: Eye,
-    children: [
-        { id: "yeux-rouges", label: "Yeux rouges ou irrités", description: "Rougeur ou irritation des yeux", descriptionTunisian: "عينين حمر" },
-        { id: "vision-floue", label: "Vision floue", description: "Vue qui devient trouble", descriptionTunisian: "نظر مضبب" },
-        { id: "secheresse-oculaire", label: "Sensation de sécheresse / sable", description: "Sensation de corps étranger ou de sécheresse dans les yeux", descriptionTunisian: "تحس عينيك شايحين" },
-        { 
-          id: "ecoulement-oeil", 
-          label: "Écoulement oculaire", 
-          descriptionTunisian: "عينيك تدمّع",
-          children: [
-            { id: "ecoulement-oeil-clair", label: "Écoulement clair (larmes)", description: "Larmoiement excessif et clair", descriptionTunisian: "صافي كي الدموع" },
-            { id: "ecoulement-oeil-purulent", label: "Écoulement purulent (jaunâtre)", description: "Écoulement épais et jaunâtre", descriptionTunisian: "أصفر وخاثر" },
-          ]
-        },
-        { id: "sensibilite-lumiere", label: "Sensibilité à la lumière", description: "La lumière vive est douloureuse ou gênante", descriptionTunisian: "تتقلق من الضوء"},
-    ]
   },
   {
     id: "genito-urinaire",
@@ -354,6 +296,82 @@ export const symptomTree: SymptomNode[] = [
       { id: "sang-urines", label: "Sang dans les urines", description: "Présence de sang dans les urines", descriptionTunisian: "دم في البول" },
       { id: "douleur-reins", label: "Douleur bas du dos / reins", description: "Douleur dans la région lombaire", descriptionTunisian: "وجيعة في أسفل الظهر / الكلاوي" },
       { id: "ecoulement-inhabituel", label: "Écoulement inhabituel", description: "Écoulement génital qui n'est pas normal", descriptionTunisian: "إفرازات غير عادية" },
+    ]
+  },
+  {
+    id: "peau",
+    label: "Problèmes de peau",
+    descriptionTunisian: "مشاكل جلدة",
+    icon: Sheet,
+    children: [
+      { 
+        id: "eruption-cutanee", 
+        label: "Éruption (boutons, plaques)", 
+        descriptionTunisian: "حبوب، طفح جلدي",
+        children: [
+           { id: "eruption-localisee", label: "Localisée", description: "Éruption sur une zone précise du corps", descriptionTunisian: "في بقعة معينة" },
+           { id: "eruption-generalisee", label: "Généralisée", description: "Éruption sur une grande partie du corps", descriptionTunisian: "منتشرة في البدن الكل" },
+        ]
+      },
+      { id: "demangeaisons", label: "Démangeaisons", description: "Sensation qui pousse à se gratter", descriptionTunisian: "حكة" },
+      { id: "secheresse-peau", label: "Peau sèche ou qui pèle", description: "Peau sèche ou desquamation", descriptionTunisian: "جلدة شايحة تتقشر" },
+      { id: "lesion-inhabituelle", label: "Lésion ou grain de beauté inhabituel", description: "Apparition ou modification d'une lésion cutanée", descriptionTunisian: "ظهور أو تغير في شكل \"خالة\"" },
+    ]
+  },
+   {
+    id: "etat-general",
+    label: "État général",
+    descriptionTunisian: "الحالة العامة",
+    icon: Users,
+    children: [
+      { 
+        id: "fievre", 
+        label: "Fièvre",
+        descriptionTunisian: "سخانة",
+        icon: Thermometer,
+        children: [
+          { id: "fievre-legere", label: "Légère (< 38.5°C)", description: "Fièvre légère (moins de 38.5°C)", descriptionTunisian: "خفيفة" },
+          { id: "fievre-elevee", label: "Élevée (> 38.5°C)", description: "Fièvre élevée (plus de 38.5°C)", descriptionTunisian: "قوية" },
+          { id: "fievre-frissons", label: "Avec frissons", description: "Fièvre accompagnée de frissons", descriptionTunisian: "معاها رعشة"},
+        ]
+       },
+       { id: "fatigue-inhabituelle", label: "Fatigue intense et inhabituelle", description: "Grande fatigue qui ne passe pas avec le repos", descriptionTunisian: "تعب كبير غير عادي", icon: Annoyed },
+       { id: "perte-poids", label: "Perte de poids involontaire", description: "Amaigrissement non expliqué", descriptionTunisian: "طيحت ميزان من غير سبب", icon: PersonStanding},
+       { id: "sueurs-nocturnes", label: "Sueurs nocturnes", description: "Transpiration excessive pendant la nuit", descriptionTunisian: "عرق في الليل", icon: Droplet},
+    ],
+  },
+  {
+    id: "sante-mentale",
+    label: "Humeur & Santé Mentale",
+    descriptionTunisian: "الحالة النفسية",
+    icon: BrainCircuit,
+    children: [
+      { id: "anxiete-stress", label: "Anxiété / Stress élevé", description: "Sentiment constant de nervosité ou d'inquiétude", descriptionTunisian: "قلق و ستراس", icon: ShieldAlert},
+      { id: "tristesse-persistante", label: "Tristesse persistante / Déprime", description: "Humeur basse et perte d'intérêt pendant plus de 2 semaines", descriptionTunisian: "حزن متواصل", icon: Annoyed},
+      { id: "trouble-sommeil", label: "Troubles du sommeil", description: "Difficulté à s'endormir, réveils nocturnes ou sommeil non réparateur", descriptionTunisian: "مشاكل في النوم", icon: Thermometer}, // using thermometer as a placeholder for a bed/moon icon if not available
+      { id: "irritabilite", label: "Irritabilité", description: "Tendance à se mettre en colère facilement", descriptionTunisian: "سريع الغضب", icon: PersonStanding},
+      { id: "difficulte-concentration", label: "Difficulté de concentration", description: "Esprit embrouillé, difficulté à rester concentré", descriptionTunisian: "صعوبة في التركيز", icon: Brain},
+    ]
+  },
+  {
+    id: "troubles-yeux",
+    label: "Troubles oculaires",
+    descriptionTunisian: "مشاكل في العينين",
+    icon: Eye,
+    children: [
+        { id: "yeux-rouges", label: "Yeux rouges ou irrités", description: "Rougeur ou irritation des yeux", descriptionTunisian: "عينين حمر" },
+        { id: "vision-floue", label: "Vision floue", description: "Vue qui devient trouble", descriptionTunisian: "نظر مضبب" },
+        { id: "secheresse-oculaire", label: "Sensation de sécheresse / sable", description: "Sensation de corps étranger ou de sécheresse dans les yeux", descriptionTunisian: "تحس عينيك شايحين" },
+        { 
+          id: "ecoulement-oeil", 
+          label: "Écoulement oculaire", 
+          descriptionTunisian: "عينيك تدمّع",
+          children: [
+            { id: "ecoulement-oeil-clair", label: "Écoulement clair (larmes)", description: "Larmoiement excessif et clair", descriptionTunisian: "صافي كي الدموع" },
+            { id: "ecoulement-oeil-purulent", label: "Écoulement purulent (jaunâtre)", description: "Écoulement épais et jaunâtre", descriptionTunisian: "أصفر وخاثر" },
+          ]
+        },
+        { id: "sensibilite-lumiere", label: "Sensibilité à la lumière", description: "La lumière vive est douloureuse ou gênante", descriptionTunisian: "تتقلق من الضوء"},
     ]
   },
   {
