@@ -252,7 +252,15 @@ export const symptomTree: SymptomNode[] = [
     icon: Waves,
     children: [
       { id: "nausees-vomissements", label: "Nausées ou vomissements", description: "Envie de vomir ou vomissements", descriptionTunisian: "غثيان أو تقيء" },
-      { id: "diarrhee", label: "Diarrhée", description: "Selles liquides et fréquentes", descriptionTunisian: "جريان كرش" },
+      { 
+        id: "diarrhee", 
+        label: "Diarrhée",
+        descriptionTunisian: "جريان كرش",
+        children: [
+            { id: "diarrhee-aigue", label: "Aiguë (< 2 semaines)", description: "Diarrhée depuis moins de 2 semaines", descriptionTunisian: "أقل من جمعتين" },
+            { id: "diarrhee-chronique", label: "Chronique (> 2 semaines)", description: "Diarrhée depuis plus de 2 semaines", descriptionTunisian: "أكثر من جمعتين" },
+        ]
+      },
       { id: "constipation", label: "Constipation", description: "Difficulté à évacuer les selles", descriptionTunisian: "قبض (كونستيباسيون)" },
       { id: "ballonnements", label: "Ballonnements et gaz", description: "Sensation de ventre gonflé et gaz excessifs", descriptionTunisian: "نفخ و غازات" },
       { id: "perte-appetit", label: "Perte d'appétit", description: "Absence de faim", descriptionTunisian: "شهية مسدودة"},
@@ -284,7 +292,15 @@ export const symptomTree: SymptomNode[] = [
     descriptionTunisian: "مشاكل جلدة",
     icon: Sheet,
     children: [
-      { id: "eruption-cutanee", label: "Éruption (boutons, plaques rouges)", description: "Apparition de boutons ou de plaques sur la peau", descriptionTunisian: "حبوب، طفح جلدي" },
+      { 
+        id: "eruption-cutanee", 
+        label: "Éruption (boutons, plaques)", 
+        descriptionTunisian: "حبوب، طفح جلدي",
+        children: [
+           { id: "eruption-localisee", label: "Localisée", description: "Éruption sur une zone précise du corps", descriptionTunisian: "في بقعة معينة" },
+           { id: "eruption-generalisee", label: "Généralisée", description: "Éruption sur une grande partie du corps", descriptionTunisian: "منتشرة في البدن الكل" },
+        ]
+      },
       { id: "demangeaisons", label: "Démangeaisons", description: "Sensation qui pousse à se gratter", descriptionTunisian: "حكة" },
       { id: "secheresse-peau", label: "Peau sèche ou qui pèle", description: "Peau sèche ou desquamation", descriptionTunisian: "جلدة شايحة تتقشر" },
       { id: "lesion-inhabituelle", label: "Lésion ou grain de beauté inhabituel", description: "Apparition ou modification d'une lésion cutanée", descriptionTunisian: "ظهور أو تغير في شكل \"خالة\"" },
@@ -304,6 +320,7 @@ export const symptomTree: SymptomNode[] = [
         children: [
           { id: "vertiges-debout", label: "En se levant", description: "Vertiges en passant de la position assise à debout", descriptionTunisian: "كي تقوم من بلاصتك" },
           { id: "vertiges-continus", label: "Continus", description: "Vertiges constants", descriptionTunisian: "متواصلة" },
+          { id: "vertiges-rotatoires", label: "Rotatoires (tout tourne)", description: "Sensation que l'environnement tourne autour de vous", descriptionTunisian: "الدنيا تدور بيك"},
         ]
       },
       { id: "somnolence", label: "Somnolence excessive", description: "Envie de dormir constante durant la journée", descriptionTunisian: "تحب ترقد برشة" },
@@ -319,7 +336,15 @@ export const symptomTree: SymptomNode[] = [
         { id: "yeux-rouges", label: "Yeux rouges ou irrités", description: "Rougeur ou irritation des yeux", descriptionTunisian: "عينين حمر" },
         { id: "vision-floue", label: "Vision floue", description: "Vue qui devient trouble", descriptionTunisian: "نظر مضبب" },
         { id: "secheresse-oculaire", label: "Sensation de sécheresse / sable", description: "Sensation de corps étranger ou de sécheresse dans les yeux", descriptionTunisian: "تحس عينيك شايحين" },
-        { id: "ecoulement-oeil", label: "Écoulement oculaire", description: "Larmoiement excessif ou écoulement purulent", descriptionTunisian: "عينيك تدمّع" },
+        { 
+          id: "ecoulement-oeil", 
+          label: "Écoulement oculaire", 
+          descriptionTunisian: "عينيك تدمّع",
+          children: [
+            { id: "ecoulement-oeil-clair", label: "Écoulement clair (larmes)", description: "Larmoiement excessif et clair", descriptionTunisian: "صافي كي الدموع" },
+            { id: "ecoulement-oeil-purulent", label: "Écoulement purulent (jaunâtre)", description: "Écoulement épais et jaunâtre", descriptionTunisian: "أصفر وخاثر" },
+          ]
+        },
         { id: "sensibilite-lumiere", label: "Sensibilité à la lumière", description: "La lumière vive est douloureuse ou gênante", descriptionTunisian: "تتقلق من الضوء"},
     ]
   },
