@@ -176,36 +176,15 @@ export const symptomTree: SymptomNode[] = [
     descriptionTunisian: "وجيعة قراجم",
     icon: Activity,
     children: [
-      {
-        id: "gorge-douleur-type",
-        label: "Type de douleur",
-        descriptionTunisian: "نوع الوجيعة",
-        children: [
-          { id: "gorge-picotement", label: "Picotement / Irritation", description: "Mal de gorge avec picotements ou irritation", descriptionTunisian: "تحس بتنميل / تقليق" },
-          { id: "gorge-brulure", label: "Brûlure", description: "Mal de gorge avec sensation de brûlure", descriptionTunisian: "حرقة" },
-          { id: "gorge-avaler", label: "Difficulté à avaler", description: "Mal de gorge avec difficulté à déglutir", descriptionTunisian: "صعوبة في البلع" },
-        ],
-      },
-      {
-        id: "gorge-aspect",
-        label: "Aspect de la gorge",
-        descriptionTunisian: "كيفاش تراها",
-        children: [
-          { id: "gorge-rouge", label: "Gorge très rouge", description: "Gorge d'apparence très rouge", descriptionTunisian: "حمراء برشة" },
-          { id: "gorge-points-blancs", label: "Points blancs", description: "Gorge avec des points blancs sur les amygdales", descriptionTunisian: "نقط بيض في اللوزتين" },
-        ],
-      },
-      {
-        id: "gorge-symptomes-associes",
-        label: "Symptômes associés",
-        descriptionTunisian: "أعراض أخرى",
-        children: [
-          { id: "gorge-avec-fievre", label: "Avec de la fièvre", description: "Mal de gorge accompagné de fièvre", descriptionTunisian: "مع السخانة" },
-          { id: "gorge-avec-toux", label: "Avec une toux", description: "Mal de gorge accompagné de toux", descriptionTunisian: "مع الكحة" },
-          { id: "gorge-avec-nez-coule", label: "Avec le nez qui coule", description: "Mal de gorge avec un écoulement nasal", descriptionTunisian: "مع الخشم إللي يجري" },
-          { id: "gorge-avec-ganglions", label: "Avec des ganglions gonflés", description: "Mal de gorge avec des ganglions gonflés dans le cou", descriptionTunisian: "مع كعابر (غدد) منفوخة" },
-        ],
-      },
+        { id: "gorge-picotement-brulure", label: "Picotement ou Brûlure", description: "Mal de gorge avec picotements ou sensation de brûlure", descriptionTunisian: "تنميل أو حرقة" },
+        { id: "gorge-difficulte-avaler", label: "Difficulté à avaler", description: "Mal de gorge rendant la déglutition difficile", descriptionTunisian: "صعوبة في البلع" },
+        { id: "gorge-rouge-gonflee", label: "Gorge rouge et/ou gonflée", description: "Gorge d'apparence très rouge ou enflée", descriptionTunisian: "حمراء و/أو منفوخة" },
+        { id: "gorge-points-blancs-caseum", label: "Points blancs / Caséum", description: "Présence de points blancs ou de dépôts jaunâtres sur les amygdales", descriptionTunisian: "نقط بيض أو صفراء" },
+        { id: "gorge-voix-enrouee", label: "Voix enrouée", description: "Modification de la voix, qui devient rauque", descriptionTunisian: "صوت مبحاح" },
+        { id: "gorge-sensation-boule", label: "Sensation de boule dans la gorge", description: "Impression d'avoir quelque chose de coincé dans la gorge", descriptionTunisian: "تحس بكعبة في قرجومك" },
+        { id: "gorge-avec-ganglions", label: "Avec des ganglions gonflés", description: "Mal de gorge avec des ganglions gonflés dans le cou", descriptionTunisian: "مع كعابر (غدد) منفوخة" },
+        { id: "gorge-avec-toux", label: "Avec une toux", description: "Mal de gorge accompagné de toux", descriptionTunisian: "مع الكحة" },
+        { id: "gorge-avec-nez-coule", label: "Avec le nez qui coule", description: "Mal de gorge avec un écoulement nasal", descriptionTunisian: "مع الخشم إللي يجري" },
     ],
   },
   {
