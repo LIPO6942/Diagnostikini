@@ -45,7 +45,9 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
         setIsLoading(false);
       }
     };
-    getAnalysis();
+    if (isProfileComplete !== undefined) {
+      getAnalysis();
+    }
   }, [symptomDescription, profile, isProfileComplete]);
 
   return (

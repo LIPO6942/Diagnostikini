@@ -95,9 +95,20 @@ export type SymptomNode = {
   children?: SymptomNode[];
 };
 
+export type DiagnosisSuggestion = {
+    name: string;
+    description: string;
+    justification: string;
+}
+
+export type MedicationSuggestion = {
+    name: string;
+    justification: string;
+}
+
 export type AnalyzeSymptomsOutput = {
-    diagnosisSuggestions: string[];
+    diagnosisSuggestions: DiagnosisSuggestion[];
     clarifyingQuestions: string[];
-    medicationSuggestions: string[];
+    medicationSuggestions: MedicationSuggestion[];
     traditionalRemedies: TraditionalRemedy[];
 }

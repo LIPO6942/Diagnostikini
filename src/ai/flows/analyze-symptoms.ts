@@ -19,16 +19,27 @@ const AnalyzeSymptomsInputSchema = z.object({
 });
 export type AnalyzeSymptomsInput = z.infer<typeof AnalyzeSymptomsInputSchema>;
 
+const DiagnosisSuggestionSchema = z.object({
+  name: z.string().describe("Le nom concis et direct du diagnostic potentiel (ex: 'Migraine', 'Gastro-entérite virale')."),
+  description: z.string().describe("Une brève description de ce qu'est cette condition médicale."),
+  justification: z.string().describe("Une explication personnalisée expliquant pourquoi ce diagnostic est suggéré, en se basant spécifiquement sur les symptômes et le profil de l'utilisateur."),
+});
+
+const MedicationSuggestionSchema = z.object({
+    name: z.string().describe("Le nom du médicament en vente libre suggéré."),
+    justification: z.string().describe("Une explication sur la manière dont ce médicament peut aider à soulager les symptômes décrits. Inclure systématiquement un avertissement de consulter un médecin avant de prendre le médicament."),
+});
+
 const AnalyzeSymptomsOutputSchema = z.object({
   diagnosisSuggestions: z
-    .array(z.string())
-    .describe("Une liste de diagnostics potentiels basés sur les symptômes. Les diagnostics doivent être des noms de conditions concis et directs (ex: 'Migraine', 'Gastro-entérite virale') sans justifications supplémentaires dans le titre."),
+    .array(DiagnosisSuggestionSchema)
+    .describe("Une liste de diagnostics potentiels, chacun avec un nom, une description et une justification personnalisée."),
   clarifyingQuestions: z
     .array(z.string())
     .describe("Une liste de questions de clarification à poser à l'utilisateur pour plus d'informations. Cette liste doit être vide si les informations fournies sont suffisantes."),
   medicationSuggestions: z
-    .array(z.string())
-    .describe("Une liste de médicaments en vente libre suggérés, avec un avertissement de consulter un médecin."),
+    .array(MedicationSuggestionSchema)
+    .describe("Une liste de médicaments en vente libre suggérés, avec une justification et un avertissement de consulter un médecin."),
   traditionalRemedies: z.array(z.object({
     remedyName: z.string().describe("Le nom du remède traditionnel tunisien (ex: Tisane de thym)."),
     status: z.enum(['approved', 'not_recommended', 'neutral']).describe("Statut du remède : 'approved' (approuvé), 'not_recommended' (déconseillé), ou 'neutral' (neutre/informatif)."),
@@ -45,14 +56,21 @@ const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
-  prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Votre tâche est de fournir une analyse préliminaire complète basée sur TOUTES les informations fournies.
+  prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Votre tâche est de fournir une analyse préliminaire complète, détaillée et personnalisée.
 
   Tâches :
-  1.  Analysez la description des symptômes et le profil utilisateur (s'il est fourni) pour suggérer quelques diagnostics potentiels. IMPORTANT: Les noms des diagnostics doivent être courts et directs (ex: "Migraine", "Gastro-entérite virale"), sans phrases de justification ajoutées.
-  2.  Votre objectif est de fournir un diagnostic si complet que vous n'avez PAS besoin de poser de questions de clarification. La liste 'clarifyingQuestions' doit être vide, sauf si des informations cruciales manquent.
-  3.  Suggérez des médicaments en vente libre pertinents qui pourraient soulager les symptômes. Précisez TOUJOURS que l'avis d'un médecin est préférable avant de prendre tout médicament. Par exemple : "Ibuprofène (consultez un médecin avant de le prendre)".
-  4.  Pour le diagnostic le plus probable, suggérez des remèdes traditionnels tunisiens (remèdes de grand-mère). Pour chaque remède, spécifiez son statut (approuvé, déconseillé, ou neutre) et fournissez une justification scientifique claire et simple. Par exemple, pour un rhume, "Tisane au thym et au miel (Approuvé : Le thym a des propriétés antiseptiques et le miel adoucit la gorge)".
-  5.  Assurez-vous que toute votre sortie (suggestions de diagnostic, questions, médicaments et remèdes traditionnels) est en français.
+  1. Analysez la description des symptômes et le profil utilisateur pour suggérer plusieurs diagnostics potentiels. Pour chaque diagnostic :
+     - Fournissez un 'name' concis et direct (ex: "Migraine", "Gastro-entérite virale").
+     - Ajoutez une 'description' claire de ce qu'est la condition.
+     - Rédigez une 'justification' personnalisée expliquant pourquoi ce diagnostic est plausible en se basant sur les symptômes spécifiques fournis.
+
+  2.  Votre objectif est de fournir une analyse si complète que la liste 'clarifyingQuestions' reste vide, sauf si des informations cruciales manquent.
+  
+  3.  Suggérez des médicaments en vente libre pertinents. Pour chaque médicament, fournissez son 'name' et une 'justification' expliquant son action sur les symptômes décrits. IMPORTANT : La justification doit systématiquement se terminer par la phrase : "(Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament)".
+
+  4.  Pour le diagnostic le plus probable, suggérez des remèdes traditionnels tunisiens (remèdes de grand-mère). Pour chaque remède, spécifiez son statut (approuvé, déconseillé, ou neutre) et fournissez une justification scientifique claire et simple.
+
+  5.  Assurez-vous que toute votre sortie est en français.
 
   Description des symptômes (basée sur la sélection de l'utilisateur) : {{{symptomsDescription}}}
 
@@ -117,7 +135,7 @@ const analyzeSymptomsFlow = ai.defineFlow(
     if (!output) {
       console.error('LLM response was empty or failed', llmResponse);
       return {
-        diagnosisSuggestions: ["Analyse non disponible"],
+        diagnosisSuggestions: [],
         clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
         medicationSuggestions: [],
         traditionalRemedies: [],
