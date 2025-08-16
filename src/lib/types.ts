@@ -51,7 +51,7 @@ export type HealthRecordCategory =
 
 export type HealthRecord = {
   id: string; // Unique ID, also used for sorting (new Date().toISOString())
-  date: string; // Deprecated, but kept for backward compatibility. Use ID for sorting.
+  date: string; 
   category: HealthRecordCategory;
   title: string;
   symptoms?: string;

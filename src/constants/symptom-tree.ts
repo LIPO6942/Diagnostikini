@@ -143,6 +143,72 @@ export const symptomTree: SymptomNode[] = [
     ],
   },
   {
+    id: "fievre",
+    label: "Fièvre / Température",
+    descriptionTunisian: "سخانة",
+    icon: Thermometer,
+    children: [
+      { 
+        id: "fievre-legere", 
+        label: "Légère (37.5-38.4°C)", 
+        descriptionTunisian: "خفيفة",
+        children: [
+            { id: "fievre-legere-courte", label: "Depuis 1-2 jours", description: "Fièvre légère depuis 1 à 2 jours", descriptionTunisian: "عندها يوم أو يومين" },
+            { id: "fievre-legere-longue", label: "Depuis plus de 3 jours", description: "Fièvre légère depuis plus de 3 jours", descriptionTunisian: "أكثر من 3 أيام" },
+        ]
+       },
+      { id: "fievre-moderee", label: "Modérée (38.5-39.4°C)", description: "Fièvre modérée (38.5-39.4°C)", descriptionTunisian: "متوسطة" },
+      { id: "fievre-elevee", label: "Élevée (>39.5°C)", description: "Fièvre élevée (plus de 39.5°C)", descriptionTunisian: "قوية" },
+      { 
+        id: "fievre-frissons", 
+        label: "Avec frissons et sueurs", 
+        descriptionTunisian: "معاها رعشة و عرق",
+        children: [
+          { id: "fievre-frissons-continus", label: "Frissons continus", description: "Fièvre avec des frissons constants", descriptionTunisian: "رعشة متواصلة" },
+          { id: "fievre-sueurs-nocturnes", label: "Sueurs surtout la nuit", description: "Fièvre avec des sueurs principalement nocturnes", descriptionTunisian: "عرق في الليل" },
+        ]
+      },
+    ],
+  },
+  {
+    id: "gorge",
+    label: "Mal de Gorge",
+    descriptionTunisian: "وجيعة قراجم",
+    icon: Activity,
+    children: [
+      {
+        id: "gorge-douleur-type",
+        label: "Type de douleur",
+        descriptionTunisian: "نوع الوجيعة",
+        children: [
+          { id: "gorge-picotement", label: "Picotement / Irritation", description: "Mal de gorge avec picotements ou irritation", descriptionTunisian: "تحس بتنميل / تقليق" },
+          { id: "gorge-brulure", label: "Brûlure", description: "Mal de gorge avec sensation de brûlure", descriptionTunisian: "حرقة" },
+          { id: "gorge-avaler", label: "Difficulté à avaler", description: "Mal de gorge avec difficulté à déglutir", descriptionTunisian: "صعوبة في البلع" },
+        ],
+      },
+      {
+        id: "gorge-aspect",
+        label: "Aspect de la gorge",
+        descriptionTunisian: "كيفاش تراها",
+        children: [
+          { id: "gorge-rouge", label: "Gorge très rouge", description: "Gorge d'apparence très rouge", descriptionTunisian: "حمراء برشة" },
+          { id: "gorge-points-blancs", label: "Points blancs", description: "Gorge avec des points blancs sur les amygdales", descriptionTunisian: "نقط بيض في اللوزتين" },
+        ],
+      },
+      {
+        id: "gorge-symptomes-associes",
+        label: "Symptômes associés",
+        descriptionTunisian: "أعراض أخرى",
+        children: [
+          { id: "gorge-avec-fievre", label: "Avec de la fièvre", description: "Mal de gorge accompagné de fièvre", descriptionTunisian: "مع السخانة" },
+          { id: "gorge-avec-toux", label: "Avec une toux", description: "Mal de gorge accompagné de toux", descriptionTunisian: "مع الكحة" },
+          { id: "gorge-avec-nez-coule", label: "Avec le nez qui coule", description: "Mal de gorge avec un écoulement nasal", descriptionTunisian: "مع الخشم إللي يجري" },
+          { id: "gorge-avec-ganglions", label: "Avec des ganglions gonflés", description: "Mal de gorge avec des ganglions gonflés dans le cou", descriptionTunisian: "مع كعابر (غدد) منفوخة" },
+        ],
+      },
+    ],
+  },
+  {
     id: "respiration",
     label: "Gêne respiratoire",
     descriptionTunisian: "مشكلة في التنفس",
@@ -179,34 +245,6 @@ export const symptomTree: SymptomNode[] = [
       { id: "douleur-respiration", label: "Douleur en respirant profondément", description: "Douleur thoracique à l'inspiration profonde", descriptionTunisian: "وجيعة كي تجبد نفس بالقوي"},
     ],
   },
-  {
-    id: "fievre",
-    label: "Fièvre / Température",
-    descriptionTunisian: "سخانة",
-    icon: Thermometer,
-    children: [
-      { 
-        id: "fievre-legere", 
-        label: "Légère (37.5-38.4°C)", 
-        descriptionTunisian: "خفيفة",
-        children: [
-            { id: "fievre-legere-courte", label: "Depuis 1-2 jours", description: "Fièvre légère depuis 1 à 2 jours", descriptionTunisian: "عندها يوم أو يومين" },
-            { id: "fievre-legere-longue", label: "Depuis plus de 3 jours", description: "Fièvre légère depuis plus de 3 jours", descriptionTunisian: "أكثر من 3 أيام" },
-        ]
-       },
-      { id: "fievre-moderee", label: "Modérée (38.5-39.4°C)", description: "Fièvre modérée (38.5-39.4°C)", descriptionTunisian: "متوسطة" },
-      { id: "fievre-elevee", label: "Élevée (>39.5°C)", description: "Fièvre élevée (plus de 39.5°C)", descriptionTunisian: "قوية" },
-      { 
-        id: "fievre-frissons", 
-        label: "Avec frissons et sueurs", 
-        descriptionTunisian: "معاها رعشة و عرق",
-        children: [
-          { id: "fievre-frissons-continus", label: "Frissons continus", description: "Fièvre avec des frissons constants", descriptionTunisian: "رعشة متواصلة" },
-          { id: "fievre-sueurs-nocturnes", label: "Sueurs surtout la nuit", description: "Fièvre avec des sueurs principalement nocturnes", descriptionTunisian: "عرق في الليل" },
-        ]
-      },
-    ],
-  },
    {
     id: "troubles-digestifs",
     label: "Troubles digestifs",
@@ -221,20 +259,11 @@ export const symptomTree: SymptomNode[] = [
     ],
   },
   {
-    id: "troubles-orl",
-    label: "Gorge, Nez, Oreilles",
-    descriptionTunisian: "قراجم، خشم، وذنين",
+    id: "troubles-nez-oreilles",
+    label: "Nez & Oreilles",
+    descriptionTunisian: "خشم و وذنين",
     icon: Ear,
     children: [
-      { 
-        id: "mal-gorge", 
-        label: "Mal de gorge", 
-        descriptionTunisian: "وجيعة قراجم",
-        children: [
-          { id: "gorge-avaler", label: "Difficulté à avaler", description: "Mal de gorge avec difficulté à déglutir", descriptionTunisian: "صعوبة في البلع" },
-          { id: "gorge-blanche", label: "Points blancs sur les amygdales", description: "Mal de gorge avec présence de points blancs", descriptionTunisian: "نقط بيض في اللوزتين" },
-        ]
-      },
       { id: "nez-bouche", label: "Nez bouché", description: "Congestion nasale", descriptionTunisian: "خشم مسكر" },
       { 
         id: "ecoulement-nasal", 
