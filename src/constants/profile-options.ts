@@ -57,6 +57,5 @@ export const analysisTypeOptions = [
     "Rectoscopie",
     "Biopsie",
     "Autre document médical",
+    "Consultation IA",
 ];
-
-    

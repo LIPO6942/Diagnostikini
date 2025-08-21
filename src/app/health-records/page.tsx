@@ -76,6 +76,8 @@ const categoryIcons:  Record<string, JSX.Element> = {
     "Rapport d'IRM": <FileText className="h-5 w-5 text-indigo-500" />,
     "Rapport d'échographie": <FileText className="h-5 w-5 text-pink-500" />,
     "Autre document médical": <FileText className="h-5 w-5 text-gray-500" />,
+    "Rectoscopie": <FileText className="h-5 w-5 text-orange-500" />,
+    "Biopsie": <FileText className="h-5 w-5 text-teal-500" />,
 }
 
 function DocumentPreview({ doc }: { doc: HealthDocument }) {
@@ -195,18 +197,23 @@ export default function HealthRecordsPage() {
     });
   };
 
+  const groupedRecords = useMemo(() => {
+    return filteredRecords.reduce((acc, record) => {
+      const category = record.category || 'Autre';
+      if(!acc[category]) acc[category] = [];
+      acc[category].push(record);
+      return acc;
+    }, {} as Record<string, HealthRecord[]>);
+  }, [filteredRecords]);
+  
+  const categories = useMemo(() => {
+    return Array.from(new Set(allRecords.map(r => r.category || 'Autre')));
+  }, [allRecords]);
+
+
   if (!isMounted) {
     return <HealthRecordSkeleton />;
   }
-
-  const groupedRecords = filteredRecords.reduce((acc, record) => {
-    const category = record.category || 'Autre';
-    if(!acc[category]) acc[category] = [];
-    acc[category].push(record);
-    return acc;
-  }, {} as Record<string, HealthRecord[]>);
-  
-  const categories = Array.from(new Set(allRecords.map(r => r.category || 'Autre')));
 
   return (
     <div className="space-y-6">
@@ -291,19 +298,24 @@ export default function HealthRecordsPage() {
         </Card>
       ) : (
         <Accordion type="multiple" className="w-full space-y-4">
-          {categories.map(category => (
-            groupedRecords[category] && (
+          {categories.map(category => {
+            const categoryRecords = groupedRecords[category];
+            if (!categoryRecords || categoryRecords.length === 0) return null;
+            
+            const Icon = categoryIcons[category] || <FileText className="h-5 w-5 text-gray-500" />;
+
+            return (
                 <AccordionItem value={category} key={category} className="border-none">
                     <Card>
                     <AccordionTrigger className="p-6 text-xl font-semibold hover:no-underline">
                         <div className="flex items-center gap-3">
-                            {categoryIcons[category as keyof typeof categoryIcons] || <FileText className="h-5 w-5 text-gray-500" />}
-                            {category} ({groupedRecords[category].length})
+                            {Icon}
+                            {category} ({categoryRecords.length})
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="px-6 pb-6">
                          <div className="space-y-4">
-                            {groupedRecords[category].map(record => (
+                            {categoryRecords.map(record => (
                                 <Card key={record.id} className="bg-muted/30">
                                 <CardHeader>
                                     <div className="flex justify-between items-start">
@@ -384,8 +396,8 @@ export default function HealthRecordsPage() {
                     </AccordionContent>
                     </Card>
                 </AccordionItem>
-            )
-          ))}
+            );
+          })}
         </Accordion>
       )}
     </div>
