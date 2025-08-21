@@ -316,7 +316,7 @@ export default function HealthRecordsPage() {
                                                 {record.treatmentDate && <div className="flex items-center gap-1.5"><CalendarIcon className="size-3" />{format(new Date(record.treatmentDate), "d MMMM yyyy", { locale: fr })}</div>}
                                             </div>
                                         </div>
-                                        <CardDescription>{format(new Date(record.id), "d MMM yy", { locale: fr })}</CardDescription>
+                                        <CardDescription>{format(new Date(record.date), "d MMM yy", { locale: fr })}</CardDescription>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
