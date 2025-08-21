@@ -54,6 +54,8 @@ export const analysisTypeOptions = [
     "Rapport d'IRM",
     "Rapport d'échographie",
     "Ordonnance",
+    "Rectoscopie",
+    "Biopsie",
     "Autre document médical",
 ];
 
