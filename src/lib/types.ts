@@ -34,19 +34,13 @@ export type HealthDocument = {
 
 export type HealthRecordCategory = 
   | 'Consultation IA'
-  | 'Bilan'
-  | 'Ordonnance'
-  | 'Radio'
-  | 'Scanner'
-  | 'IRM'
-  | 'Échographie'
-  | 'Autre'
   | 'Bilan sanguin'
   | "Analyse d'urine"
   | "Rapport de radiographie"
   | "Rapport de scanner"
   | "Rapport d'IRM"
   | "Rapport d'échographie"
+  | "Ordonnance"
   | "Autre document médical";
 
 export type HealthRecord = {

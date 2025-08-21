@@ -37,7 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { PlusCircle, LoaderCircle, Image as ImageIcon, X, FileText, CalendarIcon } from "lucide-react";
-import type { HealthRecord, HealthDocument } from "@/lib/types";
+import type { HealthRecord, HealthDocument, HealthRecordCategory } from "@/lib/types";
 import { saveHealthRecord, updateHealthRecord, saveDocumentDataUrl, getDocumentDataUrl, deleteDocumentDataUrl } from "@/services/health-record-service";
 import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
@@ -48,7 +48,7 @@ import { analysisTypeOptions } from "@/constants/profile-options";
 
 const addDocumentSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
-  category: z.enum(["Bilan", "Ordonnance", "Radio", "Scanner", "IRM", "Échographie", "Autre"]),
+  category: z.enum(analysisTypeOptions as [string, ...string[]]).refine(val => val !== 'Consultation IA'),
   doctorName: z.string().optional(),
   treatmentDate: z.date().optional(),
   prescription: z.string().optional(),
@@ -119,7 +119,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
   
   const defaultFormValues: AddDocumentForm = {
     title: "",
-    category: "Bilan" as const,
+    category: "Bilan sanguin",
     doctorName: "",
     treatmentDate: undefined,
     prescription: "",
@@ -146,7 +146,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
       if (isEditing) {
         form.reset({
             title: existingRecord.title || "",
-            category: existingRecord.category || "Bilan",
+            category: existingRecord.category as any,
             doctorName: existingRecord.doctorName || "",
             treatmentDate: existingRecord.treatmentDate ? new Date(existingRecord.treatmentDate) : undefined,
             prescription: existingRecord.prescription || "",
@@ -205,7 +205,7 @@ export function AddDocumentDialog({ onRecordUpdate, existingRecord, triggerButto
         
         const recordData = {
           title: values.title,
-          category: values.category,
+          category: values.category as HealthRecordCategory,
           doctorName: values.doctorName,
           treatmentDate: values.treatmentDate?.toISOString(),
           prescription: values.prescription,
