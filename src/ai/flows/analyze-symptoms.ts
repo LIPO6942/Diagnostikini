@@ -84,11 +84,24 @@ export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<Anal
     }
   }
 
-  const system = `Vous êtes un Assistant de Symptômes IA francophone. Vous produisez un JSON valide respectant strictement le schéma demandé.`;
+  const system = `Vous êtes un Assistant de Symptômes IA francophone. Retournez UNIQUEMENT un JSON valide (aucun texte hors JSON).`;
   const user = [
-    `Description des symptômes: ${input.symptomsDescription}`,
+    `Interprétez le chemin de symptômes suivant et produisez une analyse clinique préliminaire: ${input.symptomsDescription}.`,
     profileLines.length ? `\nProfil utilisateur:\n- ${profileLines.join('\n- ')}` : '',
-    `\n\nTâches:\n1. Suggérez plusieurs diagnostics potentiels. Pour chacun, fournissez name, description, justification personnalisée.\n2. Essayez d'être complet pour éviter des questions de clarification; s'il manque des infos cruciales seulement, ajoutez-les dans clarifyingQuestions.\n3. Suggérez des médicaments en vente libre pertinents. Chaque justification DOIT se terminer par: "(Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament)".\n4. Ajoutez des remèdes traditionnels tunisiens (approved, not_recommended ou neutral) pour le diagnostic le plus probable, avec justification scientifique simple.\n5. Répondez uniquement en français.`,
+    `\n\nContraintes de sortie:\n- Retournez un objet JSON STRICTEMENT au format suivant (exemple, à peupler avec du contenu réel):\n\n{
+  "diagnosisSuggestions": [
+    { "name": "", "description": "", "justification": "" },
+    { "name": "", "description": "", "justification": "" },
+    { "name": "", "description": "", "justification": "" }
+  ],
+  "clarifyingQuestions": [],
+  "medicationSuggestions": [
+    { "name": "", "justification": "Texte. (Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament)" }
+  ],
+  "traditionalRemedies": [
+    { "remedyName": "", "status": "approved", "justification": "" }
+  ]
+}\n\nRègles de fond:\n1) Fournissez AU MOINS 3 éléments dans diagnosisSuggestions.\n2) Les justifications doivent être spécifiques aux symptômes fournis.\n3) clarifyingQuestions DOIT être un tableau vide.\n4) medicationSuggestions: 1 à 3 médicaments en vente libre pertinents; chaque justification DOIT finir par la phrase requise.\n5) traditionalRemedies: 1 à 3 remèdes, avec un statut (approved/not_recommended/neutral) et une justification concise.\n6) Répondez uniquement en français.`,
   ].join('');
 
   try {
@@ -97,8 +110,9 @@ export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<Anal
       user,
       schemaName: 'AnalyzeSymptomsOutput',
       schema: {},
-      temperature: 0.2,
-      maxTokens: 2048,
+      temperature: 0.3,
+      maxTokens: 2200,
+      model: 'llama-3.3-70b-versatile',
     });
     // Ensure arrays exist and force no clarifying questions
     const suggestions = (output.diagnosisSuggestions ?? []);
