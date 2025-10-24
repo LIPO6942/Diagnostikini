@@ -87,11 +87,18 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
   const onSaveRecord = async () => {
     try {
         const remedyRecs = traditionalRemedies.map(r => r.remedyName).join(', ') || 'Aucune recommandation spécifique.';
+        const medsList = medicationSuggestions.map(m => m.name).join(', ');
+        const top = diagnosisSuggestions[0];
+        const summaryFromAnalysis = top
+          ? `Pour des symptômes rapportés, l'IA suggère en priorité **${top.name}**. ${top.description ? `(${top.description}) ` : ''}Médicaments possibles: ${medsList || 'aucun'}. Remèdes: ${remedyRecs || 'aucun'}.`
+          : `Consultation IA enregistrée. Médicaments possibles: ${medsList || 'aucun'}.`;
+
         const result = await recordConsultation({
             symptoms: symptoms,
             differentialDiagnosis: diagnosisSuggestions.map(d => d.name).join(', '),
-            remedyRecommendations: `Médicaments suggérés : ${medicationSuggestions.map(m => m.name).join(', ')}. Remèdes traditionnels : ${remedyRecs}`
+            remedyRecommendations: `Médicaments suggérés : ${medsList}. Remèdes traditionnels : ${remedyRecs}`
         });
+        const summaryToSave = (result.summary && result.summary.trim().length > 0) ? result.summary : summaryFromAnalysis;
 
         const newRecord: HealthRecord = {
             id: result.recordId,
@@ -99,7 +106,8 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
             category: 'Consultation IA',
             title: potentialDiagnosis,
             symptoms: symptoms,
-            summary: result.summary,
+            diagnosis: potentialDiagnosis,
+            summary: summaryToSave,
         };
 
         await saveHealthRecord(newRecord);
@@ -130,6 +138,14 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
         <>
             <div>
                 <h3 className="font-bold mb-2">Diagnostics Potentiels</h3>
+                {diagnosisSuggestions[0] && (
+                  <div className="mb-3 p-3 rounded-md bg-primary/10 border border-primary/20">
+                    <p className="text-sm">
+                      <span className="font-semibold">Diagnostic le plus probable: </span>
+                      {diagnosisSuggestions[0].name}
+                    </p>
+                  </div>
+                )}
                 <Accordion type="single" collapsible defaultValue={diagnosisSuggestions[0]?.name}>
                     {diagnosisSuggestions.map((d, i) => (
                        <AccordionItem value={d.name} key={i}>
@@ -149,7 +165,7 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
                 </Accordion>
             </div>
             
-            {clarifyingQuestions && clarifyingQuestions.length > 0 && (
+            {false && clarifyingQuestions && clarifyingQuestions.length > 0 && (
                  <div>
                     <h3 className="font-bold mb-2 flex items-center gap-2"><MessageCircleQuestion className="h-4 w-4" />Questions de clarification</h3>
                     <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">

@@ -7,9 +7,9 @@
  * - AnalyzeSymptomsOutput - The return type for the analyzeSymptoms function.
  */
 
-import {ai} from '@/ai/genkit';
+import { generateJson } from '@/ai/groq';
 import { UserProfileSchema } from '@/lib/types';
-import {z} from 'genkit';
+import { z } from 'zod';
 
 const AnalyzeSymptomsInputSchema = z.object({
   symptomsDescription: z
@@ -49,99 +49,92 @@ const AnalyzeSymptomsOutputSchema = z.object({
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
 export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<AnalyzeSymptomsOutput> {
-  return analyzeSymptomsFlow(input);
-}
+  const profile = input.userProfile;
 
-const prompt = ai.definePrompt({
-  name: 'analyzeSymptomsPrompt',
-  input: {schema: AnalyzeSymptomsInputSchema},
-  output: {schema: AnalyzeSymptomsOutputSchema},
-  prompt: `Vous êtes un Assistant de Symptômes IA. Un utilisateur vous décrira ses symptômes en français. Votre tâche est de fournir une analyse préliminaire complète, détaillée et personnalisée.
-
-  Tâches :
-  1. Analysez la description des symptômes et le profil utilisateur pour suggérer plusieurs diagnostics potentiels. Pour chaque diagnostic :
-     - Fournissez un 'name' concis et direct (ex: "Migraine", "Gastro-entérite virale").
-     - Ajoutez une 'description' claire de ce qu'est la condition.
-     - Rédigez une 'justification' personnalisée expliquant pourquoi ce diagnostic est plausible en se basant sur les symptômes spécifiques fournis.
-
-  2.  Votre objectif est de fournir une analyse si complète que la liste 'clarifyingQuestions' reste vide, sauf si des informations cruciales manquent.
-  
-  3.  Suggérez des médicaments en vente libre pertinents. Pour chaque médicament, fournissez son 'name' et une 'justification' expliquant son action sur les symptômes décrits. IMPORTANT : La justification doit systématiquement se terminer par la phrase : "(Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament)".
-
-  4.  Pour le diagnostic le plus probable, suggérez des remèdes traditionnels tunisiens (remèdes de grand-mère). Pour chaque remède, spécifiez son statut (approuvé, déconseillé, ou neutre) et fournissez une justification scientifique claire et simple.
-
-  5.  Assurez-vous que toute votre sortie est en français.
-
-  Description des symptômes (basée sur la sélection de l'utilisateur) : {{{symptomsDescription}}}
-
-  {{#if userProfile}}
-  Informations complémentaires du profil utilisateur :
-  - Âge : {{#if userProfile.age}}{{userProfile.age}}{{else}}Non spécifié{{/if}}
-  - Sexe : {{#if userProfile.sex}}{{userProfile.sex}}{{else}}Non spécifié{{/if}}
-  - Poids : {{#if userProfile.weight}}{{userProfile.weight}} kg{{else}}Non spécifié{{/if}}
-
-  {{#if userProfile.medicalHistory.conditions}}
-  - Antécédents médicaux (sélection) : 
-    {{#each userProfile.medicalHistory.conditions}}
-    - {{this}}
-    {{/each}}
-  {{/if}}
-  {{#if userProfile.medicalHistory.other}}
-  - Antécédents médicaux (autre) : {{userProfile.medicalHistory.other}}
-  {{/if}}
-
-  {{#if userProfile.allergies.items}}
-  - Allergies (sélection) : 
-    {{#each userProfile.allergies.items}}
-    - {{this}}
-    {{/each}}
-  {{/if}}
-  {{#if userProfile.allergies.other}}
-  - Allergies (autre) : {{userProfile.allergies.other}}
-  {{/if}}
-
-  {{#if userProfile.currentTreatments.medications}}
-  - Traitements actuels (sélection) :
-    {{#each userProfile.currentTreatments.medications}}
-    - {{this}}
-    {{/each}}
-  {{/if}}
-  {{#if userProfile.currentTreatments.other}}
-  - Traitements actuels (autre) : {{userProfile.currentTreatments.other}}
-  {{/if}}
-
-  {{#if userProfile.additionalSymptoms.symptoms}}
-  - Symptômes supplémentaires (sélection) :
-    {{#each userProfile.additionalSymptoms.symptoms}}
-    - {{this}}
-    {{/each}}
-  {{/if}}
-  {{#if userProfile.additionalSymptoms.other}}
-  - Symptômes supplémentaires (autre) : {{userProfile.additionalSymptoms.other}}
-  {{/if}}
-  {{/if}}`,
-});
-
-const analyzeSymptomsFlow = ai.defineFlow(
-  {
-    name: 'analyzeSymptomsFlow',
-    inputSchema: AnalyzeSymptomsInputSchema,
-    outputSchema: AnalyzeSymptomsOutputSchema,
-  },
-  async input => {
-    const llmResponse = await prompt(input);
-    const output = llmResponse.output;
-
-    if (!output) {
-      console.error('LLM response was empty or failed', llmResponse);
-      return {
-        diagnosisSuggestions: [],
-        clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
-        medicationSuggestions: [],
-        traditionalRemedies: [],
-      };
+  const profileLines: string[] = [];
+  if (profile) {
+    profileLines.push(`Âge: ${profile.age ?? 'Non spécifié'}`);
+    profileLines.push(`Sexe: ${profile.sex ?? 'Non spécifié'}`);
+    if (profile.weight !== undefined && profile.weight !== null && profile.weight !== '') {
+      profileLines.push(`Poids: ${profile.weight} kg`);
     }
-
-    return output;
+    if (profile.medicalHistory?.conditions?.length) {
+      profileLines.push(`Antécédents médicaux: ${profile.medicalHistory.conditions.join(', ')}`);
+    }
+    if (profile.medicalHistory?.other) {
+      profileLines.push(`Antécédents médicaux (autre): ${profile.medicalHistory.other}`);
+    }
+    if (profile.allergies?.items?.length) {
+      profileLines.push(`Allergies: ${profile.allergies.items.join(', ')}`);
+    }
+    if (profile.allergies?.other) {
+      profileLines.push(`Allergies (autre): ${profile.allergies.other}`);
+    }
+    if (profile.currentTreatments?.medications?.length) {
+      profileLines.push(`Traitements actuels: ${profile.currentTreatments.medications.join(', ')}`);
+    }
+    if (profile.currentTreatments?.other) {
+      profileLines.push(`Traitements actuels (autre): ${profile.currentTreatments.other}`);
+    }
+    if (profile.additionalSymptoms?.symptoms?.length) {
+      profileLines.push(`Symptômes supplémentaires: ${profile.additionalSymptoms.symptoms.join(', ')}`);
+    }
+    if (profile.additionalSymptoms?.other) {
+      profileLines.push(`Symptômes supplémentaires (autre): ${profile.additionalSymptoms.other}`);
+    }
   }
-);
+
+  const system = `Vous êtes un Assistant de Symptômes IA francophone. Retournez UNIQUEMENT un JSON valide (aucun texte hors JSON).`;
+  const user = [
+    `Interprétez le chemin de symptômes suivant et produisez une analyse clinique préliminaire: ${input.symptomsDescription}.`,
+    profileLines.length ? `\nProfil utilisateur:\n- ${profileLines.join('\n- ')}` : '',
+    `\n\nContraintes de sortie:\n- Retournez un objet JSON STRICTEMENT au format suivant (exemple, à peupler avec du contenu réel):\n\n{
+  "diagnosisSuggestions": [
+    { "name": "", "description": "", "justification": "" },
+    { "name": "", "description": "", "justification": "" },
+    { "name": "", "description": "", "justification": "" }
+  ],
+  "clarifyingQuestions": [],
+  "medicationSuggestions": [
+    { "name": "", "justification": "Texte. (Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament)" }
+  ],
+  "traditionalRemedies": [
+    { "remedyName": "", "status": "approved", "justification": "" }
+  ]
+}\n\nRègles de fond:\n1) Fournissez AU MOINS 3 éléments dans diagnosisSuggestions.\n2) Les justifications doivent être spécifiques aux symptômes fournis.\n3) clarifyingQuestions DOIT être un tableau vide.\n4) medicationSuggestions: 1 à 3 médicaments en vente libre pertinents; chaque justification DOIT finir par la phrase requise.\n5) traditionalRemedies: 1 à 3 remèdes, avec un statut (approved/not_recommended/neutral) et une justification concise.\n6) Répondez uniquement en français.`,
+  ].join('');
+
+  try {
+    const output = await generateJson<AnalyzeSymptomsOutput>({
+      system,
+      user,
+      schemaName: 'AnalyzeSymptomsOutput',
+      schema: {},
+      temperature: 0.3,
+      maxTokens: 2200,
+      model: 'llama-3.3-70b-versatile',
+    });
+    // Ensure arrays exist and force no clarifying questions
+    const suggestions = (output.diagnosisSuggestions ?? []);
+    const safeSuggestions = suggestions.length > 0 ? suggestions : [{
+      name: 'Analyse non concluante',
+      description: "Aucun diagnostic probable n'a pu être déterminé à partir des informations fournies.",
+      justification: "Les symptômes sont insuffisamment spécifiques. Consultez un professionnel de santé si nécessaire.",
+    }];
+
+    return {
+      diagnosisSuggestions: safeSuggestions,
+      clarifyingQuestions: [],
+      medicationSuggestions: output.medicationSuggestions ?? [],
+      traditionalRemedies: output.traditionalRemedies ?? [],
+    };
+  } catch (e) {
+    console.error('Groq analyzeSymptoms failed', e);
+    return {
+      diagnosisSuggestions: [],
+      clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
+      medicationSuggestions: [],
+      traditionalRemedies: [],
+    };
+  }
+}

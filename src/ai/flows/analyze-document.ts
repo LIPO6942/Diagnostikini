@@ -7,9 +7,9 @@
  * - AnalyzeDocumentOutput - The return type for the analyzeDocument function.
  */
 
-import { ai } from '@/ai/genkit';
+import { generateJson } from '@/ai/groq';
 import { UserProfileSchema } from '@/lib/types';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const AnalyzeDocumentInputSchema = z.object({
   documentText: z.string().describe('The text extracted via OCR from the health document.'),
@@ -33,48 +33,41 @@ const AnalyzeDocumentOutputSchema = z.object({
 export type AnalyzeDocumentOutput = z.infer<typeof AnalyzeDocumentOutputSchema>;
 
 export async function analyzeDocument(input: AnalyzeDocumentInput): Promise<AnalyzeDocumentOutput> {
-  return analyzeDocumentFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'analyzeDocumentPrompt',
-  input: { schema: AnalyzeDocumentInputSchema },
-  output: { schema: AnalyzeDocumentOutputSchema },
-  prompt: `Vous êtes un expert médical IA, spécialisé dans l'interprétation de documents de santé en français. Votre mission est d'analyser en profondeur le texte d'un bilan sanguin et de fournir une analyse personnalisée et directe, agissant comme un véritable consultant de santé.
-
-  Tâches :
-  1.  Analysez le texte du document fourni : {{{documentText}}}.
-  2.  Pour chaque mesure médicale identifiable (ex: "Glycémie", "Cholestérol", "TSH"), extrayez son nom, sa valeur, et l'intervalle de normalité.
-  3.  Pour CHAQUE mesure, fournissez une 'interpretation' claire et personnalisée.
-      - Si la valeur est NORMALE : Expliquez brièvement à quoi correspond ce paramètre et confirmez que le résultat est dans la norme et ne présente pas de problème.
-      - Si la valeur est ANORMALE (haute ou basse) : Expliquez ce que cela signifie concrètement pour la santé, en utilisant le profil de l'utilisateur pour contextualiser l'analyse (ex: "légèrement élevé, ce qui chez un patient diabétique connu comme vous, suggère que votre traitement actuel pourrait nécessiter un ajustement..."). Soyez direct et proposez des pistes d'action ou de réflexion.
-  4.  Remplissez le tableau 'analysisItems' avec toutes les mesures et leurs analyses.
-  5.  Générez un 'summary' global UNIQUEMENT si une ou plusieurs valeurs sont anormales. Ce résumé doit synthétiser les points clés de l'analyse et offrir des conseils proactifs ou des prochaines étapes suggérées. Si tout est normal, laissez le champ 'summary' vide.
-
-  {{#if userProfile}}
-  Profil de l'utilisateur à prendre en compte pour une analyse pointue :
-  - Âge : {{#if userProfile.age}}{{userProfile.age}}{{else}}Non spécifié{{/if}}
-  - Sexe : {{#if userProfile.sex}}{{userProfile.sex}}{{else}}Non spécifié{{/if}}
-  - Antécédents : {{#if userProfile.medicalHistory.conditions}}{{#each userProfile.medicalHistory.conditions}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}Aucun{{/if}}{{#if userProfile.medicalHistory.other}}, {{userProfile.medicalHistory.other}}{{/if}}
-  {{/if}}
-  
-  Image du document pour référence visuelle (ne pas l'analyser directement, se baser sur le texte) :
-  {{media url=documentImage}}
-  `,
-});
-
-
-const analyzeDocumentFlow = ai.defineFlow(
-  {
-    name: 'analyzeDocumentFlow',
-    inputSchema: AnalyzeDocumentInputSchema,
-    outputSchema: AnalyzeDocumentOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
-    if (!output) {
-      throw new Error("L'analyse IA n'a retourné aucune sortie.");
+  const profile = input.userProfile;
+  const profileBits: string[] = [];
+  if (profile) {
+    profileBits.push(`Âge: ${profile.age ?? 'Non spécifié'}`);
+    profileBits.push(`Sexe: ${profile.sex ?? 'Non spécifié'}`);
+    if (profile.medicalHistory?.conditions?.length) {
+      profileBits.push(`Antécédents: ${profile.medicalHistory.conditions.join(', ')}`);
     }
-    return output;
+    if (profile.medicalHistory?.other) {
+      profileBits.push(`Antécédents (autre): ${profile.medicalHistory.other}`);
+    }
   }
-);
+
+  const system = `Vous êtes un expert médical IA francophone pour l'interprétation de bilans sanguins. Retournez un JSON strictement conforme.`;
+  const user = [
+    `Texte OCR du document:\n${input.documentText}\n`,
+    profileBits.length ? `\nProfil utilisateur:\n- ${profileBits.join('\n- ')}` : '',
+    `\n\nTâches:\n1. Identifiez chaque mesure médicale (ex: Glycémie, Cholestérol total, TSH), extrayez son nom, sa valeur et l'intervalle de normalité.\n2. Fournissez pour CHACUNE une interpretation personnalisée (normale: brève explication et confirmation; anormale: explication concrète tenant compte du profil et pistes d'action).\n3. Renseignez analysisItems pour toutes les mesures détectées.\n4. Générez summary UNIQUEMENT si au moins une valeur est anormale; sinon, summary doit être vide.\n5. Répondez uniquement en français.`,
+  ].join('');
+
+  try {
+    const output = await generateJson<AnalyzeDocumentOutput>({
+      system,
+      user,
+      schemaName: 'AnalyzeDocumentOutput',
+      schema: {},
+      temperature: 0.2,
+      maxTokens: 1500,
+    });
+    return {
+      analysisItems: output.analysisItems ?? [],
+      summary: output.summary ?? '',
+    };
+  } catch (e) {
+    console.error('Groq analyzeDocument failed', e);
+    return { analysisItems: [], summary: '' };
+  }
+}

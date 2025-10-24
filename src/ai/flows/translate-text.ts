@@ -9,8 +9,8 @@
  * - TranslateTextOutput - The return type for the translateText function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { generateJson } from '@/ai/groq';
+import { z } from 'zod';
 
 const TranslateTextInputSchema = z.object({
   textToTranslate: z.string().describe('The text to be translated.'),
@@ -24,28 +24,22 @@ const TranslateTextOutputSchema = z.object({
 export type TranslateTextOutput = z.infer<typeof TranslateTextOutputSchema>;
 
 export async function translateText(input: TranslateTextInput): Promise<TranslateTextOutput> {
-  return translateTextFlow(input);
-}
+  const system = 'You are a helpful translator.';
+  const user = `Translate the following text into ${input.targetLanguage}. Return a JSON with a single property translatedText.\n\nText:\n${input.textToTranslate}`;
 
-const prompt = ai.definePrompt({
-  name: 'translateTextPrompt',
-  input: {schema: TranslateTextInputSchema},
-  output: {schema: TranslateTextOutputSchema},
-  prompt: `Translate the following text into {{targetLanguage}}. Return only the translated text.
-
-Text to translate:
-"{{textToTranslate}}"
-`,
-});
-
-const translateTextFlow = ai.defineFlow(
-  {
-    name: 'translateTextFlow',
-    inputSchema: TranslateTextInputSchema,
-    outputSchema: TranslateTextOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  try {
+    const { translatedText } = await generateJson<{ translatedText: string}>({
+      system,
+      user,
+      schemaName: 'TranslateTextOutput',
+      schema: { type: 'object', properties: { translatedText: { type: 'string' } }, required: ['translatedText'] },
+      temperature: 0.0,
+      maxTokens: 400,
+      jsonStrict: true,
+    });
+    return { translatedText };
+  } catch (e) {
+    console.error('Groq translateText failed', e);
+    return { translatedText: input.textToTranslate };
   }
-);
+}

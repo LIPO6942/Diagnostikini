@@ -9,8 +9,8 @@
  * - RecordConsultationOutput - The return type for the recordConsultation function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { generateJson } from '@/ai/groq';
+import { z } from 'zod';
 
 const RecordConsultationInputSchema = z.object({
   symptoms: z.string().describe("Les symptômes décrits par l'utilisateur."),
@@ -26,35 +26,24 @@ const RecordConsultationOutputSchema = z.object({
 export type RecordConsultationOutput = z.infer<typeof RecordConsultationOutputSchema>;
 
 export async function recordConsultation(input: RecordConsultationInput): Promise<RecordConsultationOutput> {
-  return recordConsultationFlow(input);
-}
+  const system = 'Vous êtes un assistant de dossier de santé IA. Vous retournez un JSON minimal.';
+  const user = `Rédigez un résumé concis et lisible de cette consultation, en français, avec mise en évidence **bold** pour les termes importants.\n\nSymptômes: ${input.symptoms}\nDiagnostic différentiel: ${input.differentialDiagnosis}\nRecommandations: ${input.remedyRecommendations}`;
 
-const prompt = ai.definePrompt({
-  name: 'recordConsultationPrompt',
-  input: {schema: RecordConsultationInputSchema},
-  output: {schema: RecordConsultationOutputSchema},
-  prompt: `Vous êtes un assistant de dossier de santé IA. Votre tâche est de créer un résumé très concis et facile à lire d'une consultation, en français.
+  try {
+    const { summary } = await generateJson<{ summary: string }>({
+      system,
+      user,
+      schemaName: 'RecordConsultationSummary',
+      schema: { type: 'object', properties: { summary: { type: 'string' } }, required: ['summary'] },
+      temperature: 0.2,
+      maxTokens: 300,
+    });
 
-  Informations de la consultation :
-  - Symptômes : {{{symptoms}}}
-  - Diagnostic Différentiel : {{{differentialDiagnosis}}}
-  - Recommandations : {{{remedyRecommendations}}}
-
-  Instructions :
-  1. Générez un résumé qui va droit au but. Par exemple : "Pour des symptômes de **fièvre** et **toux**, un diagnostic possible de **grippe** a été suggéré."
-  2. Mettez en évidence les termes médicaux et les diagnostics les plus importants en les entourant de **deux astérisques**. Par exemple : **migraine**, **ibuprofène**.
-  3. Retournez un ID de dossier unique pour cette entrée.
-`,
-});
-
-const recordConsultationFlow = ai.defineFlow(
-  {
-    name: 'recordConsultationFlow',
-    inputSchema: RecordConsultationInputSchema,
-    outputSchema: RecordConsultationOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const recordId = (globalThis.crypto?.randomUUID?.() ?? `rec_${Date.now()}`);
+    return { recordId, summary };
+  } catch (e) {
+    console.error('Groq recordConsultation failed', e);
+    const recordId = (globalThis.crypto?.randomUUID?.() ?? `rec_${Date.now()}`);
+    return { recordId, summary: "Résumé indisponible pour le moment." };
   }
-);
+}

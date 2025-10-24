@@ -8,6 +8,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import type { Doctor } from "@/constants/doctors";
 
+declare global {
+  interface Window { google?: any }
+  namespace google {
+    namespace maps {
+      type Map = any;
+      type Marker = any;
+      type LatLngLiteral = { lat: number; lng: number };
+      namespace marker { type AdvancedMarkerElement = any }
+    }
+  }
+}
+
 interface DoctorMapProps {
   doctors: Doctor[];
   selectedDoctor: Doctor | null;

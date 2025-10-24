@@ -41,7 +41,9 @@ export default function AssistantChat() {
       if (recordId && summary) {
         const newRecord: HealthRecord = {
           id: recordId || new Date().toISOString(),
-          date: new Date().toLocaleDateString(),
+          date: new Date().toISOString(),
+          category: 'Consultation IA',
+          title: diagnosis.split(',')[0] || 'Consultation IA',
           symptoms: symptoms,
           diagnosis: diagnosis,
           summary: summary,
@@ -87,12 +89,14 @@ export default function AssistantChat() {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content: (
-            <AssistantResponse
-              symptoms={symptoms}
-              diagnosisSuggestions={analysisOutput.diagnosisSuggestions}
-              clarifyingQuestions={analysisOutput.clarifyingQuestions}
-              onSaveRecord={handleSaveRecord}
-            />
+              <AssistantResponse
+                symptoms={symptoms}
+                diagnosisSuggestions={analysisOutput.diagnosisSuggestions}
+                clarifyingQuestions={analysisOutput.clarifyingQuestions}
+                medicationSuggestions={analysisOutput.medicationSuggestions}
+                traditionalRemedies={analysisOutput.traditionalRemedies}
+                fullAnalysis={analysisOutput}
+              />
           ),
         };
         setMessages((prev) => [...prev, assistantMessage]);
