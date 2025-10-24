@@ -207,7 +207,7 @@ export default function ProfilePage() {
                  </div>
 
                  {formFields.map((section) => (
-                   <FormField
+                  <FormField
                     key={section.name}
                     control={form.control}
                     name={section.name}
@@ -219,8 +219,9 @@ export default function ProfilePage() {
                                     <FormField
                                         key={item}
                                         control={form.control}
-                                        name={`${section.name}.${section.formKey}`}
+                                        name={`${section.name}.${section.formKey}` as any}
                                         render={({ field }) => {
+                                        const current: string[] = Array.isArray(field.value) ? (field.value as string[]) : [];
                                         return (
                                             <FormItem
                                                 key={item}
@@ -228,12 +229,12 @@ export default function ProfilePage() {
                                             >
                                                 <FormControl>
                                                     <Checkbox
-                                                        checked={field.value?.includes(item)}
+                                                        checked={current.includes(item)}
                                                         onCheckedChange={(checked) => {
                                                         return checked
-                                                            ? field.onChange([...(field.value || []), item])
+                                                            ? field.onChange([...(current), item])
                                                             : field.onChange(
-                                                                field.value?.filter(
+                                                                current.filter(
                                                                 (value) => value !== item
                                                                 )
                                                             )
@@ -251,7 +252,7 @@ export default function ProfilePage() {
                             </div>
                             <FormField
                                 control={form.control}
-                                name={`${section.name}.other`}
+                                name={`${section.name}.other` as any}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="font-normal">Autre (veuillez préciser)</FormLabel>
