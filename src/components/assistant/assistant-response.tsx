@@ -130,6 +130,14 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
         <>
             <div>
                 <h3 className="font-bold mb-2">Diagnostics Potentiels</h3>
+                {diagnosisSuggestions[0] && (
+                  <div className="mb-3 p-3 rounded-md bg-primary/10 border border-primary/20">
+                    <p className="text-sm">
+                      <span className="font-semibold">Diagnostic le plus probable: </span>
+                      {diagnosisSuggestions[0].name}
+                    </p>
+                  </div>
+                )}
                 <Accordion type="single" collapsible defaultValue={diagnosisSuggestions[0]?.name}>
                     {diagnosisSuggestions.map((d, i) => (
                        <AccordionItem value={d.name} key={i}>
@@ -149,7 +157,7 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
                 </Accordion>
             </div>
             
-            {clarifyingQuestions && clarifyingQuestions.length > 0 && (
+            {false && clarifyingQuestions && clarifyingQuestions.length > 0 && (
                  <div>
                     <h3 className="font-bold mb-2 flex items-center gap-2"><MessageCircleQuestion className="h-4 w-4" />Questions de clarification</h3>
                     <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">

@@ -100,10 +100,17 @@ export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<Anal
       temperature: 0.2,
       maxTokens: 2048,
     });
-    // Ensure arrays exist
+    // Ensure arrays exist and force no clarifying questions
+    const suggestions = (output.diagnosisSuggestions ?? []);
+    const safeSuggestions = suggestions.length > 0 ? suggestions : [{
+      name: 'Analyse non concluante',
+      description: "Aucun diagnostic probable n'a pu être déterminé à partir des informations fournies.",
+      justification: "Les symptômes sont insuffisamment spécifiques. Consultez un professionnel de santé si nécessaire.",
+    }];
+
     return {
-      diagnosisSuggestions: output.diagnosisSuggestions ?? [],
-      clarifyingQuestions: output.clarifyingQuestions ?? [],
+      diagnosisSuggestions: safeSuggestions,
+      clarifyingQuestions: [],
       medicationSuggestions: output.medicationSuggestions ?? [],
       traditionalRemedies: output.traditionalRemedies ?? [],
     };
