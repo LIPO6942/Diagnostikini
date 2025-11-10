@@ -92,20 +92,55 @@ export default function ProfilePage() {
   
   const form = useForm<UserProfile>({
     resolver: zodResolver(UserProfileSchema),
-    // We'll set default values in an effect to avoid hydration issues
+    defaultValues: {
+      age: undefined,
+      sex: 'ne-specifie-pas',
+      bloodGroup: 'inconnu',
+      weight: undefined,
+      medicalHistory: { conditions: [], other: '' },
+      allergies: { items: [], other: '' },
+      currentTreatments: { medications: [], other: '' },
+      additionalSymptoms: { symptoms: [], other: '' }
+    },
   });
 
   useEffect(() => {
     if (isProfileComplete !== undefined) {
-       form.reset(profile || {
-          age: '',
-          sex: 'ne-specifie-pas',
-          weight: '',
-          medicalHistory: { conditions: [], other: '' },
-          allergies: { items: [], other: '' },
-          currentTreatments: { medications: [], other: '' },
-          additionalSymptoms: { symptoms: [], other: '' }
+      const defaultValues = {
+        age: undefined as number | undefined,
+        sex: 'ne-specifie-pas' as const,
+        bloodGroup: 'inconnu' as const,
+        weight: undefined as number | undefined,
+        medicalHistory: { conditions: [] as string[], other: '' },
+        allergies: { items: [] as string[], other: '' },
+        currentTreatments: { medications: [] as string[], other: '' },
+        additionalSymptoms: { symptoms: [] as string[], other: '' }
+      };
+      
+      if (profile) {
+        form.reset({
+          ...defaultValues,
+          ...profile,
+          medicalHistory: {
+            conditions: profile.medicalHistory?.conditions || [],
+            other: profile.medicalHistory?.other || ''
+          },
+          allergies: {
+            items: profile.allergies?.items || [],
+            other: profile.allergies?.other || ''
+          },
+          currentTreatments: {
+            medications: profile.currentTreatments?.medications || [],
+            other: profile.currentTreatments?.other || ''
+          },
+          additionalSymptoms: {
+            symptoms: profile.additionalSymptoms?.symptoms || [],
+            other: profile.additionalSymptoms?.other || ''
+          }
         });
+      } else {
+        form.reset(defaultValues);
+      }
     }
   }, [profile, form, isProfileComplete])
 
@@ -204,6 +239,37 @@ export default function ProfilePage() {
                         </FormItem>
                     )}
                     />
+                    <FormField
+                    control={form.control}
+                    name="bloodGroup"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Groupe sanguin</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value ?? 'inconnu'}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez..." />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="A+">A+</SelectItem>
+                                <SelectItem value="A-">A-</SelectItem>
+                                <SelectItem value="B+">B+</SelectItem>
+                                <SelectItem value="B-">B-</SelectItem>
+                                <SelectItem value="AB+">AB+</SelectItem>
+                                <SelectItem value="AB-">AB-</SelectItem>
+                                <SelectItem value="O+">O+</SelectItem>
+                                <SelectItem value="O-">O-</SelectItem>
+                                <SelectItem value="inconnu">Je ne sais pas</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormDescription>
+                            Important pour les urgences médicales
+                        </FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
                  </div>
 
                  {formFields.map((section) => (
@@ -215,39 +281,41 @@ export default function ProfilePage() {
                         <FormItem>
                             <FormLabel className="text-base">{section.label}</FormLabel>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
-                                {section.options.map((item) => (
-                                    <FormField
-                                        key={item}
-                                        control={form.control}
-                                        name={`${section.name}.${section.formKey}`}
-                                        render={({ field }) => {
-                                        return (
-                                            <FormItem
-                                                key={item}
-                                                className="flex flex-row items-start space-x-3 space-y-0"
-                                            >
-                                                <FormControl>
-                                                    <Checkbox
-                                                        checked={field.value?.includes(item)}
-                                                        onCheckedChange={(checked) => {
-                                                        return checked
-                                                            ? field.onChange([...(field.value || []), item])
-                                                            : field.onChange(
-                                                                field.value?.filter(
-                                                                (value) => value !== item
-                                                                )
-                                                            )
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    {item}
-                                                </FormLabel>
-                                            </FormItem>
-                                        )
-                                        }}
-                                    />
-                                ))}
+                                {section.options.map((item) => {
+                                    const fieldName = `${section.name}.${section.formKey}` as const;
+                                    return (
+                                        <FormField
+                                            key={item}
+                                            control={form.control}
+                                            name={fieldName}
+                                            render={({ field }) => {
+                                                const fieldValue = Array.isArray(field.value) ? field.value : [];
+                                                return (
+                                                    <FormItem
+                                                        key={item}
+                                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={fieldValue.includes(item)}
+                                                                onCheckedChange={(checked) => {
+                                                                    if (checked) {
+                                                                        field.onChange([...fieldValue, item]);
+                                                                    } else {
+                                                                        field.onChange(fieldValue.filter((value: string) => value !== item));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal">
+                                                            {item}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+                                    );
+                                })}
                             </div>
                             <FormField
                                 control={form.control}

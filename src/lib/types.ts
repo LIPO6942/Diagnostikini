@@ -4,6 +4,7 @@ import { z } from "zod";
 export const UserProfileSchema = z.object({
   age: z.union([z.number().min(0).max(120), z.literal('')]).optional().nullable(),
   sex: z.enum(["homme", "femme", "ne-specifie-pas"]).optional().nullable(),
+  bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "inconnu"]).optional().nullable(),
   weight: z.union([z.number().min(0), z.literal('')]).optional().nullable(),
   medicalHistory: z.object({
     conditions: z.array(z.string()).optional(),

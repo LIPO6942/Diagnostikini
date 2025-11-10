@@ -2,7 +2,7 @@
  * @fileoverview Defines the interactive symptom tree structure.
  */
 import type { SymptomNode } from "@/lib/types";
-import { PersonStanding, Wind, Thermometer, Waves, Ear, Brain, Bone, Eye, Sheet, Activity, Droplet, HeartPulse, ShieldAlert, BadgeInfo, BrainCircuit, Users, Heart, Annoyed } from "lucide-react";
+import { PersonStanding, Wind, Thermometer, Waves, Ear, Brain, Bone, Eye, Sheet, Activity, Droplet, HeartPulse, ShieldAlert, BadgeInfo, BrainCircuit, Users, Heart, Annoyed, AlertTriangle, Bandage, CarCrash, Bone as BoneIcon } from "lucide-react";
 
 export const symptomTree: SymptomNode[] = [
   {
@@ -372,6 +372,69 @@ export const symptomTree: SymptomNode[] = [
           ]
         },
         { id: "sensibilite-lumiere", label: "Sensibilité à la lumière", description: "La lumière vive est douloureuse ou gênante", descriptionTunisian: "تتقلق من الضوء"},
+    ]
+  },
+  {
+    id: "blessures-incidents",
+    label: "Blessures & Incidents",
+    descriptionTunisian: "الاصابات والحوادث",
+    icon: AlertTriangle,
+    children: [
+      {
+        id: "blessures-tete",
+        label: "Blessures à la tête",
+        descriptionTunisian: "إصابات الرأس",
+        icon: Brain,
+        children: [
+          { id: "commotion", label: "Commotion cérébrale", description: "Suite à un choc à la tête", descriptionTunisian: "ضربة في الرأس" },
+          { id: "plaie-tete", label: "Plaie au cuir chevelu", description: "Blessure ouverte sur le crâne", descriptionTunisian: "جرح في الراس" },
+          { id: "fracture-cranienne", label: "Fracture du crâne suspectée", description: "Suite à un traumatisme crânien sévère", descriptionTunisian: "كسر في الجمجمة" }
+        ]
+      },
+      {
+        id: "blessures-membres",
+        label: "Blessures aux membres",
+        descriptionTunisian: "إصابات الأطراف",
+        icon: BoneIcon,
+        children: [
+          { id: "fracture", label: "Fracture suspectée", description: "Douleur intense, gonflement, déformation", descriptionTunisian: "كسر مشكوك فيه" },
+          { id: "entorse", label: "Entorse", description: "Douleur articulaire avec gonflement", descriptionTunisian: "التواء" },
+          { id: "plaie-profonde", label: "Plaie profonde", description: "Blessure nécessitant potentiellement des points de suture", descriptionTunisian: "جرح عميق" }
+        ]
+      },
+      {
+        id: "brulures",
+        label: "Brûlures",
+        descriptionTunisian: "الحروق",
+        icon: Thermometer,
+        children: [
+          { id: "brulure-1er-degre", label: "1er degré (rougeur)", description: "Rougeur sans cloque", descriptionTunisian: "حروق من الدرجة الأولى" },
+          { id: "brulure-2eme-degre", label: "2ème degré (cloque)", description: "Avec cloques et douleur intense", descriptionTunisian: "حروق من الدرجة الثانية" },
+          { id: "brulure-3eme-degre", label: "3ème degré", description: "Peau blanche ou noircie, peu douloureuse", descriptionTunisian: "حروق من الدرجة الثالثة" }
+        ]
+      },
+      {
+        id: "accidents",
+        label: "Accidents",
+        descriptionTunisian: "الحوادث",
+        icon: CarCrash,
+        children: [
+          { id: "accident-voiture", label: "Accident de voiture", description: "Même sans blessure apparente", descriptionTunisian: "حادث سيارة" },
+          { id: "chute-hauteur", label: "Chute de hauteur", description: "Plus d'1 mètre pour un adulte", descriptionTunisian: "سقوط من علو" },
+          { id: "morsure-animale", label: "Morsure d'animal", description: "Nécessite évaluation médicale", descriptionTunisian: "عضة حيوان" }
+        ]
+      },
+      {
+        id: "corps-etranger",
+        label: "Corps étranger",
+        descriptionTunisian: "جسم غريب",
+        icon: Bandage,
+        children: [
+          { id: "oeil-corps-etranger", label: "Dans l'œil", description: "Ne pas frotter", descriptionTunisian: "في العين" },
+          { id: "peau-corps-etranger", label: "Sous la peau", description: "Écharde, verre, etc.", descriptionTunisian: "تحت الجلد" },
+          { id: "avale-corps-etranger", label: "Avalé", description: "Objet avalé accidentellement", descriptionTunisian: "بلع جسم غريب" }
+        ]
+      }
     ]
   },
   {
