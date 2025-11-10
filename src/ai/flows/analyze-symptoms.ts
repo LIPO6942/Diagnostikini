@@ -49,20 +49,31 @@ const AnalyzeSymptomsOutputSchema = z.object({
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
 export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<AnalyzeSymptomsOutput> {
+  console.log('Début de l\'analyse des symptômes avec l\'entrée :', JSON.stringify(input, null, 2));
+  
   try {
     // Valider l'entrée
     const validatedInput = AnalyzeSymptomsInputSchema.parse(input);
+    console.log('Entrée validée avec succès');
     
     // Si le profil utilisateur est fourni, s'assurer qu'il est valide
     if (validatedInput.userProfile) {
+      console.log('Profil utilisateur fourni, validation...');
       validatedInput.userProfile = UserProfileSchema.parse(validatedInput.userProfile);
+      console.log('Profil utilisateur validé');
+    } else {
+      console.log('Aucun profil utilisateur fourni');
     }
     
     // Exécuter le flux d'analyse
+    console.log('Début du flux d\'analyse...');
     const result = await analyzeSymptomsFlow(validatedInput);
+    console.log('Flux d\'analyse terminé avec le résultat :', result);
     
     // Valider la sortie
-    return AnalyzeSymptomsOutputSchema.parse(result);
+    const parsedResult = AnalyzeSymptomsOutputSchema.parse(result);
+    console.log('Résultat validé avec succès');
+    return parsedResult;
   } catch (error) {
     console.error("Erreur lors de l'analyse des symptômes :", error);
     
@@ -94,8 +105,13 @@ const templateHelpers = {
 
 const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
+  model: 'groq/mixtral-8x7b-32768',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
+  config: {
+    temperature: 0.7,
+    maxOutputTokens: 2048,
+  },
   prompt: `Vous êtes un Assistant de Symptômes IA spécialisé dans l'analyse médicale personnalisée. Votre rôle est de fournir une évaluation préliminaire des symptômes en tenant compte du profil complet de l'utilisateur.
 
 DIRECTIVES IMPORTANTES :
@@ -204,6 +220,8 @@ const analyzeSymptomsFlow = ai.defineFlow(
     outputSchema: AnalyzeSymptomsOutputSchema,
   },
   async input => {
+    console.log('Début du flux d\'analyse avec l\'entrée :', JSON.stringify(input, null, 2));
+    
     try {
       // Préparer l'entrée pour le prompt
       const promptInput = {
@@ -218,8 +236,12 @@ const analyzeSymptomsFlow = ai.defineFlow(
         } : undefined
       };
 
-      // Appeler le modèle d'IA
+      console.log('Appel du modèle IA avec le prompt :', JSON.stringify(promptInput, null, 2));
+      
+      // Appeler le modèle d'IA avec un timeout
       const llmResponse = await prompt(promptInput);
+      
+      console.log('Réponse du modèle IA reçue :', llmResponse);
       
       if (!llmResponse || !llmResponse.output) {
         console.error('LLM response was empty or failed', llmResponse);
@@ -227,7 +249,9 @@ const analyzeSymptomsFlow = ai.defineFlow(
       }
 
       // Valider et retourner la sortie
-      return AnalyzeSymptomsOutputSchema.parse(llmResponse.output);
+      const output = llmResponse.output;
+      console.log('Validation de la sortie du modèle...');
+      return AnalyzeSymptomsOutputSchema.parse(output);
     } catch (error) {
       console.error('Erreur dans analyzeSymptomsFlow:', error);
       return {
