@@ -49,7 +49,31 @@ const AnalyzeSymptomsOutputSchema = z.object({
 export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
 export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<AnalyzeSymptomsOutput> {
-  return analyzeSymptomsFlow(input);
+  try {
+    // Valider l'entrée
+    const validatedInput = AnalyzeSymptomsInputSchema.parse(input);
+    
+    // Si le profil utilisateur est fourni, s'assurer qu'il est valide
+    if (validatedInput.userProfile) {
+      validatedInput.userProfile = UserProfileSchema.parse(validatedInput.userProfile);
+    }
+    
+    // Exécuter le flux d'analyse
+    const result = await analyzeSymptomsFlow(validatedInput);
+    
+    // Valider la sortie
+    return AnalyzeSymptomsOutputSchema.parse(result);
+  } catch (error) {
+    console.error("Erreur lors de l'analyse des symptômes :", error);
+    
+    // Retourner une réponse d'erreur structurée
+    return {
+      diagnosisSuggestions: [],
+      clarifyingQuestions: ["Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard."],
+      medicationSuggestions: [],
+      traditionalRemedies: []
+    };
+  }
 }
 
 // Fonctions d'aide pour le template
@@ -180,19 +204,38 @@ const analyzeSymptomsFlow = ai.defineFlow(
     outputSchema: AnalyzeSymptomsOutputSchema,
   },
   async input => {
-    const llmResponse = await prompt(input);
-    const output = llmResponse.output;
+    try {
+      // Préparer l'entrée pour le prompt
+      const promptInput = {
+        ...input,
+        // S'assurer que les tableaux sont définis pour éviter les erreurs dans le template
+        userProfile: input.userProfile ? {
+          ...input.userProfile,
+          medicalHistory: input.userProfile.medicalHistory || { conditions: [], other: '' },
+          allergies: input.userProfile.allergies || { items: [], other: '' },
+          currentTreatments: input.userProfile.currentTreatments || { medications: [], other: '' },
+          additionalSymptoms: input.userProfile.additionalSymptoms || { symptoms: [], other: '' }
+        } : undefined
+      };
 
-    if (!output) {
-      console.error('LLM response was empty or failed', llmResponse);
+      // Appeler le modèle d'IA
+      const llmResponse = await prompt(promptInput);
+      
+      if (!llmResponse || !llmResponse.output) {
+        console.error('LLM response was empty or failed', llmResponse);
+        throw new Error('La réponse du modèle IA est vide ou invalide');
+      }
+
+      // Valider et retourner la sortie
+      return AnalyzeSymptomsOutputSchema.parse(llmResponse.output);
+    } catch (error) {
+      console.error('Erreur dans analyzeSymptomsFlow:', error);
       return {
         diagnosisSuggestions: [],
-        clarifyingQuestions: ["L'analyse n'a pas pu être complétée. Veuillez réessayer."],
+        clarifyingQuestions: ["Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer."],
         medicationSuggestions: [],
-        traditionalRemedies: [],
+        traditionalRemedies: []
       };
     }
-
-    return output;
   }
 );

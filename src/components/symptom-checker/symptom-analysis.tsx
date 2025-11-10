@@ -29,26 +29,59 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
   const { profile, isProfileComplete } = useProfile();
 
   useEffect(() => {
+    let isMounted = true;
+    
     const getAnalysis = async () => {
+      if (!isMounted) return;
+      
       setIsLoading(true);
       setError(null);
+      
       try {
         const analysisOutput = await analyzeSymptoms({ 
-            symptomsDescription: symptomDescription,
-            userProfile: isProfileComplete ? profile ?? undefined : undefined
+          symptomsDescription: symptomDescription,
+          userProfile: isProfileComplete ? profile ?? undefined : undefined
         });
+        
+        if (!isMounted) return;
+        
+        // Vérifier si la réponse contient des erreurs
+        if (analysisOutput.clarifyingQuestions && 
+            analysisOutput.clarifyingQuestions.length > 0 && 
+            analysisOutput.clarifyingQuestions[0].includes('erreur')) {
+          throw new Error(analysisOutput.clarifyingQuestions[0]);
+        }
+        
         setAnalysisResult(analysisOutput);
       } catch (e) {
+        if (!isMounted) return;
+        
         console.error("Erreur lors de l'analyse des symptômes :", e);
-        setError("Désolé, une erreur s'est produite lors de l'analyse. Veuillez réessayer.");
+        const errorMessage = e instanceof Error ? e.message : "Une erreur inattendue s'est produite";
+        setError(`Désolé, une erreur s'est produite : ${errorMessage}`);
+        
+        // Afficher une notification d'erreur
+        toast({
+          variant: "destructive",
+          title: "Erreur d'analyse",
+          description: "Impossible d'analyser les symptômes. Veuillez réessayer plus tard.",
+        });
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
+    
     if (isProfileComplete !== undefined) {
       getAnalysis();
     }
-  }, [symptomDescription, profile, isProfileComplete]);
+    
+    // Nettoyage en cas de démontage du composant
+    return () => {
+      isMounted = false;
+    };
+  }, [symptomDescription, profile, isProfileComplete, toast]);
 
   return (
     <Card className="animate-fade-in-up">
