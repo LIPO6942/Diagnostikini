@@ -65,16 +65,19 @@ const prompt = ai.definePrompt({
     temperature: 0.3,
     maxOutputTokens: 1024,
   },
-  prompt: `Translate the following text into {{targetLanguage}}. Return ONLY a valid JSON object with this exact format:
+  prompt: `Translate the following text into Tunisian Arabic dialect ONLY. Return ONLY a valid JSON object with this exact format:
 {"translatedText": "your translated text here"}
 
 Text to translate:
 "{{textToTranslate}}"
 
-Important: 
+CRITICAL REQUIREMENTS:
 - Return ONLY the JSON object, no additional text
+- Translate to TUNISIAN DIALECT only (not standard Arabic)
+- Use ONLY Arabic letters, no Latin letters or characters
 - Escape all newlines and quotes properly in the JSON
-- The translated text should be on a single line within the JSON value`,
+- The translated text should be on a single line within the JSON value
+- Examples of Tunisian dialect: "شنوو", "برايه", "نبي", "مازال", "ياه", "واخا"`,
 });
 
 const translateTextFlow = ai.defineFlow(
