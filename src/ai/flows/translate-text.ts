@@ -29,8 +29,13 @@ export async function translateText(input: TranslateTextInput): Promise<Translat
 
 const prompt = ai.definePrompt({
   name: 'translateTextPrompt',
+  model: 'groq/llama-3.3-70b-versatile',
   input: {schema: TranslateTextInputSchema},
   output: {schema: TranslateTextOutputSchema},
+  config: {
+    temperature: 0.3,
+    maxOutputTokens: 1024,
+  },
   prompt: `Translate the following text into {{targetLanguage}}. Return only the translated text.
 
 Text to translate:
