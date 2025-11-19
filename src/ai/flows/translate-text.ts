@@ -24,7 +24,36 @@ const TranslateTextOutputSchema = z.object({
 export type TranslateTextOutput = z.infer<typeof TranslateTextOutputSchema>;
 
 export async function translateText(input: TranslateTextInput): Promise<TranslateTextOutput> {
-  return translateTextFlow(input);
+  try {
+    console.log('Début de la traduction avec l\'entrée :', input);
+    const result = await translateTextFlow(input);
+    console.log('Traduction réussie :', result);
+    return result;
+  } catch (error) {
+    console.error('Erreur lors de la traduction :', error);
+    
+    let errorMessage = "Une erreur est survenue lors de la traduction. Veuillez réessayer.";
+    
+    if (error instanceof Error) {
+      console.error('Détails de l\'erreur de traduction:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        errorMessage = "Erreur d'authentification avec l'API. Veuillez vérifier votre configuration.";
+      } else if (error.message.includes('429') || error.message.includes('rate limit')) {
+        errorMessage = "Trop de requêtes. Veuillez réessayer dans quelques instants.";
+      } else if (error.message.includes('timeout')) {
+        errorMessage = "Le serveur met trop temps à répondre. Veuillez réessayer.";
+      }
+    }
+    
+    return {
+      translatedText: errorMessage
+    };
+  }
 }
 
 const prompt = ai.definePrompt({
@@ -50,7 +79,37 @@ const translateTextFlow = ai.defineFlow(
     outputSchema: TranslateTextOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      console.log('Début du flux de traduction avec l\'entrée :', input);
+      const {output} = await prompt(input);
+      console.log('Flux de traduction terminé avec le résultat :', output);
+      return output!;
+    } catch (error) {
+      console.error('Erreur dans translateTextFlow:', error);
+      
+      let errorMessage = "Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer.";
+      
+      if (error instanceof Error) {
+        console.error('Détails de l\'erreur:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+        
+        if (error.message.includes('401') || error.message.includes('unauthorized')) {
+          errorMessage = "Erreur d'authentification avec l'API Groq. Veuillez vérifier votre configuration.";
+        } else if (error.message.includes('429') || error.message.includes('rate limit')) {
+          errorMessage = "Trop de requêtes. Veuillez réessayer dans quelques instants.";
+        } else if (error.message.includes('timeout')) {
+          errorMessage = "Le serveur met trop temps à répondre. Veuillez réessayer.";
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "Erreur de connexion à l'API Groq. Veuillez vérifier votre connexion.";
+        }
+      }
+      
+      return {
+        translatedText: errorMessage
+      };
+    }
   }
 );
