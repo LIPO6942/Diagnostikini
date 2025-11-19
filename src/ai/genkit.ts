@@ -17,4 +17,4 @@ export const ai = genkit({
 });
 
 // Configuration du modèle par défaut
-export const DEFAULT_MODEL = 'groq/mixtral-8x7b-32768';
+export const DEFAULT_MODEL = 'groq/llama-3.3-70b-versatile';

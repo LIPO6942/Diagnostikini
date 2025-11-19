@@ -125,7 +125,7 @@ const templateHelpers = {
 
 const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
-  model: 'groq/mixtral-8x7b-32768',
+  model: 'groq/llama-3.3-70b-versatile',
   input: {schema: AnalyzeSymptomsInputSchema},
   output: {schema: AnalyzeSymptomsOutputSchema},
   config: {
