@@ -164,7 +164,7 @@ INFORMATIONS SUR LES SYMPTÔMES :
 {{#if userProfile}}
 PROFIL UTILISATEUR :
 {{#if userProfile.age}}
-- Âge : {{userProfile.age}} ans ({{#if (gte userProfile.age 65)}}personne âgée{{else if (gte userProfile.age 18)}}adulte{{else if (gte userProfile.age 13)}}adolescent{{else if (gte userProfile.age 2)}}enfant{{else}}nourrisson{{/if}})
+- Âge : {{userProfile.age}} ans ({{#if userProfile.age}}{{#if (gt userProfile.age 64)}}personne âgée{{else}}{{#if (gt userProfile.age 17)}}adulte{{else}}{{#if (gt userProfile.age 12)}}adolescent{{else}}{{#if (gt userProfile.age 1)}}enfant{{else}}nourrisson{{/if}}{{/if}}{{/if}}{{/if}}{{/if}})
 {{/if}}
 {{#if userProfile.sex}}
 - Sexe : {{#if (eq userProfile.sex 'homme')}}Homme (prise en compte des spécificités masculines){{else if (eq userProfile.sex 'femme')}}Femme (prise en compte des spécificités féminines){{else}}Non spécifié{{/if}}
@@ -176,21 +176,18 @@ PROFIL UTILISATEUR :
 - Groupe sanguin : {{userProfile.bloodGroup}}
 {{/if}}
 
-{{#if (or userProfile.medicalHistory.conditions userProfile.medicalHistory.other)}}
-ANTÉCÉDENTS MÉDICAUX :
 {{#if userProfile.medicalHistory.conditions}}
+ANTÉCÉDENTS MÉDICAUX :
   {{#each userProfile.medicalHistory.conditions}}
   - {{this}}
   {{/each}}
 {{/if}}
 {{#if userProfile.medicalHistory.other}}
-- {{userProfile.medicalHistory.other}}
-{{/if}}
+Autres antécédents : {{userProfile.medicalHistory.other}}
 {{/if}}
 
-{{#if (or userProfile.allergies.items userProfile.allergies.other)}}
-ALLERGIES CONNUES :
 {{#if userProfile.allergies.items}}
+ALLERGIES CONNUES :
   {{#each userProfile.allergies.items}}
   - {{this}}
   {{/each}}
@@ -198,11 +195,9 @@ ALLERGIES CONNUES :
 {{#if userProfile.allergies.other}}
 - {{userProfile.allergies.other}}
 {{/if}}
-{{/if}}
 
-{{#if (or userProfile.currentTreatments.medications userProfile.currentTreatments.other)}}
-TRAITEMENTS EN COURS :
 {{#if userProfile.currentTreatments.medications}}
+TRAITEMENTS EN COURS :
   {{#each userProfile.currentTreatments.medications}}
   - {{this}}
   {{/each}}
@@ -210,18 +205,15 @@ TRAITEMENTS EN COURS :
 {{#if userProfile.currentTreatments.other}}
 - {{userProfile.currentTreatments.other}}
 {{/if}}
-{{/if}}
 
-{{#if (or userProfile.additionalSymptoms.symptoms userProfile.additionalSymptoms.other)}}
-SYMPTÔMES SUPPLÉMENTAIRES :
 {{#if userProfile.additionalSymptoms.symptoms}}
+SYMPTÔMES SUPPLÉMENTAIRES :
   {{#each userProfile.additionalSymptoms.symptoms}}
   - {{this}}
   {{/each}}
 {{/if}}
 {{#if userProfile.additionalSymptoms.other}}
 - {{userProfile.additionalSymptoms.other}}
-{{/if}}
 {{/if}}
 {{/if}}
 
