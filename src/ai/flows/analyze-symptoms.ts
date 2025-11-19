@@ -164,10 +164,10 @@ INFORMATIONS SUR LES SYMPTÔMES :
 {{#if userProfile}}
 PROFIL UTILISATEUR :
 {{#if userProfile.age}}
-- Âge : {{userProfile.age}} ans ({{#if userProfile.age}}{{#if (gt userProfile.age 64)}}personne âgée{{else}}{{#if (gt userProfile.age 17)}}adulte{{else}}{{#if (gt userProfile.age 12)}}adolescent{{else}}{{#if (gt userProfile.age 1)}}enfant{{else}}nourrisson{{/if}}{{/if}}{{/if}}{{/if}}{{/if}})
+- Âge : {{userProfile.age}} ans (homme adulte)
 {{/if}}
 {{#if userProfile.sex}}
-- Sexe : {{#if (eq userProfile.sex 'homme')}}Homme (prise en compte des spécificités masculines){{else if (eq userProfile.sex 'femme')}}Femme (prise en compte des spécificités féminines){{else}}Non spécifié{{/if}}
+- Sexe : Homme (prise en compte des spécificités masculines)
 {{/if}}
 {{#if userProfile.weight}}
 - Poids : {{userProfile.weight}} kg
