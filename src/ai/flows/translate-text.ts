@@ -65,11 +65,16 @@ const prompt = ai.definePrompt({
     temperature: 0.3,
     maxOutputTokens: 1024,
   },
-  prompt: `Translate the following text into {{targetLanguage}}. Return only the translated text.
+  prompt: `Translate the following text into {{targetLanguage}}. Return ONLY a valid JSON object with this exact format:
+{"translatedText": "your translated text here"}
 
 Text to translate:
 "{{textToTranslate}}"
-`,
+
+Important: 
+- Return ONLY the JSON object, no additional text
+- Escape all newlines and quotes properly in the JSON
+- The translated text should be on a single line within the JSON value`,
 });
 
 const translateTextFlow = ai.defineFlow(
