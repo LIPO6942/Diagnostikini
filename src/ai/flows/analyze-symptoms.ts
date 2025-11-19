@@ -77,10 +77,30 @@ export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<Anal
   } catch (error) {
     console.error("Erreur lors de l'analyse des symptômes :", error);
     
+    // Extraire plus de détails de l'erreur
+    let errorMessage = "Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.";
+    
+    if (error instanceof Error) {
+      console.error('Détails de l\'erreur principale:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      // Messages d'erreur spécifiques
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        errorMessage = "Erreur d'authentification avec l'API. Veuillez vérifier votre configuration.";
+      } else if (error.message.includes('429') || error.message.includes('rate limit')) {
+        errorMessage = "Trop de requêtes. Veuillez réessayer dans quelques instants.";
+      } else if (error.message.includes('timeout')) {
+        errorMessage = "Le serveur met trop temps à répondre. Veuillez réessayer.";
+      }
+    }
+    
     // Retourner une réponse d'erreur structurée
     return {
       diagnosisSuggestions: [],
-      clarifyingQuestions: ["Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard."],
+      clarifyingQuestions: [errorMessage],
       medicationSuggestions: [],
       traditionalRemedies: []
     };
@@ -254,9 +274,32 @@ const analyzeSymptomsFlow = ai.defineFlow(
       return AnalyzeSymptomsOutputSchema.parse(output);
     } catch (error) {
       console.error('Erreur dans analyzeSymptomsFlow:', error);
+      
+      // Extraire plus de détails de l'erreur
+      let errorMessage = "Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer.";
+      
+      if (error instanceof Error) {
+        console.error('Détails de l\'erreur:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+        
+        // Messages d'erreur spécifiques pour Groq
+        if (error.message.includes('401') || error.message.includes('unauthorized')) {
+          errorMessage = "Erreur d'authentification avec l'API Groq. Veuillez vérifier votre clé API.";
+        } else if (error.message.includes('429') || error.message.includes('rate limit')) {
+          errorMessage = "Limite de débit de l'API Groq atteinte. Veuillez réessayer dans quelques instants.";
+        } else if (error.message.includes('timeout')) {
+          errorMessage = "Délai d'attente dépassé. Veuillez réessayer.";
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "Erreur de connexion à l'API Groq. Veuillez vérifier votre connexion.";
+        }
+      }
+      
       return {
         diagnosisSuggestions: [],
-        clarifyingQuestions: ["Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer."],
+        clarifyingQuestions: [errorMessage],
         medicationSuggestions: [],
         traditionalRemedies: []
       };
