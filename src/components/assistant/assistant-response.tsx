@@ -3,9 +3,9 @@
  */
 "use client";
 
-import { useState } from "react";
-import type { Remedy, TraditionalRemedy, DiagnosisSuggestion, MedicationSuggestion, ClarifyingQuestion } from "@/lib/types";
-import { ClarificationQuestions } from "./clarification-questions";
+import { useState, useEffect } from "react";
+import type { Remedy, TraditionalRemedy, DiagnosisSuggestion, MedicationSuggestion } from "@/lib/types";
+import { ClarificationSection } from "./clarification-section";
 import { commonRemedies, baseRemedies } from "@/lib/remedies";
 import { Button } from "@/components/ui/button";
 import { FilePlus2, HeartPulse, Pill, Languages, LoaderCircle, Leaf, MessageCircleQuestion, Lightbulb, Info } from "lucide-react";
@@ -40,8 +40,9 @@ export const AssistantResponse = ({
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [clarifyingQuestionsData, setClarifyingQuestionsData] = useState<ClarifyingQuestion[]>([]);
+  const [showClarification, setShowClarification] = useState(true);
+  const [currentDiagnosis, setCurrentDiagnosis] = useState(diagnosisSuggestions[0]?.name || "Inconnu");
+  const [diagnosisConfidence, setDiagnosisConfidence] = useState(0.5);
   const { toast } = useToast();
 
   const potentialDiagnosis = diagnosisSuggestions[0]?.name || "Inconnu";
@@ -153,53 +154,16 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
                 </Accordion>
             </div>
             
-            {clarifyingQuestions && clarifyingQuestions.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="font-bold mb-2 flex items-center gap-2">
-                  <MessageCircleQuestion className="h-4 w-4" />
-                  Questions de clarification
-                </h3>
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <ClarificationQuestions
-                    questions={clarifyingQuestions.map((question, index) => ({
-                      id: `q${index}`,
-                      question: question,
-                      type: 'multiple_choice',
-                      required: true,
-                      options: [
-                        { id: 'yes', label: 'Oui' },
-                        { id: 'no', label: 'Non' },
-                        { id: 'unsure', label: 'Je ne sais pas' }
-                      ]
-                    }))}
-                    onSubmit={async (answers) => {
-                      try {
-                        setIsSubmitting(true);
-                        // Traiter les réponses ici
-                        console.log('Réponses aux questions de clarification :', answers);
-                        // Vous pouvez ajouter ici la logique pour envoyer les réponses au serveur
-                        // et mettre à jour l'interface utilisateur en conséquence
-                        
-                        // Exemple de mise à jour de l'interface
-                        toast({
-                          title: "Réponses enregistrées",
-                          description: "Vos réponses ont été enregistrées avec succès.",
-                        });
-                      } catch (error) {
-                        console.error("Erreur lors de l'envoi des réponses :", error);
-                        toast({
-                          variant: "destructive",
-                          title: "Erreur",
-                          description: "Une erreur est survenue lors de l'envoi de vos réponses.",
-                        });
-                      } finally {
-                        setIsSubmitting(false);
-                      }
-                    }}
-                    isSubmitting={isSubmitting}
-                  />
-                </div>
-              </div>
+            {showClarification && (
+              <ClarificationSection
+                initialDiagnosis={currentDiagnosis}
+                symptoms={symptoms.split(/[,.]+/).map(s => s.trim()).filter(Boolean)}
+                onDiagnosisUpdate={(newDiagnosis, confidence) => {
+                  setCurrentDiagnosis(newDiagnosis);
+                  setDiagnosisConfidence(confidence);
+                }}
+                onComplete={() => setShowClarification(false)}
+              />
             )}
 
 
