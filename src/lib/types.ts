@@ -101,9 +101,79 @@ export type MedicationSuggestion = {
     justification: string;
 }
 
+// Types pour l'analyse avancée des symptômes
+export type SymptomCategory = 
+  | 'general'
+  | 'head_neck'
+  | 'chest'
+  | 'abdomen'
+  | 'musculoskeletal'
+  | 'neurological'
+  | 'psychiatric'
+  | 'skin'
+  | 'urinary'
+  | 'reproductive'
+  | 'other';
+
+export interface Symptom {
+  id: string;
+  name: string;
+  category: SymptomCategory;
+  severity: number;
+  duration: string;
+  frequency: string;
+  onset: 'sudden' | 'gradual' | 'unknown';
+  aggravatingFactors: string[];
+  relievingFactors: string[];
+  associatedSymptoms: string[];
+  notes: string;
+}
+
+export interface SymptomAnalysis {
+  primarySymptoms: Symptom[];
+  symptomPatterns: string[];
+  severity: 'mild' | 'moderate' | 'severe';
+  urgency: 'routine' | 'urgent' | 'emergency';
+  possibleConditions: Array<{
+    condition: string;
+    probability: number;
+    matchingSymptoms: string[];
+    missingSymptoms: string[];
+  }>;
+  redFlags: Array<{
+    symptom: string;
+    description: string;
+    severity: 'warning' | 'danger' | 'critical';
+  }>;
+  recommendedActions: Array<{
+    action: string;
+    priority: 'high' | 'medium' | 'low';
+    category: 'diagnostic' | 'treatment' | 'referral' | 'monitoring';
+  }>;
+}
+
+// Types pour les médicaments
+export interface PreciseMedication {
+  id: string;
+  name: string;
+  genericName: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  description: string;
+  type: 'prescription' | 'otc' | 'natural';
+  category: 'analgesic' | 'anti_inflammatory' | 'antibiotic' | 'antihistamine' | 'antipyretic' | 'other';
+  sideEffects: string[];
+  contraindications: string[];
+  interactions: string[];
+  notes: string;
+}
+
 export type AnalyzeSymptomsOutput = {
-    diagnosisSuggestions: DiagnosisSuggestion[];
-    clarifyingQuestions: string[];
-    medicationSuggestions: MedicationSuggestion[];
-    traditionalRemedies: TraditionalRemedy[];
+  diagnosisSuggestions: DiagnosisSuggestion[];
+  clarifyingQuestions: string[];
+  medicationSuggestions: MedicationSuggestion[];
+  traditionalRemedies: TraditionalRemedy[];
+  symptomAnalysis?: SymptomAnalysis;
+  preciseMedications?: PreciseMedication[];
 }
