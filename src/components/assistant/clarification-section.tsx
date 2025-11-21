@@ -21,9 +21,9 @@ interface ClarificationSectionProps {
   onComplete: () => void;
 }
 
-export function ClarificationSection({ 
-  initialDiagnosis, 
-  symptoms, 
+export function ClarificationSection({
+  initialDiagnosis,
+  symptoms,
   onDiagnosisUpdate,
   onComplete
 }: ClarificationSectionProps) {
@@ -38,9 +38,9 @@ export function ClarificationSection({
   // Charger les questions initiales
   useEffect(() => {
     const loadInitialQuestions = async () => {
-      const { questions } = await refineDiagnosis({ 
-        diagnosis: initialDiagnosis, 
-        symptoms 
+      const { questions } = await refineDiagnosis({
+        diagnosis: initialDiagnosis,
+        symptoms
       });
       setQuestions(createQuestionObjects(questions));
     };
@@ -71,7 +71,7 @@ export function ClarificationSection({
 
   const submitAnswers = async (userAnswers: Record<string, string>) => {
     setIsLoading(true);
-    
+
     try {
       // Créer les objets de réponses pour le service
       const answerObjects = Object.entries(userAnswers).map(([id, answer]) => {
@@ -84,11 +84,11 @@ export function ClarificationSection({
 
       // Mettre à jour la liste complète des réponses
       const allAnswers = [...answeredQuestions, ...answerObjects];
-      
+
       // Appeler le service de raffinement
-      const { refinedDiagnosis, confidence: newConfidence, questions: newQuestions } = 
-        await refineDiagnosis({ 
-          diagnosis: currentDiagnosis, 
+      const { refinedDiagnosis, confidence: newConfidence, questions: newQuestions } =
+        await refineDiagnosis({
+          diagnosis: currentDiagnosis,
           symptoms,
           previousAnswers: allAnswers
         });
@@ -97,12 +97,12 @@ export function ClarificationSection({
       setCurrentDiagnosis(refinedDiagnosis);
       setConfidence(newConfidence);
       setAnsweredQuestions(allAnswers);
-      
+
       // Mettre à jour le composant parent
       onDiagnosisUpdate(refinedDiagnosis, newConfidence);
 
       // Si plus de questions ou confiance suffisante, terminer
-      if (newQuestions.length === 0 || newConfidence >= 0.8 || allAnswers.length >= 3) {
+      if (newQuestions.length === 0 || newConfidence >= 0.85 || allAnswers.length >= 5) {
         onComplete();
         toast({
           title: "Diagnostic finalisé",
@@ -131,7 +131,7 @@ export function ClarificationSection({
       <h3 className="font-bold mb-2 flex items-center gap-2">
         Questions pour affiner le diagnostic
       </h3>
-      
+
       <div className="space-y-4">
         {questions.map(question => (
           <div key={question.id} className="p-4 bg-muted/50 rounded-lg">
@@ -143,8 +143,8 @@ export function ClarificationSection({
             >
               {question.options.map(option => (
                 <div key={option.id} className="flex items-center space-x-2">
-                  <RadioGroupItem 
-                    value={option.id} 
+                  <RadioGroupItem
+                    value={option.id}
                     id={`${question.id}-${option.id}`}
                     disabled={isLoading}
                   />
@@ -162,7 +162,7 @@ export function ClarificationSection({
         <div className="text-sm text-muted-foreground">
           Confiance: {Math.round(confidence * 100)}%
         </div>
-        <Button 
+        <Button
           onClick={() => submitAnswers(answers)}
           disabled={isLoading || Object.keys(answers).length === 0}
         >

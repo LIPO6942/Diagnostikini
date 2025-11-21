@@ -68,9 +68,9 @@ Suggestions de médicaments:
 ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
       `;
 
-    if (traditionalRemedies.length > 0) {
+    if (traditionalRemedies.filter(r => r.status === 'approved').length > 0) {
       contentToTranslate += `\nRemèdes traditionnels:\n`
-      traditionalRemedies.forEach(remedy => {
+      traditionalRemedies.filter(r => r.status === 'approved').forEach(remedy => {
         contentToTranslate += `- ${remedy.remedyName}: ${remedy.justification}\n`;
       })
     }
@@ -183,11 +183,11 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
         </>
       )}
 
-      {traditionalRemedies && traditionalRemedies.length > 0 && !translatedContent && (
+      {traditionalRemedies && traditionalRemedies.filter(r => r.status === 'approved').length > 0 && !translatedContent && (
         <div>
           <h3 className="font-bold mb-2 flex items-center gap-2"><Leaf className="h-4 w-4" /> Remèdes traditionnels</h3>
           <div className="grid sm:grid-cols-1 gap-2">
-            {traditionalRemedies.map((remedy) => (
+            {traditionalRemedies.filter(r => r.status === 'approved').map((remedy) => (
               <TraditionalRemedyCard key={remedy.remedyName} {...remedy} />
             ))}
           </div>
