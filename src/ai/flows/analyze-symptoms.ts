@@ -7,9 +7,9 @@
  * - AnalyzeSymptomsOutput - The return type for the analyzeSymptoms function.
  */
 
-import {ai} from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { UserProfileSchema } from '@/lib/types';
-import {z} from 'genkit';
+import { z } from 'genkit';
 
 const AnalyzeSymptomsInputSchema = z.object({
   symptomsDescription: z
@@ -26,8 +26,8 @@ const DiagnosisSuggestionSchema = z.object({
 });
 
 const MedicationSuggestionSchema = z.object({
-    name: z.string().describe("Le nom du médicament en vente libre suggéré."),
-    justification: z.string().describe("Une explication sur la manière dont ce médicament peut aider à soulager les symptômes décrits. Inclure systématiquement un avertissement de consulter un médecin avant de prendre le médicament."),
+  name: z.string().describe("Le nom du médicament en vente libre suggéré."),
+  justification: z.string().describe("Une explication sur la manière dont ce médicament peut aider à soulager les symptômes décrits. Inclure systématiquement un avertissement de consulter un médecin avant de prendre le médicament."),
 });
 
 const AnalyzeSymptomsOutputSchema = z.object({
@@ -50,12 +50,12 @@ export type AnalyzeSymptomsOutput = z.infer<typeof AnalyzeSymptomsOutputSchema>;
 
 export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<AnalyzeSymptomsOutput> {
   console.log('Début de l\'analyse des symptômes avec l\'entrée :', JSON.stringify(input, null, 2));
-  
+
   try {
     // Valider l'entrée
     const validatedInput = AnalyzeSymptomsInputSchema.parse(input);
     console.log('Entrée validée avec succès');
-    
+
     // Si le profil utilisateur est fourni, s'assurer qu'il est valide
     if (validatedInput.userProfile) {
       console.log('Profil utilisateur fourni, validation...');
@@ -64,29 +64,29 @@ export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<Anal
     } else {
       console.log('Aucun profil utilisateur fourni');
     }
-    
+
     // Exécuter le flux d'analyse
     console.log('Début du flux d\'analyse...');
     const result = await analyzeSymptomsFlow(validatedInput);
     console.log('Flux d\'analyse terminé avec le résultat :', result);
-    
+
     // Valider la sortie
     const parsedResult = AnalyzeSymptomsOutputSchema.parse(result);
     console.log('Résultat validé avec succès');
     return parsedResult;
   } catch (error) {
     console.error("Erreur lors de l'analyse des symptômes :", error);
-    
+
     // Extraire plus de détails de l'erreur
     let errorMessage = "Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.";
-    
+
     if (error instanceof Error) {
       console.error('Détails de l\'erreur principale:', {
         name: error.name,
         message: error.message,
         stack: error.stack
       });
-      
+
       // Messages d'erreur spécifiques
       if (error.message.includes('401') || error.message.includes('unauthorized')) {
         errorMessage = "Erreur d'authentification avec l'API. Veuillez vérifier votre configuration.";
@@ -96,7 +96,7 @@ export async function analyzeSymptoms(input: AnalyzeSymptomsInput): Promise<Anal
         errorMessage = "Le serveur met trop temps à répondre. Veuillez réessayer.";
       }
     }
-    
+
     // Retourner une réponse d'erreur structurée
     return {
       diagnosisSuggestions: [],
@@ -126,8 +126,8 @@ const templateHelpers = {
 const prompt = ai.definePrompt({
   name: 'analyzeSymptomsPrompt',
   model: 'groq/llama-3.3-70b-versatile',
-  input: {schema: AnalyzeSymptomsInputSchema},
-  output: {schema: AnalyzeSymptomsOutputSchema},
+  input: { schema: AnalyzeSymptomsInputSchema },
+  output: { schema: AnalyzeSymptomsOutputSchema },
   config: {
     temperature: 0.7,
     maxOutputTokens: 2048,
@@ -154,9 +154,13 @@ DIRECTIVES IMPORTANTES :
    - Terminez toujours par : "(Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament ou de suivre un traitement)."
 
 4. REMÈDES TRADITIONNELS :
-   - Proposez des remèdes adaptés à la culture tunisienne.
-   - Indiquez clairement leur efficacité et leurs limites.
+   - NE PROPOSEZ des remèdes traditionnels QUE s'ils sont vraiment pertinents et efficaces pour les symptômes décrits.
+   - Si AUCUN remède traditionnel n'est approprié ou efficace, retournez un tableau VIDE pour traditionalRemedies.
+   - Ne proposez PAS de remèdes génériques comme "Tisane de thym" par défaut.
+   - Les remèdes doivent être spécifiquement adaptés aux symptômes et à la culture tunisienne.
+   - Indiquez clairement leur efficacité scientifiquement prouvée et leurs limites.
    - Mentionnez les contre-indications éventuelles en fonction du profil de l'utilisateur.
+   - Si vous proposez un remède, il doit avoir un statut 'approved' ou 'not_recommended' justifié, pas de remèdes 'neutral' sans raison valable.
 
 INFORMATIONS SUR LES SYMPTÔMES :
 {{{symptomsDescription}}}
@@ -233,7 +237,7 @@ const analyzeSymptomsFlow = ai.defineFlow(
   },
   async input => {
     console.log('Début du flux d\'analyse avec l\'entrée :', JSON.stringify(input, null, 2));
-    
+
     try {
       // Préparer l'entrée pour le prompt
       const promptInput = {
@@ -249,12 +253,12 @@ const analyzeSymptomsFlow = ai.defineFlow(
       };
 
       console.log('Appel du modèle IA avec le prompt :', JSON.stringify(promptInput, null, 2));
-      
+
       // Appeler le modèle d'IA avec un timeout
       const llmResponse = await prompt(promptInput);
-      
+
       console.log('Réponse du modèle IA reçue :', llmResponse);
-      
+
       if (!llmResponse || !llmResponse.output) {
         console.error('LLM response was empty or failed', llmResponse);
         throw new Error('La réponse du modèle IA est vide ou invalide');
@@ -266,17 +270,17 @@ const analyzeSymptomsFlow = ai.defineFlow(
       return AnalyzeSymptomsOutputSchema.parse(output);
     } catch (error) {
       console.error('Erreur dans analyzeSymptomsFlow:', error);
-      
+
       // Extraire plus de détails de l'erreur
       let errorMessage = "Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer.";
-      
+
       if (error instanceof Error) {
         console.error('Détails de l\'erreur:', {
           name: error.name,
           message: error.message,
           stack: error.stack
         });
-        
+
         // Messages d'erreur spécifiques pour Groq
         if (error.message.includes('401') || error.message.includes('unauthorized')) {
           errorMessage = "Erreur d'authentification avec l'API Groq. Veuillez vérifier votre clé API.";
@@ -288,7 +292,7 @@ const analyzeSymptomsFlow = ai.defineFlow(
           errorMessage = "Erreur de connexion à l'API Groq. Veuillez vérifier votre connexion.";
         }
       }
-      
+
       return {
         diagnosisSuggestions: [],
         clarifyingQuestions: [errorMessage],
