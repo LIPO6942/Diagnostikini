@@ -40,7 +40,7 @@ export const AssistantResponse = ({
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
-  const [showClarification, setShowClarification] = useState(true);
+  const [showClarification, setShowClarification] = useState(false);
   const [currentDiagnosis, setCurrentDiagnosis] = useState(diagnosisSuggestions[0]?.name || "Inconnu");
   const [diagnosisConfidence, setDiagnosisConfidence] = useState(0.5);
   const { toast } = useToast();
@@ -54,10 +54,10 @@ export const AssistantResponse = ({
   };
 
   const handleTranslate = async () => {
-      setIsTranslating(true);
-      setTranslatedContent(null);
-      
-      let contentToTranslate = `
+    setIsTranslating(true);
+    setTranslatedContent(null);
+
+    let contentToTranslate = `
 Diagnostic Potentiel:
 ${diagnosisSuggestions.map(d => `- ${d.name}: ${d.description}\nJustification: ${d.justification}`).join('\n')}
 
@@ -68,57 +68,57 @@ Suggestions de médicaments:
 ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
       `;
 
-      if (traditionalRemedies.length > 0) {
-          contentToTranslate += `\nRemèdes traditionnels:\n`
-          traditionalRemedies.forEach(remedy => {
-              contentToTranslate += `- ${remedy.remedyName}: ${remedy.justification}\n`;
-          })
-      }
+    if (traditionalRemedies.length > 0) {
+      contentToTranslate += `\nRemèdes traditionnels:\n`
+      traditionalRemedies.forEach(remedy => {
+        contentToTranslate += `- ${remedy.remedyName}: ${remedy.justification}\n`;
+      })
+    }
 
-      try {
-        const result = await translateText({
-            textToTranslate: contentToTranslate,
-            targetLanguage: "Tunisian Arabic"
-        });
-        setTranslatedContent(result.translatedText);
-      } catch (error) {
-        console.error("Translation failed", error);
-        setTranslatedContent("La traduction a échoué. Veuillez réessayer.");
-      } finally {
-        setIsTranslating(false);
-      }
+    try {
+      const result = await translateText({
+        textToTranslate: contentToTranslate,
+        targetLanguage: "Tunisian Arabic"
+      });
+      setTranslatedContent(result.translatedText);
+    } catch (error) {
+      console.error("Translation failed", error);
+      setTranslatedContent("La traduction a échoué. Veuillez réessayer.");
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   const onSaveRecord = async () => {
     try {
-        const remedyRecs = traditionalRemedies.map(r => r.remedyName).join(', ') || 'Aucune recommandation spécifique.';
-        const result = await recordConsultation({
-            symptoms: symptoms,
-            differentialDiagnosis: diagnosisSuggestions.map(d => d.name).join(', '),
-            remedyRecommendations: `Médicaments suggérés : ${medicationSuggestions.map(m => m.name).join(', ')}. Remèdes traditionnels : ${remedyRecs}`
-        });
+      const remedyRecs = traditionalRemedies.map(r => r.remedyName).join(', ') || 'Aucune recommandation spécifique.';
+      const result = await recordConsultation({
+        symptoms: symptoms,
+        differentialDiagnosis: diagnosisSuggestions.map(d => d.name).join(', '),
+        remedyRecommendations: `Médicaments suggérés : ${medicationSuggestions.map(m => m.name).join(', ')}. Remèdes traditionnels : ${remedyRecs}`
+      });
 
-        const newRecord: HealthRecord = {
-            id: result.recordId,
-            date: new Date().toISOString(),
-            category: 'Consultation IA',
-            title: potentialDiagnosis,
-            symptoms: symptoms,
-            summary: result.summary,
-        };
+      const newRecord: HealthRecord = {
+        id: result.recordId,
+        date: new Date().toISOString(),
+        category: 'Consultation IA',
+        title: potentialDiagnosis,
+        symptoms: symptoms,
+        summary: result.summary,
+      };
 
-        await saveHealthRecord(newRecord);
-        toast({
-            title: "Dossier sauvegardé",
-            description: "Votre consultation a été sauvegardée avec succès.",
-        });
+      await saveHealthRecord(newRecord);
+      toast({
+        title: "Dossier sauvegardé",
+        description: "Votre consultation a été sauvegardée avec succès.",
+      });
     } catch (e) {
-        console.error("Erreur lors de la sauvegarde", e);
-        toast({
-            variant: "destructive",
-            title: "Erreur de sauvegarde",
-            description: "La sauvegarde de la consultation a échoué."
-        });
+      console.error("Erreur lors de la sauvegarde", e);
+      toast({
+        variant: "destructive",
+        title: "Erreur de sauvegarde",
+        description: "La sauvegarde de la consultation a échoué."
+      });
     }
   };
 
@@ -126,88 +126,94 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
   return (
     <div className="space-y-4">
       {translatedContent ? (
-         <div>
-            <h3 className="font-bold mb-2">Traduction (Arabe Tunisien)</h3>
-            <p className="whitespace-pre-line text-sm">{translatedContent}</p>
-            <Button variant="link" size="sm" className="p-0 h-auto" onClick={() => setTranslatedContent(null)}>Afficher l'original</Button>
+        <div>
+          <h3 className="font-bold mb-2">Traduction (Arabe Tunisien)</h3>
+          <p className="whitespace-pre-line text-sm">{translatedContent}</p>
+          <Button variant="link" size="sm" className="p-0 h-auto" onClick={() => setTranslatedContent(null)}>Afficher l'original</Button>
         </div>
       ) : (
         <>
-            <div>
-                <h3 className="font-bold mb-2">Diagnostics Potentiels</h3>
-                <Accordion type="single" collapsible defaultValue={diagnosisSuggestions[0]?.name}>
-                    {diagnosisSuggestions.map((d, i) => (
-                       <AccordionItem value={d.name} key={i}>
-                           <AccordionTrigger className="text-base font-semibold">{d.name}</AccordionTrigger>
-                           <AccordionContent className="space-y-3 pt-2">
-                               <div className="flex items-start gap-2">
-                                  <Info className="size-4 mt-1 shrink-0 text-primary" />
-                                  <p className="text-sm text-muted-foreground">{d.description}</p>
-                               </div>
-                               <div className="flex items-start gap-2">
-                                  <Lightbulb className="size-4 mt-1 shrink-0 text-amber-500" />
-                                  <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">Justification :</span> {d.justification}</p>
-                               </div>
-                           </AccordionContent>
-                       </AccordionItem>
-                    ))}
-                </Accordion>
-            </div>
-            
-            {showClarification && (
-              <ClarificationSection
-                initialDiagnosis={currentDiagnosis}
-                symptoms={symptoms.split(/[,.]+/).map(s => s.trim()).filter(Boolean)}
-                onDiagnosisUpdate={(newDiagnosis, confidence) => {
-                  setCurrentDiagnosis(newDiagnosis);
-                  setDiagnosisConfidence(confidence);
-                }}
-                onComplete={() => setShowClarification(false)}
-              />
-            )}
-
-
-            {medicationSuggestions && medicationSuggestions.length > 0 && (
-                <div>
-                    <h3 className="font-bold mb-2 flex items-center gap-2"><Pill className="h-4 w-4" /> Suggestions de médicaments</h3>
-                    <div className="space-y-2">
-                        {medicationSuggestions.map((med, i) => (
-                            <div key={i} className="text-sm p-3 bg-muted/50 rounded-lg">
-                                <p className="font-semibold">{med.name}</p>
-                                <p className="text-muted-foreground">{med.justification}</p>
-                            </div>
-                        ))}
+          <div>
+            <h3 className="font-bold mb-2">Diagnostics Potentiels</h3>
+            <Accordion type="single" collapsible defaultValue={diagnosisSuggestions[0]?.name}>
+              {diagnosisSuggestions.map((d, i) => (
+                <AccordionItem value={d.name} key={i}>
+                  <AccordionTrigger className="text-base font-semibold">{d.name}</AccordionTrigger>
+                  <AccordionContent className="space-y-3 pt-2">
+                    <div className="flex items-start gap-2">
+                      <Info className="size-4 mt-1 shrink-0 text-primary" />
+                      <p className="text-sm text-muted-foreground">{d.description}</p>
                     </div>
-                </div>
-            )}
-       </>
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="size-4 mt-1 shrink-0 text-amber-500" />
+                      <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">Justification :</span> {d.justification}</p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+
+          {showClarification && (
+            <ClarificationSection
+              initialDiagnosis={currentDiagnosis}
+              symptoms={symptoms.split(/[,.]+/).map(s => s.trim()).filter(Boolean)}
+              onDiagnosisUpdate={(newDiagnosis, confidence) => {
+                setCurrentDiagnosis(newDiagnosis);
+                setDiagnosisConfidence(confidence);
+              }}
+              onComplete={() => setShowClarification(false)}
+            />
+          )}
+
+
+          {medicationSuggestions && medicationSuggestions.length > 0 && (
+            <div>
+              <h3 className="font-bold mb-2 flex items-center gap-2"><Pill className="h-4 w-4" /> Suggestions de médicaments</h3>
+              <div className="space-y-2">
+                {medicationSuggestions.map((med, i) => (
+                  <div key={i} className="text-sm p-3 bg-muted/50 rounded-lg">
+                    <p className="font-semibold">{med.name}</p>
+                    <p className="text-muted-foreground">{med.justification}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {traditionalRemedies && traditionalRemedies.length > 0 && !translatedContent && (
         <div>
-            <h3 className="font-bold mb-2 flex items-center gap-2"><Leaf className="h-4 w-4" /> Remèdes traditionnels</h3>
-             <div className="grid sm:grid-cols-1 gap-2">
-                {traditionalRemedies.map((remedy) => (
-                    <TraditionalRemedyCard key={remedy.remedyName} {...remedy} />
-                ))}
-            </div>
+          <h3 className="font-bold mb-2 flex items-center gap-2"><Leaf className="h-4 w-4" /> Remèdes traditionnels</h3>
+          <div className="grid sm:grid-cols-1 gap-2">
+            {traditionalRemedies.map((remedy) => (
+              <TraditionalRemedyCard key={remedy.remedyName} {...remedy} />
+            ))}
+          </div>
         </div>
       )}
 
       {remedies && (
-         <div>
-            <h3 className="font-bold mb-2">Recommandations de remèdes</h3>
-            <div className="grid sm:grid-cols-2 gap-2">
-                {remedies.length > 0 ? remedies.map((remedy) => (
-                    <RemedyCard key={remedy.title} {...remedy} />
-                )) : <p>Aucun remède spécifique à suggérer. Veuillez consulter un médecin.</p>}
-            </div>
+        <div>
+          <h3 className="font-bold mb-2">Recommandations de remèdes</h3>
+          <div className="grid sm:grid-cols-2 gap-2">
+            {remedies.length > 0 ? remedies.map((remedy) => (
+              <RemedyCard key={remedy.title} {...remedy} />
+            )) : <p>Aucun remède spécifique à suggérer. Veuillez consulter un médecin.</p>}
+          </div>
         </div>
       )}
 
-      <Separator className="pt-2"/>
+      <Separator className="pt-2" />
 
       <div className="flex flex-wrap gap-2">
+        {!showClarification && (
+          <Button variant="outline" size="sm" onClick={() => setShowClarification(true)}>
+            <MessageCircleQuestion className="mr-2 h-4 w-4" />
+            Affiner le diagnostic
+          </Button>
+        )}
         <Button variant="outline" size="sm" onClick={handleShowRemedies} disabled={!!remedies}>
           <HeartPulse className="mr-2 h-4 w-4" />
           Afficher les remèdes
@@ -217,8 +223,8 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
           Sauvegarder
         </Button>
         <Button variant="outline" size="sm" onClick={handleTranslate} disabled={isTranslating || !!translatedContent}>
-            {isTranslating ? <LoaderCircle className="animate-spin mr-2 h-4 w-4"/> : <Languages className="mr-2 h-4 w-4" />}
-            {isTranslating ? 'Traduction...' : 'Traduire en Tunisien'}
+          {isTranslating ? <LoaderCircle className="animate-spin mr-2 h-4 w-4" /> : <Languages className="mr-2 h-4 w-4" />}
+          {isTranslating ? 'Traduction...' : 'Traduire en Tunisien'}
         </Button>
       </div>
       <p className="text-xs text-muted-foreground pt-2">
