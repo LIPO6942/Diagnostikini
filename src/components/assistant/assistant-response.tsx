@@ -31,18 +31,23 @@ interface AssistantResponseProps {
 
 export const AssistantResponse = ({
   symptoms,
-  diagnosisSuggestions,
+  diagnosisSuggestions: initialDiagnosisSuggestions,
   clarifyingQuestions,
-  medicationSuggestions,
-  traditionalRemedies,
+  medicationSuggestions: initialMedicationSuggestions,
+  traditionalRemedies: initialTraditionalRemedies,
   fullAnalysis,
 }: AssistantResponseProps) => {
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [showClarification, setShowClarification] = useState(false);
-  const [currentDiagnosis, setCurrentDiagnosis] = useState(diagnosisSuggestions[0]?.name || "Inconnu");
+
+  // States pour les suggestions mises à jour par l'affinement
+  const [diagnosisSuggestions, setDiagnosisSuggestions] = useState(initialDiagnosisSuggestions);
+  const [medicationSuggestions, setMedicationSuggestions] = useState(initialMedicationSuggestions);
+  const [traditionalRemedies, setTraditionalRemedies] = useState(initialTraditionalRemedies);
   const [diagnosisConfidence, setDiagnosisConfidence] = useState(0.5);
+
   const { toast } = useToast();
 
   const potentialDiagnosis = diagnosisSuggestions[0]?.name || "Inconnu";
@@ -156,10 +161,13 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
 
           {showClarification && (
             <ClarificationSection
-              initialDiagnosis={currentDiagnosis}
-              symptoms={symptoms.split(/[,.]+/).map(s => s.trim()).filter(Boolean)}
-              onDiagnosisUpdate={(newDiagnosis, confidence) => {
-                setCurrentDiagnosis(newDiagnosis);
+              initialDiagnosis={potentialDiagnosis}
+              symptoms={symptoms}
+              symptomsArray={symptoms.split(/[,.]+/).map(s => s.trim()).filter(Boolean)}
+              onDiagnosisUpdate={(newDiagnosisSuggestions, newMedicationSuggestions, newTraditionalRemedies, confidence) => {
+                setDiagnosisSuggestions(newDiagnosisSuggestions);
+                setMedicationSuggestions(newMedicationSuggestions);
+                setTraditionalRemedies(newTraditionalRemedies);
                 setDiagnosisConfidence(confidence);
               }}
               onComplete={() => setShowClarification(false)}

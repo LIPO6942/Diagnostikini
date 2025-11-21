@@ -27,7 +27,7 @@ const DiagnosisSuggestionSchema = z.object({
 
 const MedicationSuggestionSchema = z.object({
   name: z.string().describe("Le nom du médicament en vente libre suggéré."),
-  justification: z.string().describe("Une explication sur la manière dont ce médicament peut aider à soulager les symptômes décrits. Inclure systématiquement un avertissement de consulter un médecin avant de prendre le médicament."),
+  justification: z.string().describe("Une explication concise sur la manière dont ce médicament peut aider à soulager les symptômes décrits."),
 });
 
 const AnalyzeSymptomsOutputSchema = z.object({
@@ -147,11 +147,11 @@ DIRECTIVES IMPORTANTES :
    - Mentionnez explicitement comment l'âge, le sexe ou les antécédents influencent chaque diagnostic potentiel.
 
 3. MÉDICAMENTS ET TRAITEMENTS :
+   - Suggérez des médicaments en vente libre appropriés et pertinents pour les symptômes.
    - Tenez compte des allergies, du groupe sanguin et des traitements actuels dans vos recommandations.
    - Adaptez les posologies en fonction de l'âge, du poids et des caractéristiques physiologiques de l'utilisateur.
    - Mettez en garde contre les interactions médicamenteuses potentielles, notamment en fonction du groupe sanguin quand cela est pertinent.
    - Pour les traitements impliquant des transfusions ou des interventions chirurgicales, mentionnez l'importance du groupe sanguin.
-   - Terminez toujours par : "(Avertissement : Consultez toujours un professionnel de santé avant de prendre un nouveau médicament ou de suivre un traitement)."
 
 4. REMÈDES TRADITIONNELS :
    - NE PROPOSEZ des remèdes traditionnels QUE s'ils sont vraiment pertinents et efficaces pour les symptômes décrits.

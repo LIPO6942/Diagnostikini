@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { refineDiagnosis, ClarificationAnswer } from "@/services/diagnosis-refinement";
+import { refineDiagnosisWithAI } from "@/ai/flows/refine-diagnosis";
+import type { DiagnosisSuggestion, MedicationSuggestion, TraditionalRemedy } from "@/lib/types";
 
 interface ClarificationQuestion {
   id: string;
@@ -16,14 +17,21 @@ interface ClarificationQuestion {
 
 interface ClarificationSectionProps {
   initialDiagnosis: string;
-  symptoms: string[];
-  onDiagnosisUpdate: (diagnosis: string, confidence: number) => void;
+  symptoms: string;
+  symptomsArray: string[];
+  onDiagnosisUpdate: (
+    diagnosisSuggestions: DiagnosisSuggestion[],
+    medicationSuggestions: MedicationSuggestion[],
+    traditionalRemedies: TraditionalRemedy[],
+    confidence: number
+  ) => void;
   onComplete: () => void;
 }
 
 export function ClarificationSection({
   initialDiagnosis,
   symptoms,
+  symptomsArray,
   onDiagnosisUpdate,
   onComplete
 }: ClarificationSectionProps) {
@@ -38,14 +46,14 @@ export function ClarificationSection({
   // Charger les questions initiales
   useEffect(() => {
     const loadInitialQuestions = async () => {
-      const { questions } = await refineDiagnosis({
+      const { questions: questionsList } = await refineDiagnosis({
         diagnosis: initialDiagnosis,
-        symptoms
+        symptoms: symptomsArray
       });
-      setQuestions(createQuestionObjects(questions));
+      setQuestions(createQuestionObjects(questionsList));
     };
     loadInitialQuestions();
-  }, [initialDiagnosis, symptoms]);
+  }, [initialDiagnosis, symptomsArray]);
 
   const createQuestionObjects = (questionTexts: string[]): ClarificationQuestion[] => {
     return questionTexts.map((text, index) => ({
@@ -84,34 +92,55 @@ export function ClarificationSection({
 
       // Mettre à jour la liste complète des réponses
       const allAnswers = [...answeredQuestions, ...answerObjects];
-
-      // Appeler le service de raffinement
-      const { refinedDiagnosis, confidence: newConfidence, questions: newQuestions } =
-        await refineDiagnosis({
-          diagnosis: currentDiagnosis,
-          symptoms,
-          previousAnswers: allAnswers
-        });
-
-      // Mettre à jour l'état local
-      setCurrentDiagnosis(refinedDiagnosis);
-      setConfidence(newConfidence);
       setAnsweredQuestions(allAnswers);
 
-      // Mettre à jour le composant parent
-      onDiagnosisUpdate(refinedDiagnosis, newConfidence);
+      // Appeler le service IA pour raffiner le diagnostic avec les nouvelles réponses
+      const refinedResult = await refineDiagnosisWithAI({
+        initialSymptoms: symptoms,
+        initialDiagnosis: currentDiagnosis,
+        clarificationAnswers: allAnswers
+      });
 
-      // Si plus de questions ou confiance suffisante, terminer
-      if (newQuestions.length === 0 || newConfidence >= 0.85 || allAnswers.length >= 5) {
+      // Mettre à jour le diagnostic et la confiance
+      const newDiagnosis = refinedResult.diagnosisSuggestions[0]?.name || currentDiagnosis;
+      const newConfidence = refinedResult.confidence;
+
+      setCurrentDiagnosis(newDiagnosis);
+      setConfidence(newConfidence);
+
+      // Mettre à jour le composant parent avec TOUS les nouveaux résultats
+      onDiagnosisUpdate(
+        refinedResult.diagnosisSuggestions,
+        refinedResult.medicationSuggestions,
+        refinedResult.traditionalRemedies,
+        newConfidence
+      );
+
+      // Si confiance suffisante ou trop de questions, terminer
+      if (newConfidence >= 0.85 || allAnswers.length >= 5) {
         onComplete();
         toast({
-          title: "Diagnostic finalisé",
+          title: "Diagnostic affiné",
           description: `Confiance: ${Math.round(newConfidence * 100)}%`,
         });
       } else {
-        // Sinon, afficher les nouvelles questions
-        setQuestions(createQuestionObjects(newQuestions));
-        setAnswers({});
+        // Sinon, générer de nouvelles questions
+        const { questions: newQuestions } = await refineDiagnosis({
+          diagnosis: newDiagnosis,
+          symptoms: symptomsArray,
+          previousAnswers: allAnswers
+        });
+
+        if (newQuestions.length > 0) {
+          setQuestions(createQuestionObjects(newQuestions));
+          setAnswers({});
+        } else {
+          onComplete();
+          toast({
+            title: "Diagnostic finalisé",
+            description: `Confiance: ${Math.round(newConfidence * 100)}%`,
+          });
+        }
       }
 
     } catch (error) {
