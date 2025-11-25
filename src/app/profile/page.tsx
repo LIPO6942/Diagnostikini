@@ -92,7 +92,7 @@ export default function ProfilePage() {
 
   const form = useForm<UserProfile>({
     resolver: zodResolver(UserProfileSchema),
-    defaultValues: {
+    defaultValues: profile || {
       age: undefined,
       sex: undefined,
       bloodGroup: undefined,
@@ -104,37 +104,7 @@ export default function ProfilePage() {
     },
   });
 
-  // Load saved profile into the form when it becomes available
-  const profileLoadedRef = React.useRef(false);
 
-  useEffect(() => {
-    if (profile && !profileLoadedRef.current) {
-      console.log("📥 Loading profile into form:", profile);
-      profileLoadedRef.current = true;
-      form.reset({
-        age: profile.age,
-        sex: profile.sex,
-        bloodGroup: profile.bloodGroup,
-        weight: profile.weight,
-        medicalHistory: {
-          conditions: profile.medicalHistory?.conditions || [],
-          other: profile.medicalHistory?.other || "",
-        },
-        allergies: {
-          items: profile.allergies?.items || [],
-          other: profile.allergies?.other || "",
-        },
-        currentTreatments: {
-          medications: profile.currentTreatments?.medications || [],
-          other: profile.currentTreatments?.other || "",
-        },
-        additionalSymptoms: {
-          symptoms: profile.additionalSymptoms?.symptoms || [],
-          other: profile.additionalSymptoms?.other || "",
-        },
-      });
-    }
-  }, [profile, form.reset]);
 
   function onSubmit(values: UserProfile) {
     console.log("💾 Saving profile:", values);
