@@ -41,6 +41,17 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 // -----------------------------------------------------------------------------
+// Dynamic form field groups (medical history, allergies, etc.)
+// -----------------------------------------------------------------------------
+const formFields = [
+  { name: "medicalHistory", label: "Antécédents médicaux", options: medicalHistoryOptions, formKey: "conditions" },
+  { name: "allergies", label: "Allergies", options: allergyOptions, formKey: "items" },
+  { name: "currentTreatments", label: "Traitements en cours", options: treatmentOptions, formKey: "medications" },
+  { name: "additionalSymptoms", label: "Symptômes généraux supplémentaires", options: additionalSymptomOptions, formKey: "symptoms" },
+] as const;
+
+
+// -----------------------------------------------------------------------------
 // Helper component displayed while the profile is loading
 // -----------------------------------------------------------------------------
 function ProfileFormSkeleton() {
