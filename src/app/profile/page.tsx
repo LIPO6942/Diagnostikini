@@ -140,6 +140,7 @@ export default function ProfilePage() {
     console.log('  - sex:', values.sex);
     console.log('  - bloodGroup:', values.bloodGroup);
     saveProfile(values);
+    console.log('🗄️ LocalStorage content:', localStorage.getItem('userProfile'));
     toast({
       title: "Profil sauvegardé",
       description: "Vos informations ont été mises à jour. Vous allez être redirigé.",
@@ -198,144 +199,132 @@ export default function ProfilePage() {
                   )}
                 />
                 <FormField
-                  control={form.control}
-                  name="sex"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sexe <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionnez..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="homme">Homme</SelectItem>
-                          <SelectItem value="femme">Femme</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                  <SelectItem value="homme">Homme</SelectItem>
+                <SelectItem value="femme">Femme</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
                   )}
                 />
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Poids (kg)</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Ex: 70" {...field} onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))} value={field.value ?? ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bloodGroup"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Groupe sanguin <span className="text-red-500">*</span></FormLabel>
+                <Select onValueChange={field.onChange} value={field.value ?? undefined}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="A+">A+</SelectItem>
+                    <SelectItem value="A-">A-</SelectItem>
+                    <SelectItem value="B+">B+</SelectItem>
+                    <SelectItem value="B-">B-</SelectItem>
+                    <SelectItem value="AB+">AB+</SelectItem>
+                    <SelectItem value="AB-">AB-</SelectItem>
+                    <SelectItem value="O+">O+</SelectItem>
+                    <SelectItem value="O-">O-</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Important pour les urgences médicales
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {formFields.map((section) => (
+          <FormField
+            key={section.name}
+            control={form.control}
+            name={section.name}
+            render={() => (
+              <FormItem>
+                <FormLabel className="text-base">{section.label}</FormLabel>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
+                  {section.options.map((item) => {
+                    const fieldName = `${section.name}.${section.formKey}` as const;
+                    return (
+                      <FormField
+                        key={item}
+                        control={form.control}
+                        name={fieldName}
+                        render={({ field }) => {
+                          const fieldValue = Array.isArray(field.value) ? field.value : [];
+                          return (
+                            <FormItem
+                              key={item}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={fieldValue.includes(item)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      field.onChange([...fieldValue, item]);
+                                    } else {
+                                      field.onChange(fieldValue.filter((value: string) => value !== item));
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {item}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    );
+                  })}
+                </div>
                 <FormField
                   control={form.control}
-                  name="weight"
+                  name={`${section.name}.other`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Poids (kg)</FormLabel>
+                      <FormLabel className="font-normal">Autre (veuillez préciser)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Ex: 70" {...field} onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))} value={field.value ?? ''} />
+                        <Textarea
+                          placeholder="Si autre, décrivez ici..."
+                          {...field}
+                          value={field.value ?? ''}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="bloodGroup"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Groupe sanguin <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionnez..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="A+">A+</SelectItem>
-                          <SelectItem value="A-">A-</SelectItem>
-                          <SelectItem value="B+">B+</SelectItem>
-                          <SelectItem value="B-">B-</SelectItem>
-                          <SelectItem value="AB+">AB+</SelectItem>
-                          <SelectItem value="AB-">AB-</SelectItem>
-                          <SelectItem value="O+">O+</SelectItem>
-                          <SelectItem value="O-">O-</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Important pour les urgences médicales
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ))}
 
-              {formFields.map((section) => (
-                <FormField
-                  key={section.name}
-                  control={form.control}
-                  name={section.name}
-                  render={() => (
-                    <FormItem>
-                      <FormLabel className="text-base">{section.label}</FormLabel>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
-                        {section.options.map((item) => {
-                          const fieldName = `${section.name}.${section.formKey}` as const;
-                          return (
-                            <FormField
-                              key={item}
-                              control={form.control}
-                              name={fieldName}
-                              render={({ field }) => {
-                                const fieldValue = Array.isArray(field.value) ? field.value : [];
-                                return (
-                                  <FormItem
-                                    key={item}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={fieldValue.includes(item)}
-                                        onCheckedChange={(checked) => {
-                                          if (checked) {
-                                            field.onChange([...fieldValue, item]);
-                                          } else {
-                                            field.onChange(fieldValue.filter((value: string) => value !== item));
-                                          }
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {item}
-                                    </FormLabel>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name={`${section.name}.other`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-normal">Autre (veuillez préciser)</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Si autre, décrivez ici..."
-                                {...field}
-                                value={field.value ?? ''}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
-
-              <Button type="submit">Sauvegarder et continuer</Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+        <Button type="submit">Sauvegarder et continuer</Button>
+      </form>
+    </Form>
+        </CardContent >
+      </Card >
+    </div >
   );
 }
