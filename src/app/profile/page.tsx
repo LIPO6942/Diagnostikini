@@ -105,47 +105,40 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (isProfileComplete !== undefined) {
-      const defaultValues = {
-        age: undefined as number | undefined,
-        sex: undefined as 'homme' | 'femme' | undefined,
-        bloodGroup: undefined as 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | undefined,
-        weight: undefined as number | undefined,
-        medicalHistory: { conditions: [] as string[], other: '' },
-        allergies: { items: [] as string[], other: '' },
-        currentTreatments: { medications: [] as string[], other: '' },
-        additionalSymptoms: { symptoms: [] as string[], other: '' }
-      };
-
-      if (profile) {
-        form.reset({
-          ...defaultValues,
-          ...profile,
-          medicalHistory: {
-            conditions: profile.medicalHistory?.conditions || [],
-            other: profile.medicalHistory?.other || ''
-          },
-          allergies: {
-            items: profile.allergies?.items || [],
-            other: profile.allergies?.other || ''
-          },
-          currentTreatments: {
-            medications: profile.currentTreatments?.medications || [],
-            other: profile.currentTreatments?.other || ''
-          },
-          additionalSymptoms: {
-            symptoms: profile.additionalSymptoms?.symptoms || [],
-            other: profile.additionalSymptoms?.other || ''
-          }
-        });
-      } else {
-        form.reset(defaultValues);
-      }
+    if (profile) {
+      console.log('📥 Loading profile into form:', profile);
+      console.log('  - sex:', profile.sex);
+      console.log('  - bloodGroup:', profile.bloodGroup);
+      form.reset({
+        age: profile.age,
+        sex: profile.sex,
+        bloodGroup: profile.bloodGroup,
+        weight: profile.weight,
+        medicalHistory: {
+          conditions: profile.medicalHistory?.conditions || [],
+          other: profile.medicalHistory?.other || ''
+        },
+        allergies: {
+          items: profile.allergies?.items || [],
+          other: profile.allergies?.other || ''
+        },
+        currentTreatments: {
+          medications: profile.currentTreatments?.medications || [],
+          other: profile.currentTreatments?.other || ''
+        },
+        additionalSymptoms: {
+          symptoms: profile.additionalSymptoms?.symptoms || [],
+          other: profile.additionalSymptoms?.other || ''
+        }
+      });
     }
-  }, [profile, form, isProfileComplete])
+  }, [profile, form])
 
 
   function onSubmit(values: UserProfile) {
+    console.log('💾 Saving profile:', values);
+    console.log('  - sex:', values.sex);
+    console.log('  - bloodGroup:', values.bloodGroup);
     saveProfile(values);
     toast({
       title: "Profil sauvegardé",
@@ -210,7 +203,7 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Sexe <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez..." />
