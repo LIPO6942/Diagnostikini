@@ -105,9 +105,12 @@ export default function ProfilePage() {
   });
 
   // Load saved profile into the form when it becomes available
+  const profileLoadedRef = React.useRef(false);
+
   useEffect(() => {
-    if (profile) {
+    if (profile && !profileLoadedRef.current) {
       console.log("📥 Loading profile into form:", profile);
+      profileLoadedRef.current = true;
       form.reset({
         age: profile.age,
         sex: profile.sex,
@@ -131,7 +134,7 @@ export default function ProfilePage() {
         },
       });
     }
-  }, [profile, form]);
+  }, [profile, form.reset]);
 
   function onSubmit(values: UserProfile) {
     console.log("💾 Saving profile:", values);
