@@ -3,8 +3,8 @@ import { z } from "zod";
 
 export const UserProfileSchema = z.object({
   age: z.union([z.number().min(0).max(120), z.literal('')]).optional().nullable(),
-  sex: z.enum(["homme", "femme", "ne-specifie-pas"]).optional().nullable(),
-  bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "inconnu"]).optional().nullable(),
+  sex: z.enum(["homme", "femme"]),
+  bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
   weight: z.union([z.number().min(0), z.literal('')]).optional().nullable(),
   medicalHistory: z.object({
     conditions: z.array(z.string()).optional(),
@@ -33,7 +33,7 @@ export type HealthDocument = {
   mimeType: string;
 };
 
-export type HealthRecordCategory = 
+export type HealthRecordCategory =
   | 'Consultation IA'
   | 'Bilan sanguin'
   | "Analyse d'urine"
@@ -46,7 +46,7 @@ export type HealthRecordCategory =
 
 export type HealthRecord = {
   id: string; // Unique ID, also used for sorting (new Date().toISOString())
-  date: string; 
+  date: string;
   category: HealthRecordCategory;
   title: string;
   symptoms?: string;
@@ -88,22 +88,23 @@ export type SymptomNode = {
   description?: string;
   descriptionTunisian?: string;
   children?: SymptomNode[];
+  sex?: 'homme' | 'femme';
 };
 
 export type DiagnosisSuggestion = {
-    name: string;
-    description: string;
-    justification: string;
+  name: string;
+  description: string;
+  justification: string;
 }
 
 export type MedicationSuggestion = {
-    name: string;
-    justification: string;
+  name: string;
+  justification: string;
 }
 
 export type AnalyzeSymptomsOutput = {
-    diagnosisSuggestions: DiagnosisSuggestion[];
-    clarifyingQuestions: string[];
-    medicationSuggestions: MedicationSuggestion[];
-    traditionalRemedies: TraditionalRemedy[];
+  diagnosisSuggestions: DiagnosisSuggestion[];
+  clarifyingQuestions: string[];
+  medicationSuggestions: MedicationSuggestion[];
+  traditionalRemedies: TraditionalRemedy[];
 }

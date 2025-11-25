@@ -28,12 +28,12 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     saveUserProfile(newProfile);
     setProfile(newProfile);
   };
-  
+
   const isProfileComplete = useMemo(() => {
     if (!isMounted) return undefined;
     if (!profile) return false;
-    // A profile is "complete" if at least age and sex are filled.
-    return !!(profile.age && profile.sex && profile.sex !== 'ne-specifie-pas');
+    // A profile is "complete" if sex and bloodGroup are filled.
+    return !!(profile.sex && profile.bloodGroup);
   }, [profile, isMounted]);
 
   const value = { profile, saveProfile, isProfileComplete };

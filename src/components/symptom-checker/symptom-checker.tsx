@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { SymptomNode } from "@/lib/types";
 import { symptomTree } from "@/constants/symptom-tree";
 import { SymptomSelection } from "./symptom-selection";
@@ -23,11 +23,34 @@ function SymptomCheckerSkeleton() {
 
 
 export default function SymptomChecker() {
-  const [currentNode, setCurrentNode] = useState<SymptomNode[]>(symptomTree);
-  const [history, setHistory] = useState<SymptomNode[][]>([symptomTree]);
+  const { isProfileComplete, profile } = useProfile();
+
+  const filterNodes = (nodes: SymptomNode[], sex: 'homme' | 'femme'): SymptomNode[] => {
+    return nodes
+      .filter(node => !node.sex || node.sex === sex)
+      .map(node => ({
+        ...node,
+        children: node.children ? filterNodes(node.children, sex) : undefined
+      }));
+  };
+
+  const filteredTree = useMemo(() => {
+    if (!profile?.sex || (profile.sex !== 'homme' && profile.sex !== 'femme')) return symptomTree;
+    return filterNodes(symptomTree, profile.sex as 'homme' | 'femme');
+  }, [profile?.sex]);
+
+  const [currentNode, setCurrentNode] = useState<SymptomNode[]>(filteredTree);
+  const [history, setHistory] = useState<SymptomNode[][]>([filteredTree]);
   const [selectedPath, setSelectedPath] = useState<SymptomNode[]>([]);
   const [analysis, setAnalysis] = useState<string | null>(null);
-  const { isProfileComplete } = useProfile();
+
+  // Reset when the tree changes (e.g. profile update)
+  useEffect(() => {
+    setCurrentNode(filteredTree);
+    setHistory([filteredTree]);
+    setSelectedPath([]);
+    setAnalysis(null);
+  }, [filteredTree]);
 
 
   const handleSelectNode = (node: SymptomNode) => {
@@ -47,29 +70,29 @@ export default function SymptomChecker() {
 
   const handleGoBack = () => {
     if (analysis) {
-        // From analysis back to selection
-        setAnalysis(null);
-        setSelectedPath(prev => prev.slice(0, -1));
-        const lastNodeChildren = history[history.length -1];
-        setCurrentNode(lastNodeChildren);
-        
+      // From analysis back to selection
+      setAnalysis(null);
+      setSelectedPath(prev => prev.slice(0, -1));
+      const lastNodeChildren = history[history.length - 1];
+      setCurrentNode(lastNodeChildren);
+
     } else if (history.length > 1) {
-        // Within the selection tree
-        const prevHistory = history.slice(0, -1);
-        const prevNodes = prevHistory[prevHistory.length - 1];
-        setHistory(prevHistory);
-        setCurrentNode(prevNodes);
-        setSelectedPath(prev => prev.slice(0, -1));
+      // Within the selection tree
+      const prevHistory = history.slice(0, -1);
+      const prevNodes = prevHistory[prevHistory.length - 1];
+      setHistory(prevHistory);
+      setCurrentNode(prevNodes);
+      setSelectedPath(prev => prev.slice(0, -1));
     }
   };
 
   const handleReset = () => {
-    setCurrentNode(symptomTree);
-    setHistory([symptomTree]);
+    setCurrentNode(filteredTree);
+    setHistory([filteredTree]);
     setSelectedPath([]);
     setAnalysis(null);
   };
-  
+
   const canGoBack = analysis ? true : history.length > 1;
 
   if (isProfileComplete === undefined) {
@@ -83,10 +106,10 @@ export default function SymptomChecker() {
   return (
     <div className="mx-auto w-full max-w-md px-2 sm:px-0">
       {analysis ? (
-        <SymptomAnalysis 
-            symptomDescription={analysis}
-            onBack={handleGoBack}
-            onReset={handleReset}
+        <SymptomAnalysis
+          symptomDescription={analysis}
+          onBack={handleGoBack}
+          onReset={handleReset}
         />
       ) : (
         <SymptomSelection

@@ -420,38 +420,6 @@ export const symptomTree: SymptomNode[] = [
           { id: "uri-couleur", label: "Urine trouble / odeur forte", descriptionTunisian: "بول خاثر / ريحة قوية" },
           { id: "uri-retention", label: "Difficulté à uriner / Blocage", descriptionTunisian: "البول محصور" },
         ]
-      },
-      {
-        id: "genital-femme",
-        label: "Gynécologique (Femme)",
-        descriptionTunisian: "نساء",
-        children: [
-          {
-            id: "gyn-regles", label: "Problèmes de règles", descriptionTunisian: "العادة الشهرية", children: [
-              { id: "regles-douloureuses", label: "Douloureuses", descriptionTunisian: "بالوجيعة" },
-              { id: "regles-abondantes", label: "Abondantes", descriptionTunisian: "قوية برشا" },
-              { id: "regles-irregulieres", label: "Irrégulières / Absentes", descriptionTunisian: "موش منظمة" },
-            ]
-          },
-          {
-            id: "gyn-pertes", label: "Pertes vaginales anormales", descriptionTunisian: "إفرازات", children: [
-              { id: "pertes-blanches", label: "Blanches / Épaisses", descriptionTunisian: "بيضاء" },
-              { id: "pertes-odeur", label: "Mauvaise odeur", descriptionTunisian: "ريحة خايبة" },
-              { id: "pertes-sang", label: "Saignement hors règles", descriptionTunisian: "دم في غير وقتو" },
-            ]
-          },
-          { id: "gyn-douleur", label: "Douleur pelvienne / Rapports", descriptionTunisian: "وجيعة لوطة" },
-        ]
-      },
-      {
-        id: "genital-homme",
-        label: "Génital (Homme)",
-        descriptionTunisian: "رجال",
-        children: [
-          { id: "hom-douleur", label: "Douleur testiculaire / Pénienne", descriptionTunisian: "وجيعة" },
-          { id: "hom-ecoulement", label: "Écoulement urétral", descriptionTunisian: "إفرازات" },
-          { id: "hom-erection", label: "Troubles de l'érection", descriptionTunisian: "ضعف جنسي" },
-        ]
       }
     ]
   },
