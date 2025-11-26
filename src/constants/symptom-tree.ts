@@ -199,7 +199,7 @@ export const symptomTree: SymptomNode[] = [
           { id: "gorge-douleur", label: "Douleur / Picotement", descriptionTunisian: "وجيعة / تنميل", children: painCharacteristics("gorge") },
           { id: "gorge-avaler", label: "Difficulté à avaler", descriptionTunisian: "وحلان الماكلة" },
           { id: "gorge-enrouee", label: "Voix enrouée / Perte de voix", descriptionTunisian: "صوت مبحاح" },
-          { id: "gorge-gonflee", label: "Sensation de gonflement / Boule", descriptionTunisian: "كعبة في القرجومة" },
+          { id: "gorge-gonflee", label: "Sensation de gonflement / Boule", descriptionTunisian: "كعبة في القرجومة", children: painCharacteristics("gorge-gonflee") },
         ]
       },
       {
@@ -300,6 +300,7 @@ export const symptomTree: SymptomNode[] = [
               { id: "fourmi-main", label: "Mains / Bras", descriptionTunisian: "في اليدين" },
               { id: "fourmi-pied", label: "Pieds / Jambes", descriptionTunisian: "في الساقين" },
               { id: "fourmi-visage", label: "Visage", descriptionTunisian: "في الوجه" },
+              ...painCharacteristics("neuro-fourmillements")
             ]
           },
           { id: "neuro-faiblesse", label: "Faiblesse musculaire / Paralysie", descriptionTunisian: "فشلة / شلل" },
@@ -333,6 +334,7 @@ export const symptomTree: SymptomNode[] = [
           { id: "palp-rapide", label: "Cœur bat trop vite (Tachycardie)", descriptionTunisian: "دقات سريعة" },
           { id: "palp-irregulier", label: "Battements irréguliers (Ratés)", descriptionTunisian: "دقات ملخبطة" },
           { id: "palp-fort", label: "Battements forts", descriptionTunisian: "دقات قوية" },
+          ...painCharacteristics("cardio-palpitations")
         ]
       },
       {
@@ -368,7 +370,7 @@ export const symptomTree: SymptomNode[] = [
               { id: "vomis-sang", label: "Sang", descriptionTunisian: "دم" },
             ]
           },
-          { id: "dig-reflux", label: "Reflux acide / Aigreurs", descriptionTunisian: "جاير" },
+          { id: "dig-reflux", label: "Reflux acide / Aigreurs", descriptionTunisian: "جاير", children: painCharacteristics("dig-reflux") },
           { id: "dig-ballonnement-haut", label: "Éructations (Rots) excessifs", descriptionTunisian: "تكرع برشا" },
         ]
       },
@@ -667,7 +669,7 @@ export const symptomTree: SymptomNode[] = [
       {
         id: "yeux-sensation", label: "Sensations", descriptionTunisian: "إحساس", children: [
           { id: "yeux-douleur", label: "Douleur oculaire", descriptionTunisian: "وجيعة", children: painCharacteristics("yeux-douleur") },
-          { id: "yeux-demangeaison", label: "Démangeaisons", descriptionTunisian: "حكة" },
+          { id: "yeux-demangeaison", label: "Démangeaisons", descriptionTunisian: "حكة", children: painCharacteristics("yeux-demangeaison") },
           { id: "yeux-sec", label: "Sécheresse / Sable", descriptionTunisian: "شياح" },
           { id: "yeux-lumiere", label: "Sensibilité lumière (Photophobie)", descriptionTunisian: "قلق من الضو" },
           { id: "yeux-ecoulement", label: "Écoulement / Larmes", descriptionTunisian: "دموع / قيح" },
@@ -742,7 +744,7 @@ export const symptomTree: SymptomNode[] = [
         descriptionTunisian: "اللثة",
         children: [
           { id: "gencive-saigne", label: "Saignement", descriptionTunisian: "دم" },
-          { id: "gencive-gonfle", label: "Gonflement / Abcès", descriptionTunisian: "نفخ" },
+          { id: "gencive-gonfle", label: "Gonflement / Abcès", descriptionTunisian: "نفخ", children: painCharacteristics("gencive-gonfle") },
         ]
       },
       {
