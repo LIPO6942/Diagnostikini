@@ -10,62 +10,86 @@ import {
   Flame, Zap, Clock, MapPin, Smile, Frown, Stethoscope, Pill
 } from "lucide-react";
 
-// Helper to create common sub-nodes for pain characteristics
-const painCharacteristics = (baseId: string): SymptomNode[] => [
+// Helper to create common sub-nodes for symptom characteristics (sequential flow)
+const symptomCharacteristics = (baseId: string): SymptomNode[] => [
   {
-    id: `${baseId}-type`,
-    label: "Type de douleur",
-    description: "Comment ressentez-vous la douleur ?",
-    descriptionTunisian: "كيفاش تحس الوجيعة؟",
+    id: `${baseId}-nature`,
+    label: "Nature du symptôme",
+    description: "Comment décririez-vous la sensation ?",
+    descriptionTunisian: "كيفاش توصف الإحساس؟",
     children: [
-      { id: `${baseId}-type-aigue`, label: "Aiguë / Perçante", description: "Douleur vive et soudaine", descriptionTunisian: "وجيعة حادة" },
-      { id: `${baseId}-type-sourde`, label: "Sourde / Lourdeur", description: "Douleur diffuse et pesante", descriptionTunisian: "وجيعة رزين" },
-      { id: `${baseId}-type-brulure`, label: "Brûlure", description: "Sensation de chaleur intense", descriptionTunisian: "حرقان" },
-      { id: `${baseId}-type-pulsatile`, label: "Pulsatile / Battante", description: "Comme un cœur qui bat", descriptionTunisian: "تسطير / تنبض" },
-      { id: `${baseId}-type-electrique`, label: "Décharge électrique", description: "Sensation de choc", descriptionTunisian: "ضو يضرب" },
-      { id: `${baseId}-type-crampe`, label: "Crampe / Torsion", description: "Contraction douloureuse", descriptionTunisian: "تكبس عليك" },
+      { id: `${baseId}-nat-pression`, label: "Pression / Écrasement / Serrement", descriptionTunisian: "رصان / ثقل / تعصير" },
+      { id: `${baseId}-nat-brulure`, label: "Brûlure / Chaleur intense", descriptionTunisian: "حرقان / سخانة" },
+      { id: `${baseId}-nat-tiraillement`, label: "Tiraillement / Étirement", descriptionTunisian: "تجبيد" },
+      { id: `${baseId}-nat-crampe`, label: "Crampe / Torsion", descriptionTunisian: "تكميش" },
+      { id: `${baseId}-nat-piqure`, label: "Piqûre / Coup d'aiguille / Poignard", descriptionTunisian: "نخس / سكاكين" },
+      { id: `${baseId}-nat-pulsation`, label: "Pulsation / Battement", descriptionTunisian: "تسطير / نبض" },
+      { id: `${baseId}-nat-decharge`, label: "Décharge électrique", descriptionTunisian: "ضو يضرب" },
+      { id: `${baseId}-nat-irritation`, label: "Irritation / Démangeaison / Picotement", descriptionTunisian: "حكة / تهييج / تنميل" },
+      { id: `${baseId}-nat-lourdeur`, label: "Lourdeur / Pesanteur", descriptionTunisian: "رزن" },
+      { id: `${baseId}-nat-autre`, label: "Autre (Précisez)", descriptionTunisian: "حاجة أخرى" },
     ]
   },
   {
     id: `${baseId}-intensite`,
     label: "Intensité",
-    description: "À quel point est-ce douloureux ?",
-    descriptionTunisian: "قوة الوجيعة",
+    description: "Quelle est l'intensité de la gêne ?",
+    descriptionTunisian: "قداش قوية القلق؟",
     children: [
-      { id: `${baseId}-int-faible`, label: "Faible (1-3)", description: "Gênant mais supportable", descriptionTunisian: "خفيفة" },
-      { id: `${baseId}-int-moderee`, label: "Modérée (4-6)", description: "Perturbe les activités", descriptionTunisian: "متوسطة" },
-      { id: `${baseId}-int-severe`, label: "Sévère (7-9)", description: "Très difficile à supporter", descriptionTunisian: "قوية برشا" },
-      { id: `${baseId}-int-insupportable`, label: "Insupportable (10)", description: "Urgence absolue", descriptionTunisian: "ما تنجمش تتحملها جملة" },
+      { id: `${baseId}-int-legere`, label: "Légère / Gênante", descriptionTunisian: "خفيفة / تقلق شوي" },
+      { id: `${baseId}-int-inconfortable`, label: "Inconfortable", descriptionTunisian: "تقلق" },
+      { id: `${baseId}-int-moderee`, label: "Modérée", descriptionTunisian: "متوسطة" },
+      { id: `${baseId}-int-severe`, label: "Sévère", descriptionTunisian: "قوية" },
+      { id: `${baseId}-int-invalidante`, label: "Invalidante / Empêche les activités", descriptionTunisian: "قوية برشا / ما تنجم تعمل شي" },
+      { id: `${baseId}-int-fluctuante`, label: "Fluctuante (Ça va et ça vient)", descriptionTunisian: "تمشي و تجي" },
+      { id: `${baseId}-int-brutale`, label: "Brutale / Soudaine", descriptionTunisian: "جات ضربة وحدة" },
     ]
   },
   {
     id: `${baseId}-frequence`,
-    label: "Fréquence & Durée",
-    description: "Quand et combien de temps ?",
-    descriptionTunisian: "وقتاش و قداش دوم؟",
+    label: "Fréquence",
+    description: "À quelle fréquence cela arrive-t-il ?",
+    descriptionTunisian: "قداش من مرة تصير؟",
     children: [
-      { id: `${baseId}-freq-constante`, label: "Constante", description: "Ne s'arrête pas", descriptionTunisian: "ديما موجودة" },
-      { id: `${baseId}-freq-intermittente`, label: "Intermittente", description: "Va et vient", descriptionTunisian: "تمشي و تجي" },
-      { id: `${baseId}-freq-nuit`, label: "Surtout la nuit", description: "Réveille ou empêche de dormir", descriptionTunisian: "خاصة في الليل" },
-      { id: `${baseId}-freq-matin`, label: "Au réveil", description: "Pire le matin", descriptionTunisian: "في الصباح" },
-      { id: `${baseId}-duree-aigue`, label: "Depuis moins de 24h", description: "Récent", descriptionTunisian: "جديدة" },
-      { id: `${baseId}-duree-jours`, label: "Quelques jours", description: "Moins d'une semaine", descriptionTunisian: "عندها أيامات" },
-      { id: `${baseId}-duree-chronique`, label: "Chronique (> 3 mois)", description: "Installée depuis longtemps", descriptionTunisian: "عندها برشا" },
+      { id: `${baseId}-freq-unique`, label: "Unique (Une seule fois)", descriptionTunisian: "مرة برك" },
+      { id: `${baseId}-freq-rare`, label: "Rare (Quelques fois)", descriptionTunisian: "ساعات قليلة" },
+      { id: `${baseId}-freq-intermittente`, label: "Intermittente (Parfois)", descriptionTunisian: "ساعات" },
+      { id: `${baseId}-freq-reguliere`, label: "Régulière / Quotidienne", descriptionTunisian: "كل يوم / ديما" },
+      { id: `${baseId}-freq-persistante`, label: "Persistante / Ne part pas", descriptionTunisian: "ما تتنحاش جملة" },
+      { id: `${baseId}-freq-crises`, label: "Par crises / Épisodes", descriptionTunisian: "نوبات" },
+      { id: `${baseId}-freq-moments`, label: "Liée à des moments précis", descriptionTunisian: "في أوقات معينة" },
     ]
   },
   {
-    id: `${baseId}-declencheurs`,
-    label: "Facteurs aggravants/soulageants",
-    description: "Qu'est-ce qui modifie la douleur ?",
-    descriptionTunisian: "شنوة يزيد/ينقص الوجيعة؟",
+    id: `${baseId}-duree`,
+    label: "Durée d'évolution",
+    description: "Depuis quand avez-vous ce symptôme ?",
+    descriptionTunisian: "ملي وقتاش عندك؟",
     children: [
-      { id: `${baseId}-agg-mouvement`, label: "Aggravé par le mouvement", descriptionTunisian: "تزيد بالحركة" },
-      { id: `${baseId}-agg-repos`, label: "Aggravé au repos", descriptionTunisian: "تزيد في الراحة" },
-      { id: `${baseId}-agg-pression`, label: "Aggravé par la pression/toucher", descriptionTunisian: "تزيد كي تمسها" },
-      { id: `${baseId}-soul-repos`, label: "Soulagé par le repos", descriptionTunisian: "ترتاح كي ترقد" },
-      { id: `${baseId}-soul-medicament`, label: "Soulagé par médicaments", descriptionTunisian: "ترتاح بالدواء" },
-      { id: `${baseId}-soul-froid`, label: "Soulagé par le froid", descriptionTunisian: "ترتاح بالبارد" },
-      { id: `${baseId}-soul-chaud`, label: "Soulagé par le chaud", descriptionTunisian: "ترتاح بالسخون" },
+      { id: `${baseId}-dur-tres-recente`, label: "Très récente (< 24h)", descriptionTunisian: "جديدة (أقل من نهار)" },
+      { id: `${baseId}-dur-recente`, label: "Récente (Quelques jours)", descriptionTunisian: "عندها أيامات" },
+      { id: `${baseId}-dur-installee`, label: "Installée (Semaines)", descriptionTunisian: "عندها جمعات" },
+      { id: `${baseId}-dur-chronique`, label: "Chronique (Mois/Années)", descriptionTunisian: "عندها أشهر / سنين" },
+      { id: `${baseId}-dur-saisonniere`, label: "Saisonnière / Récurrente", descriptionTunisian: "موسمية / ترجع كل مرة" },
+    ]
+  },
+  {
+    id: `${baseId}-facteurs`,
+    label: "Facteurs déclenchants / aggravants",
+    description: "Qu'est-ce qui déclenche ou aggrave le symptôme ?",
+    descriptionTunisian: "شنوة يزيد عليك؟",
+    children: [
+      { id: `${baseId}-fac-effort`, label: "Effort physique / Sport", descriptionTunisian: "المجهود / الرياضة" },
+      { id: `${baseId}-fac-repos`, label: "Repos / Inactivité", descriptionTunisian: "الراحة / النوم" },
+      { id: `${baseId}-fac-stress`, label: "Stress / Émotion", descriptionTunisian: "الستراس / الفجعة" },
+      { id: `${baseId}-fac-alimentation`, label: "Alimentation / Repas", descriptionTunisian: "الماكلة" },
+      { id: `${baseId}-fac-position`, label: "Position (Debout/Assis/Couché)", descriptionTunisian: "الوقفة / القعدة / النوم" },
+      { id: `${baseId}-fac-mouvement`, label: "Mouvement spécifique", descriptionTunisian: "حركة معينة" },
+      { id: `${baseId}-fac-froid-chaud`, label: "Froid / Chaud", descriptionTunisian: "البرد / السخانة" },
+      { id: `${baseId}-fac-contact`, label: "Contact / Toucher / Pression", descriptionTunisian: "المس" },
+      { id: `${baseId}-fac-cycle`, label: "Cycle menstruel / Hormonal", descriptionTunisian: "العادة الشهرية" },
+      { id: `${baseId}-fac-hygiene`, label: "Hygiène / Produits", descriptionTunisian: "النظافة / مواد تنظيف" },
+      { id: `${baseId}-fac-autre`, label: "Autre facteur", descriptionTunisian: "حاجة أخرى" },
     ]
   }
 ];
