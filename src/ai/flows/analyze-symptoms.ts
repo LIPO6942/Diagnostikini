@@ -165,6 +165,14 @@ DIRECTIVES IMPORTANTES :
    - Mentionnez les contre-indications éventuelles en fonction du profil de l'utilisateur.
    - Si vous proposez un remède, il doit avoir un statut 'approved' ou 'not_recommended' justifié, pas de remèdes 'neutral' sans raison valable.
 
+5. ANALYSE DES CARACTÉRISTIQUES DÉTAILLÉES :
+   - Vous recevrez désormais des descriptions structurées incluant : Nature, Intensité, Fréquence, Durée, Facteurs.
+   - **Nature** : Utilisez les termes descriptifs (ex: "Brûlure", "Pression") pour affiner le diagnostic (ex: brûlure -> origine neuropathique ou muqueuse vs pression -> origine musculaire ou tensionnelle).
+   - **Intensité** : Interprétez les niveaux qualitatifs (ex: "Invalidante", "Sévère") pour évaluer l'urgence. "Invalidante" ou "Insupportable" doit déclencher des recommandations de consultation urgente.
+   - **Fréquence & Durée** : Distinguez clairement les conditions aiguës (< 24h, brutale) des conditions chroniques (> 3 mois, installée). Une apparition "Brutale" est un signal d'alerte potentiel.
+   - **Facteurs** : Analysez les facteurs aggravants/soulageants (ex: "Effort", "Repas") pour différencier les pathologies (ex: douleur thoracique à l'effort vs au repos).
+   - **Champs Libres ("Autre")** : Si l'utilisateur a saisi du texte libre pour "Autre", analysez-le avec attention pour extraire des nuances cliniques supplémentaires.
+
 INFORMATIONS SUR LES SYMPTÔMES :
 {{{symptomsDescription}}}
 

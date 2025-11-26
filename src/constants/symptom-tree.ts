@@ -110,31 +110,31 @@ export const symptomTree: SymptomNode[] = [
             id: "tete-globale",
             label: "Toute la tête",
             descriptionTunisian: "الراس الكل",
-            children: painCharacteristics("tete-globale")
+            children: symptomCharacteristics("tete-globale")
           },
           {
             id: "tete-tempes",
             label: "Tempes (Côtés)",
             descriptionTunisian: "الشقيقة",
-            children: painCharacteristics("tete-tempes")
+            children: symptomCharacteristics("tete-tempes")
           },
           {
             id: "tete-front",
             label: "Front / Yeux",
             descriptionTunisian: "الجبهة / العينين",
-            children: painCharacteristics("tete-front")
+            children: symptomCharacteristics("tete-front")
           },
           {
             id: "tete-nuque",
             label: "Nuque / Arrière du crâne",
             descriptionTunisian: "القفا / الرقبة من تالي",
-            children: painCharacteristics("tete-nuque")
+            children: symptomCharacteristics("tete-nuque")
           },
           {
             id: "visage-sinus",
             label: "Visage / Sinus",
             descriptionTunisian: "الوجه / الجيوب الأنفية",
-            children: painCharacteristics("visage-sinus")
+            children: symptomCharacteristics("visage-sinus")
           }
         ]
       },
@@ -143,10 +143,10 @@ export const symptomTree: SymptomNode[] = [
         label: "Dos",
         descriptionTunisian: "الظهر",
         children: [
-          { id: "dos-cervicales", label: "Cervicales (Haut)", descriptionTunisian: "الرقبة", children: painCharacteristics("dos-cervicales") },
-          { id: "dos-dorsales", label: "Milieu du dos", descriptionTunisian: "وسط الظهر", children: painCharacteristics("dos-dorsales") },
-          { id: "dos-lombaires", label: "Lombaires (Bas)", descriptionTunisian: "أسفل الظهر", children: painCharacteristics("dos-lombaires") },
-          { id: "dos-sciatique", label: "Bas du dos irradiant jambe", descriptionTunisian: "عرق لاسة", children: painCharacteristics("dos-sciatique") },
+          { id: "dos-cervicales", label: "Cervicales (Haut)", descriptionTunisian: "الرقبة", children: symptomCharacteristics("dos-cervicales") },
+          { id: "dos-dorsales", label: "Milieu du dos", descriptionTunisian: "وسط الظهر", children: symptomCharacteristics("dos-dorsales") },
+          { id: "dos-lombaires", label: "Lombaires (Bas)", descriptionTunisian: "أسفل الظهر", children: symptomCharacteristics("dos-lombaires") },
+          { id: "dos-sciatique", label: "Bas du dos irradiant jambe", descriptionTunisian: "عرق لاسة", children: symptomCharacteristics("dos-sciatique") },
         ]
       },
       {
@@ -154,10 +154,10 @@ export const symptomTree: SymptomNode[] = [
         label: "Poitrine / Thorax",
         descriptionTunisian: "الصدر",
         children: [
-          { id: "poitrine-gauche", label: "Côté gauche (Cœur)", descriptionTunisian: "شيرة القلب", children: painCharacteristics("poitrine-gauche") },
-          { id: "poitrine-droite", label: "Côté droit", descriptionTunisian: "شيرة اليمين", children: painCharacteristics("poitrine-droite") },
-          { id: "poitrine-centre", label: "Centre (Sternum)", descriptionTunisian: "في الوسط", children: painCharacteristics("poitrine-centre") },
-          { id: "poitrine-cotes", label: "Côtés / Flancs", descriptionTunisian: "الأجناب", children: painCharacteristics("poitrine-cotes") },
+          { id: "poitrine-gauche", label: "Côté gauche (Cœur)", descriptionTunisian: "شيرة القلب", children: symptomCharacteristics("poitrine-gauche") },
+          { id: "poitrine-droite", label: "Côté droit", descriptionTunisian: "شيرة اليمين", children: symptomCharacteristics("poitrine-droite") },
+          { id: "poitrine-centre", label: "Centre (Sternum)", descriptionTunisian: "في الوسط", children: symptomCharacteristics("poitrine-centre") },
+          { id: "poitrine-cotes", label: "Côtés / Flancs", descriptionTunisian: "الأجناب", children: symptomCharacteristics("poitrine-cotes") },
         ]
       },
       {
@@ -165,12 +165,12 @@ export const symptomTree: SymptomNode[] = [
         label: "Ventre / Abdomen",
         descriptionTunisian: "الكرش",
         children: [
-          { id: "ventre-estomac", label: "Creux de l'estomac (Haut centre)", descriptionTunisian: "فم المعدة", children: painCharacteristics("ventre-estomac") },
-          { id: "ventre-foie", label: "Sous les côtes droites", descriptionTunisian: "تحت الضلوع يمين", children: painCharacteristics("ventre-foie") },
-          { id: "ventre-nombril", label: "Autour du nombril", descriptionTunisian: "داير بالسرّة", children: painCharacteristics("ventre-nombril") },
-          { id: "ventre-bas-droite", label: "Bas droite (Appendice?)", descriptionTunisian: "لوطة يمين", children: painCharacteristics("ventre-bas-droite") },
-          { id: "ventre-bas-gauche", label: "Bas gauche", descriptionTunisian: "لوطة يسار", children: painCharacteristics("ventre-bas-gauche") },
-          { id: "ventre-bas-centre", label: "Bas ventre / Pelvis", descriptionTunisian: "أسفل البطن", children: painCharacteristics("ventre-bas-centre") },
+          { id: "ventre-estomac", label: "Creux de l'estomac (Haut centre)", descriptionTunisian: "فم المعدة", children: symptomCharacteristics("ventre-estomac") },
+          { id: "ventre-foie", label: "Sous les côtes droites", descriptionTunisian: "تحت الضلوع يمين", children: symptomCharacteristics("ventre-foie") },
+          { id: "ventre-nombril", label: "Autour du nombril", descriptionTunisian: "داير بالسرّة", children: symptomCharacteristics("ventre-nombril") },
+          { id: "ventre-bas-droite", label: "Bas droite (Appendice?)", descriptionTunisian: "لوطة يمين", children: symptomCharacteristics("ventre-bas-droite") },
+          { id: "ventre-bas-gauche", label: "Bas gauche", descriptionTunisian: "لوطة يسار", children: symptomCharacteristics("ventre-bas-gauche") },
+          { id: "ventre-bas-centre", label: "Bas ventre / Pelvis", descriptionTunisian: "أسفل البطن", children: symptomCharacteristics("ventre-bas-centre") },
         ]
       },
       {
@@ -178,13 +178,13 @@ export const symptomTree: SymptomNode[] = [
         label: "Bras & Jambes",
         descriptionTunisian: "يدين و ساقين",
         children: [
-          { id: "membre-epaule", label: "Épaule", descriptionTunisian: "الكتف", children: painCharacteristics("membre-epaule") },
-          { id: "membre-coude", label: "Coude", descriptionTunisian: "المرفق", children: painCharacteristics("membre-coude") },
-          { id: "membre-poignet", label: "Poignet / Main", descriptionTunisian: "المعصم / اليد", children: painCharacteristics("membre-poignet") },
-          { id: "membre-hanche", label: "Hanche", descriptionTunisian: "الفخذ", children: painCharacteristics("membre-hanche") },
-          { id: "membre-genou", label: "Genou", descriptionTunisian: "الركبة", children: painCharacteristics("membre-genou") },
-          { id: "membre-cheville", label: "Cheville / Pied", descriptionTunisian: "الكعب / الساق", children: painCharacteristics("membre-cheville") },
-          { id: "membre-muscle", label: "Muscle (Mollet, Cuisse...)", descriptionTunisian: "العضلات", children: painCharacteristics("membre-muscle") },
+          { id: "membre-epaule", label: "Épaule", descriptionTunisian: "الكتف", children: symptomCharacteristics("membre-epaule") },
+          { id: "membre-coude", label: "Coude", descriptionTunisian: "المرفق", children: symptomCharacteristics("membre-coude") },
+          { id: "membre-poignet", label: "Poignet / Main", descriptionTunisian: "المعصم / اليد", children: symptomCharacteristics("membre-poignet") },
+          { id: "membre-hanche", label: "Hanche", descriptionTunisian: "الفخذ", children: symptomCharacteristics("membre-hanche") },
+          { id: "membre-genou", label: "Genou", descriptionTunisian: "الركبة", children: symptomCharacteristics("membre-genou") },
+          { id: "membre-cheville", label: "Cheville / Pied", descriptionTunisian: "الكعب / الساق", children: symptomCharacteristics("membre-cheville") },
+          { id: "membre-muscle", label: "Muscle (Mollet, Cuisse...)", descriptionTunisian: "العضلات", children: symptomCharacteristics("membre-muscle") },
         ]
       }
     ]
@@ -220,10 +220,10 @@ export const symptomTree: SymptomNode[] = [
         label: "Gorge",
         descriptionTunisian: "القراجم",
         children: [
-          { id: "gorge-douleur", label: "Douleur / Picotement", descriptionTunisian: "وجيعة / تنميل", children: painCharacteristics("gorge") },
+          { id: "gorge-douleur", label: "Douleur / Picotement", descriptionTunisian: "وجيعة / تنميل", children: symptomCharacteristics("gorge") },
           { id: "gorge-avaler", label: "Difficulté à avaler", descriptionTunisian: "وحلان الماكلة" },
           { id: "gorge-enrouee", label: "Voix enrouée / Perte de voix", descriptionTunisian: "صوت مبحاح" },
-          { id: "gorge-gonflee", label: "Sensation de gonflement / Boule", descriptionTunisian: "كعبة في القرجومة", children: painCharacteristics("gorge-gonflee") },
+          { id: "gorge-gonflee", label: "Sensation de gonflement / Boule", descriptionTunisian: "كعبة في القرجومة", children: symptomCharacteristics("gorge-gonflee") },
         ]
       },
       {
@@ -258,7 +258,7 @@ export const symptomTree: SymptomNode[] = [
         label: "Oreilles",
         descriptionTunisian: "الوذنين",
         children: [
-          { id: "oreille-douleur", label: "Douleur (Otite?)", descriptionTunisian: "وجيعة وذن", children: painCharacteristics("oreille") },
+          { id: "oreille-douleur", label: "Douleur (Otite?)", descriptionTunisian: "وجيعة وذن", children: symptomCharacteristics("oreille") },
           { id: "oreille-bouchon", label: "Sensation d'oreille bouchée", descriptionTunisian: "وذن مسكرة" },
           { id: "oreille-bourdonnement", label: "Bourdonnements / Acouphènes", descriptionTunisian: "تزفير في الوذن" },
           { id: "oreille-ecoulement", label: "Écoulement liquide", descriptionTunisian: "وذن تخرج في الماء/القيح" },
@@ -298,10 +298,10 @@ export const symptomTree: SymptomNode[] = [
             id: "migraine", label: "Migraine (Unilatérale, Pulsatile)", descriptionTunisian: "شقيقة", children: [
               { id: "migraine-aura", label: "Avec aura (visuelle/sensitive)", descriptionTunisian: "بالضباب/تنميل" },
               { id: "migraine-nausee", label: "Avec nausées", descriptionTunisian: "بالغثيان" },
-              ...painCharacteristics("migraine")
+              ...symptomCharacteristics("migraine")
             ]
           },
-          { id: "cephalee-tension", label: "Céphalée de tension (Casque, Barre)", descriptionTunisian: "راس مكبوس", children: painCharacteristics("cephalee-tension") },
+          { id: "cephalee-tension", label: "Céphalée de tension (Casque, Barre)", descriptionTunisian: "راس مكبوس", children: symptomCharacteristics("cephalee-tension") },
         ]
       },
       {
@@ -324,7 +324,7 @@ export const symptomTree: SymptomNode[] = [
               { id: "fourmi-main", label: "Mains / Bras", descriptionTunisian: "في اليدين" },
               { id: "fourmi-pied", label: "Pieds / Jambes", descriptionTunisian: "في الساقين" },
               { id: "fourmi-visage", label: "Visage", descriptionTunisian: "في الوجه" },
-              ...painCharacteristics("neuro-fourmillements")
+              ...symptomCharacteristics("neuro-fourmillements")
             ]
           },
           { id: "neuro-faiblesse", label: "Faiblesse musculaire / Paralysie", descriptionTunisian: "فشلة / شلل" },
@@ -349,7 +349,7 @@ export const symptomTree: SymptomNode[] = [
     descriptionTunisian: "القلب و الشرايين",
     icon: Heart,
     children: [
-      { id: "cardio-douleur", label: "Douleur thoracique (Angine?)", descriptionTunisian: "وجيعة في القلب", children: painCharacteristics("cardio-douleur") },
+      { id: "cardio-douleur", label: "Douleur thoracique (Angine?)", descriptionTunisian: "وجيعة في القلب", children: symptomCharacteristics("cardio-douleur") },
       {
         id: "cardio-palpitations",
         label: "Palpitations / Rythme",
@@ -358,7 +358,7 @@ export const symptomTree: SymptomNode[] = [
           { id: "palp-rapide", label: "Cœur bat trop vite (Tachycardie)", descriptionTunisian: "دقات سريعة" },
           { id: "palp-irregulier", label: "Battements irréguliers (Ratés)", descriptionTunisian: "دقات ملخبطة" },
           { id: "palp-fort", label: "Battements forts", descriptionTunisian: "دقات قوية" },
-          ...painCharacteristics("cardio-palpitations")
+          ...symptomCharacteristics("cardio-palpitations")
         ]
       },
       {
@@ -394,7 +394,7 @@ export const symptomTree: SymptomNode[] = [
               { id: "vomis-sang", label: "Sang", descriptionTunisian: "دم" },
             ]
           },
-          { id: "dig-reflux", label: "Reflux acide / Aigreurs", descriptionTunisian: "جاير", children: painCharacteristics("dig-reflux") },
+          { id: "dig-reflux", label: "Reflux acide / Aigreurs", descriptionTunisian: "جاير", children: symptomCharacteristics("dig-reflux") },
           { id: "dig-ballonnement-haut", label: "Éructations (Rots) excessifs", descriptionTunisian: "تكرع برشا" },
         ]
       },
@@ -440,7 +440,7 @@ export const symptomTree: SymptomNode[] = [
         label: "Urinaire",
         descriptionTunisian: "البول",
         children: [
-          { id: "uri-douleur", label: "Brûlure / Douleur en urinant", descriptionTunisian: "حرقان", children: painCharacteristics("uri-douleur") },
+          { id: "uri-douleur", label: "Brûlure / Douleur en urinant", descriptionTunisian: "حرقان", children: symptomCharacteristics("uri-douleur") },
           { id: "uri-frequence", label: "Besoin fréquent (Pollakiurie)", descriptionTunisian: "تمشي برشا للتوالات" },
           { id: "uri-urgent", label: "Besoin urgent / Fuites", descriptionTunisian: "ما تنجمش تشد روحك" },
           { id: "uri-sang", label: "Sang dans les urines", descriptionTunisian: "دم في البول" },
@@ -459,10 +459,10 @@ export const symptomTree: SymptomNode[] = [
             label: "Douleurs génitales",
             descriptionTunisian: "وجيعة في المناطق الحساسة",
             children: [
-              { id: "gen-douleur-pelvienne", label: "Douleur pelvienne / Bas ventre", descriptionTunisian: "وجيعة أسفل البطن", children: painCharacteristics("gen-douleur-pelvienne") },
-              { id: "gen-douleur-rapport", label: "Douleur pendant/après rapports", descriptionTunisian: "وجيعة وقت العلاقة", children: painCharacteristics("gen-douleur-rapport") },
-              { id: "gen-douleur-testiculaire", label: "Douleur testiculaire (Homme)", descriptionTunisian: "وجيعة في الخصitien", sex: 'homme', children: painCharacteristics("gen-douleur-testiculaire") },
-              { id: "gen-douleur-vulvaire", label: "Douleur vulvaire/vaginale (Femme)", descriptionTunisian: "وجيعة في المهبل", sex: 'femme', children: painCharacteristics("gen-douleur-vulvaire") },
+              { id: "gen-douleur-pelvienne", label: "Douleur pelvienne / Bas ventre", descriptionTunisian: "وجيعة أسفل البطن", children: symptomCharacteristics("gen-douleur-pelvienne") },
+              { id: "gen-douleur-rapport", label: "Douleur pendant/après rapports", descriptionTunisian: "وجيعة وقت العلاقة", children: symptomCharacteristics("gen-douleur-rapport") },
+              { id: "gen-douleur-testiculaire", label: "Douleur testiculaire (Homme)", descriptionTunisian: "وجيعة في الخصitien", sex: 'homme', children: symptomCharacteristics("gen-douleur-testiculaire") },
+              { id: "gen-douleur-vulvaire", label: "Douleur vulvaire/vaginale (Femme)", descriptionTunisian: "وجيعة في المهبل", sex: 'femme', children: symptomCharacteristics("gen-douleur-vulvaire") },
             ]
           },
           {
@@ -501,7 +501,7 @@ export const symptomTree: SymptomNode[] = [
             children: [
               { id: "cycle-retard", label: "Retard de règles / Absence", descriptionTunisian: "تأخر العادة" },
               { id: "cycle-abondant", label: "Règles très abondantes", descriptionTunisian: "دم قوي برشا" },
-              { id: "cycle-douloureux", label: "Règles très douloureuses", descriptionTunisian: "وجيعة قوية وقت العادة", children: painCharacteristics("cycle-douloureux") },
+              { id: "cycle-douloureux", label: "Règles très douloureuses", descriptionTunisian: "وجيعة قوية وقت العادة", children: symptomCharacteristics("cycle-douloureux") },
               { id: "cycle-irregulier", label: "Cycle irrégulier", descriptionTunisian: "عادة مش منظمة" },
               { id: "cycle-syndrome-premenstruel", label: "Syndrome prémenstruel sévère", descriptionTunisian: "قلق قبل العادة" },
             ]
@@ -565,7 +565,7 @@ export const symptomTree: SymptomNode[] = [
         children: [
           { id: "peau-boutons", label: "Boutons / Acné", descriptionTunisian: "حب" },
           { id: "peau-plaques", label: "Plaques sèches / Eczéma", descriptionTunisian: "قشور" },
-          { id: "peau-urticaire", label: "Urticaire (Gonflement, gratte)", descriptionTunisian: "حكة و نفخ", children: painCharacteristics("peau-urticaire") },
+          { id: "peau-urticaire", label: "Urticaire (Gonflement, gratte)", descriptionTunisian: "حكة و نفخ", children: symptomCharacteristics("peau-urticaire") },
           { id: "peau-vesicules", label: "Vésicules / Cloques", descriptionTunisian: "فقalil" },
           { id: "peau-grain-beaute", label: "Grain de beauté suspect", descriptionTunisian: "خالة تبدلت" },
         ]
@@ -575,7 +575,7 @@ export const symptomTree: SymptomNode[] = [
         label: "Sensations",
         descriptionTunisian: "إحساس",
         children: [
-          { id: "peau-grattage", label: "Démangeaisons (Prurit)", descriptionTunisian: "حكة", children: painCharacteristics("peau-grattage") },
+          { id: "peau-grattage", label: "Démangeaisons (Prurit)", descriptionTunisian: "حكة", children: symptomCharacteristics("peau-grattage") },
           { id: "peau-seche", label: "Sécheresse intense", descriptionTunisian: "شياح" },
           { id: "peau-chaude", label: "Chaleur au toucher", descriptionTunisian: "سخونة" },
         ]
@@ -692,8 +692,8 @@ export const symptomTree: SymptomNode[] = [
       },
       {
         id: "yeux-sensation", label: "Sensations", descriptionTunisian: "إحساس", children: [
-          { id: "yeux-douleur", label: "Douleur oculaire", descriptionTunisian: "وجيعة", children: painCharacteristics("yeux-douleur") },
-          { id: "yeux-demangeaison", label: "Démangeaisons", descriptionTunisian: "حكة", children: painCharacteristics("yeux-demangeaison") },
+          { id: "yeux-douleur", label: "Douleur oculaire", descriptionTunisian: "وجيعة", children: symptomCharacteristics("yeux-douleur") },
+          { id: "yeux-demangeaison", label: "Démangeaisons", descriptionTunisian: "حكة", children: symptomCharacteristics("yeux-demangeaison") },
           { id: "yeux-sec", label: "Sécheresse / Sable", descriptionTunisian: "شياح" },
           { id: "yeux-lumiere", label: "Sensibilité lumière (Photophobie)", descriptionTunisian: "قلق من الضو" },
           { id: "yeux-ecoulement", label: "Écoulement / Larmes", descriptionTunisian: "دموع / قيح" },
@@ -712,8 +712,8 @@ export const symptomTree: SymptomNode[] = [
         label: "Choc / Coup",
         descriptionTunisian: "ضربة",
         children: [
-          { id: "trauma-tete", label: "Traumatisme crânien", descriptionTunisian: "ضربة في الراس", children: painCharacteristics("trauma-tete") },
-          { id: "trauma-membre", label: "Coup sur un membre", descriptionTunisian: "ضربة في اليد/الساق", children: painCharacteristics("trauma-membre") },
+          { id: "trauma-tete", label: "Traumatisme crânien", descriptionTunisian: "ضربة في الراس", children: symptomCharacteristics("trauma-tete") },
+          { id: "trauma-membre", label: "Coup sur un membre", descriptionTunisian: "ضربة في اليد/الساق", children: symptomCharacteristics("trauma-membre") },
           { id: "trauma-chute", label: "Chute", descriptionTunisian: "طيحة" },
         ]
       },
@@ -733,15 +733,15 @@ export const symptomTree: SymptomNode[] = [
         label: "Brûlures",
         descriptionTunisian: "حروق",
         children: [
-          { id: "brulure-thermique", label: "Chaleur / Feu / Liquide", descriptionTunisian: "نار / ماء سخون", children: painCharacteristics("brulure-thermique") },
-          { id: "brulure-chimique", label: "Produit chimique", descriptionTunisian: "produit", children: painCharacteristics("brulure-chimique") },
-          { id: "brulure-soleil", label: "Coup de soleil", descriptionTunisian: "شمس", children: painCharacteristics("brulure-soleil") },
+          { id: "brulure-thermique", label: "Chaleur / Feu / Liquide", descriptionTunisian: "نار / ماء سخون", children: symptomCharacteristics("brulure-thermique") },
+          { id: "brulure-chimique", label: "Produit chimique", descriptionTunisian: "produit", children: symptomCharacteristics("brulure-chimique") },
+          { id: "brulure-soleil", label: "Coup de soleil", descriptionTunisian: "شمس", children: symptomCharacteristics("brulure-soleil") },
         ]
       },
       {
         id: "morsures", label: "Morsures & Piqûres", descriptionTunisian: "عضة / قرصة", children: [
-          { id: "morsure-animal", label: "Animal (Chien, Chat...)", descriptionTunisian: "حيوان", children: painCharacteristics("morsure-animal") },
-          { id: "piqure-insecte", label: "Insecte (Guêpe, Araignée...)", descriptionTunisian: "حشره", children: painCharacteristics("piqure-insecte") },
+          { id: "morsure-animal", label: "Animal (Chien, Chat...)", descriptionTunisian: "حيوان", children: symptomCharacteristics("morsure-animal") },
+          { id: "piqure-insecte", label: "Insecte (Guêpe, Araignée...)", descriptionTunisian: "حشره", children: symptomCharacteristics("piqure-insecte") },
         ]
       }
     ]
@@ -757,7 +757,7 @@ export const symptomTree: SymptomNode[] = [
         label: "Dents",
         descriptionTunisian: "السنين",
         children: [
-          { id: "dent-douleur", label: "Rage de dent", descriptionTunisian: "وجيعة سنين", children: painCharacteristics("dent") },
+          { id: "dent-douleur", label: "Rage de dent", descriptionTunisian: "وجيعة سنين", children: symptomCharacteristics("dent") },
           { id: "dent-sensible", label: "Sensibilité Chaud/Froid", descriptionTunisian: "حساسية" },
           { id: "dent-casse", label: "Dent cassée / bouge", descriptionTunisian: "سن مكسرة" },
         ]
@@ -768,7 +768,7 @@ export const symptomTree: SymptomNode[] = [
         descriptionTunisian: "اللثة",
         children: [
           { id: "gencive-saigne", label: "Saignement", descriptionTunisian: "دم" },
-          { id: "gencive-gonfle", label: "Gonflement / Abcès", descriptionTunisian: "نفخ", children: painCharacteristics("gencive-gonfle") },
+          { id: "gencive-gonfle", label: "Gonflement / Abcès", descriptionTunisian: "نفخ", children: symptomCharacteristics("gencive-gonfle") },
         ]
       },
       {
@@ -776,8 +776,8 @@ export const symptomTree: SymptomNode[] = [
         label: "Bouche & Langue",
         descriptionTunisian: "الفم",
         children: [
-          { id: "bouche-aphte", label: "Aphtes", descriptionTunisian: "أفت", children: painCharacteristics("bouche-aphte") },
-          { id: "bouche-langue", label: "Langue (Douleur, Tâche)", descriptionTunisian: "اللسان", children: painCharacteristics("bouche-langue") },
+          { id: "bouche-aphte", label: "Aphtes", descriptionTunisian: "أفت", children: symptomCharacteristics("bouche-aphte") },
+          { id: "bouche-langue", label: "Langue (Douleur, Tâche)", descriptionTunisian: "اللسان", children: symptomCharacteristics("bouche-langue") },
           { id: "bouche-haleine", label: "Mauvaise haleine", descriptionTunisian: "ريحة خايبة" },
           { id: "bouche-seche", label: "Bouche sèche", descriptionTunisian: "فم شايح" },
         ]
