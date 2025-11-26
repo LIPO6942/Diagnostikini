@@ -14,41 +14,45 @@ interface SymptomSelectionProps {
   onBack: () => void;
   onReset: () => void;
   canGoBack: boolean;
+  customTitle?: string;
+  customDescription?: string;
 }
 
 function Breadcrumbs({ path }: { path: SymptomNode[] }) {
-    if (path.length === 0) return null;
-    return (
-        <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
-            <Home className="size-4" />
-            {path.map((p, i) => (
-                <div key={p.id} className="flex items-center gap-1.5">
-                    <ChevronRight className="size-4" />
-                    <span>{p.label}</span>
-                </div>
-            ))}
+  if (path.length === 0) return null;
+  return (
+    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
+      <Home className="size-4" />
+      {path.map((p, i) => (
+        <div key={p.id} className="flex items-center gap-1.5">
+          <ChevronRight className="size-4" />
+          <span>{p.label}</span>
         </div>
-    );
+      ))}
+    </div>
+  );
 }
 
 
-export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGoBack }: SymptomSelectionProps) {
-    const title = path.length > 0 ? `Qu'est-ce qui caractérise cette ${path[path.length - 1].label.toLowerCase()} ?` : "Quel symptôme principal ressentez-vous ?";
+export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGoBack, customTitle, customDescription }: SymptomSelectionProps) {
+  const defaultTitle = path.length > 0 ? `Qu'est-ce qui caractérise cette ${path[path.length - 1].label.toLowerCase()} ?` : "Quel symptôme principal ressentez-vous ?";
+  const title = customTitle || defaultTitle;
+  const description = customDescription || "Veuillez sélectionner l'option qui correspond le mieux.";
 
   return (
     <Card className="animate-fade-in-up">
       <CardHeader>
         <div className="flex justify-between items-start">
-            <div>
-                 <Breadcrumbs path={path} />
-                 <CardTitle>{title}</CardTitle>
-                 <CardDescription>Veuillez sélectionner l'option qui correspond le mieux.</CardDescription>
-            </div>
-            {canGoBack && (
-              <Button variant="ghost" size="icon" onClick={onBack} aria-label="Retour">
-                <ArrowLeft />
-              </Button>
-            )}
+          <div>
+            <Breadcrumbs path={path} />
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>{description}</CardDescription>
+          </div>
+          {canGoBack && (
+            <Button variant="ghost" size="icon" onClick={onBack} aria-label="Retour">
+              <ArrowLeft />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-3">
@@ -61,29 +65,29 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
           >
             {node.icon && <node.icon className="size-8 text-primary mb-2 transition-transform duration-200 group-hover:scale-110" />}
             <div className="flex flex-col items-center">
-                <span className="text-sm font-bold">{node.label}</span>
-                {node.descriptionTunisian && (
-                    <span className="text-xs text-muted-foreground font-normal mt-1">
-                        ({node.descriptionTunisian})
-                    </span>
-                )}
+              <span className="text-sm font-bold">{node.label}</span>
+              {node.descriptionTunisian && (
+                <span className="text-xs text-muted-foreground font-normal mt-1">
+                  ({node.descriptionTunisian})
+                </span>
+              )}
             </div>
           </Button>
         ))}
       </CardContent>
-       {path.length === 0 && (
-         <CardFooter className="flex-col items-center gap-4 border-t pt-6">
-            <p className="text-sm text-muted-foreground text-center">Vous pouvez recommencer le questionnaire ou mettre à jour votre profil.</p>
-            <div className="flex flex-col sm:flex-row gap-2">
-                <Button variant="outline" onClick={onReset}>
-                    <RotateCcw className="mr-2" />
-                    Recommencer
-                </Button>
-                 <Button variant="outline" asChild>
-                    <Link href="/profile">Mettre à jour le profil</Link>
-                </Button>
-            </div>
-         </CardFooter>
+      {path.length === 0 && (
+        <CardFooter className="flex-col items-center gap-4 border-t pt-6">
+          <p className="text-sm text-muted-foreground text-center">Vous pouvez recommencer le questionnaire ou mettre à jour votre profil.</p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={onReset}>
+              <RotateCcw className="mr-2" />
+              Recommencer
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/profile">Mettre à jour le profil</Link>
+            </Button>
+          </div>
+        </CardFooter>
       )}
     </Card>
   );

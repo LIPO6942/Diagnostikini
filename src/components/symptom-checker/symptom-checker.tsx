@@ -50,6 +50,8 @@ export default function SymptomChecker() {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [showSportQuestion, setShowSportQuestion] = useState(false);
   const [pendingNode, setPendingNode] = useState<SymptomNode | null>(null);
+  const [sequenceNodes, setSequenceNodes] = useState<SymptomNode[]>([]);
+  const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(-1);
   const [sportData, setSportData] = useState<{
     practicesSport: boolean;
     sportId?: string;
@@ -64,14 +66,48 @@ export default function SymptomChecker() {
     setAnalysis(null);
     setShowSportQuestion(false);
     setPendingNode(null);
+    setSequenceNodes([]);
+    setCurrentSequenceIndex(-1);
     setSportData(undefined);
   }, [filteredTree]);
 
 
   const handleSelectNode = (node: SymptomNode) => {
-    // Vérifier si ce nœud nécessite des questions sportives
+    // 1. Gestion du mode Séquentiel (Wizard)
+    if (currentSequenceIndex !== -1) {
+      // L'utilisateur a répondu à une étape de la séquence (ex: "Brûlure" pour "Nature")
+      const newPath = [...selectedPath, node];
+      setSelectedPath(newPath);
+
+      // Passer à l'étape suivante
+      const nextIndex = currentSequenceIndex + 1;
+      if (nextIndex < sequenceNodes.length) {
+        setCurrentSequenceIndex(nextIndex);
+        setCurrentNode(sequenceNodes[nextIndex].children || []);
+        // Ajouter les options de l'étape suivante à l'historique pour le bouton retour
+        setHistory(prev => [...prev, sequenceNodes[nextIndex].children || []]);
+      } else {
+        // Fin de la séquence -> Analyse ou Sport
+        setSequenceNodes([]);
+        setCurrentSequenceIndex(-1);
+
+        // Vérifier si le symptôme parent (qui a déclenché la séquence) nécessite des questions sportives
+        // Le parent est le dernier élément du path AVANT d'entrer dans la séquence.
+        // Mais ici 'node' est la dernière réponse (ex: "Effort").
+        // On doit vérifier si le symptôme initial (ex: "Douleur thoracique") nécessite sport.
+        // On peut le retrouver dans selectedPath ou history, mais c'est complexe.
+        // Simplification : on vérifie si le nœud actuel (réponse) déclenche quelque chose, 
+        // ou on procède directement à l'analyse.
+
+        const symptomDescription = buildEnrichedSymptomDescription(newPath, sportData);
+        setAnalysis(symptomDescription);
+        setCurrentNode([]);
+      }
+      return;
+    }
+
+    // 2. Vérifier si ce nœud nécessite des questions sportives (cas feuille simple sans séquence)
     if (node.requiresSportQuestion && !node.children) {
-      // C'est une feuille qui nécessite des questions sportives
       setPendingNode(node);
       setShowSportQuestion(true);
       return;
@@ -81,8 +117,19 @@ export default function SymptomChecker() {
     setSelectedPath(newPath);
 
     if (node.children && node.children.length > 0) {
-      setHistory(prev => [...prev, node.children!]);
-      setCurrentNode(node.children);
+      // 3. Détection du début d'une séquence (Nature, Intensité...)
+      // On vérifie si le premier enfant est de type "Nature" (id finit par -nature)
+      if (node.children[0].id.endsWith('-nature')) {
+        // Démarrage du mode séquentiel
+        setSequenceNodes(node.children);
+        setCurrentSequenceIndex(0);
+        setCurrentNode(node.children[0].children || []);
+        setHistory(prev => [...prev, node.children![0].children || []]);
+      } else {
+        // Navigation standard dans l'arbre
+        setHistory(prev => [...prev, node.children!]);
+        setCurrentNode(node.children);
+      }
     } else {
       // Leaf node reached, show analysis
       const symptomDescription = buildEnrichedSymptomDescription(newPath, sportData);
@@ -124,6 +171,11 @@ export default function SymptomChecker() {
       setAnalysis(null);
       setSportData(undefined);
       setSelectedPath(prev => prev.slice(0, -1));
+
+      // Si on revient d'une analyse qui suivait une séquence, il faut réinitialiser correctement
+      // Mais c'est compliqué de savoir si on vient d'une séquence.
+      // Le plus simple est de revenir à l'étape précédente dans l'historique.
+
       const lastNodeChildren = history[history.length - 1];
       setCurrentNode(lastNodeChildren);
 
@@ -134,6 +186,17 @@ export default function SymptomChecker() {
       setHistory(prevHistory);
       setCurrentNode(prevNodes);
       setSelectedPath(prev => prev.slice(0, -1));
+
+      // Gestion du retour arrière dans une séquence
+      if (currentSequenceIndex !== -1) {
+        if (currentSequenceIndex > 0) {
+          setCurrentSequenceIndex(prev => prev - 1);
+        } else {
+          // On est au début de la séquence (Nature), on annule la séquence
+          setSequenceNodes([]);
+          setCurrentSequenceIndex(-1);
+        }
+      }
     }
   };
 
@@ -179,6 +242,8 @@ export default function SymptomChecker() {
           onBack={handleGoBack}
           onReset={handleReset}
           canGoBack={canGoBack}
+          customTitle={currentSequenceIndex !== -1 ? sequenceNodes[currentSequenceIndex].label : undefined}
+          customDescription={currentSequenceIndex !== -1 ? sequenceNodes[currentSequenceIndex].description : undefined}
         />
       )}
     </div>
