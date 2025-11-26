@@ -30,36 +30,36 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const getAnalysis = async () => {
       if (!isMounted) return;
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
-        const analysisOutput = await analyzeSymptoms({ 
+        const analysisOutput = await analyzeSymptoms({
           symptomsDescription: symptomDescription,
           userProfile: isProfileComplete ? profile ?? undefined : undefined
         });
-        
+
         if (!isMounted) return;
-        
+
         // Vérifier si la réponse contient des erreurs
-        if (analysisOutput.clarifyingQuestions && 
-            analysisOutput.clarifyingQuestions.length > 0 && 
-            analysisOutput.clarifyingQuestions[0].includes('erreur')) {
+        if (analysisOutput.clarifyingQuestions &&
+          analysisOutput.clarifyingQuestions.length > 0 &&
+          analysisOutput.clarifyingQuestions[0].includes('erreur')) {
           throw new Error(analysisOutput.clarifyingQuestions[0]);
         }
-        
+
         setAnalysisResult(analysisOutput);
       } catch (e) {
         if (!isMounted) return;
-        
+
         console.error("Erreur lors de l'analyse des symptômes :", e);
         const errorMessage = e instanceof Error ? e.message : "Une erreur inattendue s'est produite";
         setError(`Désolé, une erreur s'est produite : ${errorMessage}`);
-        
+
         // Afficher une notification d'erreur
         toast({
           variant: "destructive",
@@ -72,11 +72,11 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
         }
       }
     };
-    
+
     if (isProfileComplete !== undefined) {
       getAnalysis();
     }
-    
+
     // Nettoyage en cas de démontage du composant
     return () => {
       isMounted = false;
@@ -87,8 +87,8 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
     <Card className="animate-fade-in-up">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-            <BrainCircuit className="text-primary"/>
-            Résultat de l'analyse
+          <BrainCircuit className="text-primary" />
+          Résultat de l'analyse
         </CardTitle>
         <CardDescription>Basé sur votre sélection : "{symptomDescription}"</CardDescription>
       </CardHeader>
@@ -108,6 +108,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
             medicationSuggestions={analysisResult.medicationSuggestions}
             traditionalRemedies={analysisResult.traditionalRemedies}
             fullAnalysis={analysisResult}
+            userProfile={isProfileComplete ? profile ?? undefined : undefined}
           />
         )}
       </CardContent>
@@ -116,7 +117,7 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
           <ArrowLeft className="mr-2 h-4 w-4" />
           Retour
         </Button>
-         <Button variant="ghost" onClick={onReset}>
+        <Button variant="ghost" onClick={onReset}>
           <RotateCcw className="mr-2 h-4 w-4" />
           Recommencer
         </Button>

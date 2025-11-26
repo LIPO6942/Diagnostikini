@@ -4,7 +4,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Remedy, TraditionalRemedy, DiagnosisSuggestion, MedicationSuggestion } from "@/lib/types";
+import type { Remedy, TraditionalRemedy, DiagnosisSuggestion, MedicationSuggestion, UserProfile } from "@/lib/types";
 import { ClarificationSection } from "./clarification-section";
 import { commonRemedies, baseRemedies } from "@/lib/remedies";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,8 @@ interface AssistantResponseProps {
   medicationSuggestions: MedicationSuggestion[];
   traditionalRemedies: TraditionalRemedy[];
   fullAnalysis: any;
-  onSaveRecord: (record: any) => void;
+  onSaveRecord?: (record: any) => void;
+  userProfile?: UserProfile;
 }
 
 export const AssistantResponse = ({
@@ -36,6 +37,7 @@ export const AssistantResponse = ({
   medicationSuggestions: initialMedicationSuggestions,
   traditionalRemedies: initialTraditionalRemedies,
   fullAnalysis,
+  userProfile,
 }: AssistantResponseProps) => {
   const [remedies, setRemedies] = useState<Remedy[] | null>(null);
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
@@ -164,6 +166,7 @@ ${medicationSuggestions.map(m => `- ${m.name}: ${m.justification}`).join('\n')}
               initialDiagnosis={potentialDiagnosis}
               symptoms={symptoms}
               symptomsArray={symptoms.split(/[,.]+/).map(s => s.trim()).filter(Boolean)}
+              userProfile={userProfile}
               onDiagnosisUpdate={(newDiagnosisSuggestions, newMedicationSuggestions, newTraditionalRemedies, confidence) => {
                 setDiagnosisSuggestions(newDiagnosisSuggestions);
                 setMedicationSuggestions(newMedicationSuggestions);

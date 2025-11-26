@@ -89,6 +89,13 @@ export type SymptomNode = {
   descriptionTunisian?: string;
   children?: SymptomNode[];
   sex?: 'homme' | 'femme';
+  // Questions sportives conditionnelles
+  requiresSportQuestion?: boolean; // Si true, afficher la question sportive
+  sportAnswers?: {
+    practicesSport: boolean;
+    sportId?: string;
+    adaptiveAnswers?: Record<string, string>; // questionId -> optionId
+  };
 };
 
 export type DiagnosisSuggestion = {

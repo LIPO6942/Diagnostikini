@@ -404,7 +404,7 @@ export const symptomTree: SymptomNode[] = [
   },
   {
     id: "genito-urinaire",
-    label: "Génito-urinaire",
+    label: "Génito-urinaire & Sexuel",
     descriptionTunisian: "البول و الجهاز التناسلي",
     icon: Droplet,
     children: [
@@ -419,6 +419,97 @@ export const symptomTree: SymptomNode[] = [
           { id: "uri-sang", label: "Sang dans les urines", descriptionTunisian: "دم في البول" },
           { id: "uri-couleur", label: "Urine trouble / odeur forte", descriptionTunisian: "بول خاثر / ريحة قوية" },
           { id: "uri-retention", label: "Difficulté à uriner / Blocage", descriptionTunisian: "البول محصور" },
+          { id: "uri-nuit", label: "Besoin d'uriner la nuit (Nycturie)", descriptionTunisian: "تقوم في الليل للبول" },
+        ]
+      },
+      {
+        id: "genital-symptomes",
+        label: "Symptômes Génitaux",
+        descriptionTunisian: "أعراض الجهاز التناسلي",
+        children: [
+          {
+            id: "gen-douleur",
+            label: "Douleurs génitales",
+            descriptionTunisian: "وجيعة في المناطق الحساسة",
+            children: [
+              { id: "gen-douleur-pelvienne", label: "Douleur pelvienne / Bas ventre", descriptionTunisian: "وجيعة أسفل البطن" },
+              { id: "gen-douleur-rapport", label: "Douleur pendant/après rapports", descriptionTunisian: "وجيعة وقت العلاقة" },
+              { id: "gen-douleur-testiculaire", label: "Douleur testiculaire (Homme)", descriptionTunisian: "وجيعة في الخصitien", sex: 'homme' },
+              { id: "gen-douleur-vulvaire", label: "Douleur vulvaire/vaginale (Femme)", descriptionTunisian: "وجيعة في المهبل", sex: 'femme' },
+            ]
+          },
+          {
+            id: "gen-ecoulement",
+            label: "Écoulements & Sécrétions",
+            descriptionTunisian: "إفرازات",
+            children: [
+              { id: "gen-ecoulement-anormal", label: "Écoulement inhabituel", descriptionTunisian: "إفرازات غريبة" },
+              { id: "gen-ecoulement-sang", label: "Saignement hors règles", descriptionTunisian: "دم في غير وقتو" },
+              { id: "gen-ecoulement-odeur", label: "Mauvaise odeur", descriptionTunisian: "ريحة خايبة" },
+            ]
+          },
+          {
+            id: "gen-peau",
+            label: "Lésions & Peau",
+            descriptionTunisian: "حبوب و جلدة",
+            children: [
+              { id: "gen-demangeaison", label: "Démangeaisons intenses", descriptionTunisian: "حكة قوية" },
+              { id: "gen-rougeur", label: "Rougeur / Irritation", descriptionTunisian: "حمرة / طياب" },
+              { id: "gen-boutons", label: "Boutons / Verrues / Ulcères", descriptionTunisian: "حبوب / جروح" },
+              { id: "gen-gonflement", label: "Gonflement / Masse", descriptionTunisian: "نفخ / كعبرة" },
+            ]
+          }
+        ]
+      },
+      {
+        id: "sante-reproductive",
+        label: "Santé Reproductive & Sexuelle",
+        descriptionTunisian: "الصحة الإنجابية و الجنسية",
+        children: [
+          {
+            id: "repro-femme",
+            label: "Cycle & Règles (Femme)",
+            descriptionTunisian: "العادة الشهرية",
+            sex: 'femme',
+            children: [
+              { id: "cycle-retard", label: "Retard de règles / Absence", descriptionTunisian: "تأخر العادة" },
+              { id: "cycle-abondant", label: "Règles très abondantes", descriptionTunisian: "دم قوي برشا" },
+              { id: "cycle-douloureux", label: "Règles très douloureuses", descriptionTunisian: "وجيعة قوية وقت العادة" },
+              { id: "cycle-irregulier", label: "Cycle irrégulier", descriptionTunisian: "عادة مش منظمة" },
+              { id: "cycle-syndrome-premenstruel", label: "Syndrome prémenstruel sévère", descriptionTunisian: "قلق قبل العادة" },
+            ]
+          },
+          {
+            id: "repro-sexuel",
+            label: "Fonction Sexuelle",
+            descriptionTunisian: "الحياة الجنسية",
+            children: [
+              { id: "sex-libido", label: "Baisse de libido", descriptionTunisian: "نقص الرغبة" },
+              { id: "sex-erection", label: "Troubles de l'érection (Homme)", descriptionTunisian: "ضعف الانتصاب", sex: 'homme' },
+              { id: "sex-ejaculation", label: "Troubles de l'éjaculation (Homme)", descriptionTunisian: "مشاكل القذف", sex: 'homme' },
+              { id: "sex-secheresse", label: "Sécheresse vaginale (Femme)", descriptionTunisian: "شياح المهبل", sex: 'femme' },
+            ]
+          },
+          {
+            id: "repro-fertilite",
+            label: "Fertilité",
+            descriptionTunisian: "الخصوبة",
+            children: [
+              { id: "fert-conception", label: "Difficulté à concevoir", descriptionTunisian: "صعوبة في الحمل" },
+            ]
+          }
+        ]
+      },
+      {
+        id: "contexte-declencheur",
+        label: "Contexte & Facteurs",
+        descriptionTunisian: "ظروف و أسباب",
+        children: [
+          { id: "ctx-rapport", label: "Après rapport sexuel", descriptionTunisian: "بعد العلاقة" },
+          { id: "ctx-sport", label: "Après activité sportive", descriptionTunisian: "بعد الرياضة" },
+          { id: "ctx-hygiene", label: "Changement produit hygiène/lessive", descriptionTunisian: "تبديل صابون/دواء غسيل" },
+          { id: "ctx-medicament", label: "Prise de nouveaux médicaments", descriptionTunisian: "دواء جديد" },
+          { id: "ctx-hormonal", label: "Changement hormonal (Grossesse, Ménopause...)", descriptionTunisian: "تغير هرمونات" },
         ]
       }
     ]

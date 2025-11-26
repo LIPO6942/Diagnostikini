@@ -9,9 +9,11 @@ import type { SymptomNode } from "@/lib/types";
 import { symptomTree } from "@/constants/symptom-tree";
 import { SymptomSelection } from "./symptom-selection";
 import { SymptomAnalysis } from "./symptom-analysis";
+import { SportQuestion } from "./sport-question";
 import { useProfile } from "@/contexts/profile-context";
 import { ProfilePrompt } from "./profile-prompt";
 import { Skeleton } from "../ui/skeleton";
+import { markSportRelatedSymptoms, buildEnrichedSymptomDescription } from "@/constants/sport-utils";
 
 function SymptomCheckerSkeleton() {
   return (
@@ -35,14 +37,24 @@ export default function SymptomChecker() {
   };
 
   const filteredTree = useMemo(() => {
-    if (!profile?.sex || (profile.sex !== 'homme' && profile.sex !== 'femme')) return symptomTree;
-    return filterNodes(symptomTree, profile.sex as 'homme' | 'femme');
+    if (!profile?.sex || (profile.sex !== 'homme' && profile.sex !== 'femme')) {
+      return markSportRelatedSymptoms(symptomTree);
+    }
+    const filtered = filterNodes(symptomTree, profile.sex as 'homme' | 'femme');
+    return markSportRelatedSymptoms(filtered);
   }, [profile?.sex]);
 
   const [currentNode, setCurrentNode] = useState<SymptomNode[]>(filteredTree);
   const [history, setHistory] = useState<SymptomNode[][]>([filteredTree]);
   const [selectedPath, setSelectedPath] = useState<SymptomNode[]>([]);
   const [analysis, setAnalysis] = useState<string | null>(null);
+  const [showSportQuestion, setShowSportQuestion] = useState(false);
+  const [pendingNode, setPendingNode] = useState<SymptomNode | null>(null);
+  const [sportData, setSportData] = useState<{
+    practicesSport: boolean;
+    sportId?: string;
+    adaptiveAnswers?: Record<string, string>;
+  } | undefined>(undefined);
 
   // Reset when the tree changes (e.g. profile update)
   useEffect(() => {
@@ -50,10 +62,21 @@ export default function SymptomChecker() {
     setHistory([filteredTree]);
     setSelectedPath([]);
     setAnalysis(null);
+    setShowSportQuestion(false);
+    setPendingNode(null);
+    setSportData(undefined);
   }, [filteredTree]);
 
 
   const handleSelectNode = (node: SymptomNode) => {
+    // Vérifier si ce nœud nécessite des questions sportives
+    if (node.requiresSportQuestion && !node.children) {
+      // C'est une feuille qui nécessite des questions sportives
+      setPendingNode(node);
+      setShowSportQuestion(true);
+      return;
+    }
+
     const newPath = [...selectedPath, node];
     setSelectedPath(newPath);
 
@@ -62,16 +85,44 @@ export default function SymptomChecker() {
       setCurrentNode(node.children);
     } else {
       // Leaf node reached, show analysis
-      const symptomDescription = newPath.map(p => p.label).join(' -> ');
+      const symptomDescription = buildEnrichedSymptomDescription(newPath, sportData);
       setAnalysis(symptomDescription);
       setCurrentNode([]); // Clear nodes to show analysis view
     }
   };
 
+  const handleSportQuestionComplete = (data: {
+    practicesSport: boolean;
+    sportId?: string;
+    adaptiveAnswers?: Record<string, string>;
+  }) => {
+    setSportData(data);
+    setShowSportQuestion(false);
+
+    if (pendingNode) {
+      const newPath = [...selectedPath, pendingNode];
+      setSelectedPath(newPath);
+
+      // Construire la description enrichie avec les données sportives
+      const symptomDescription = buildEnrichedSymptomDescription(newPath, data);
+      setAnalysis(symptomDescription);
+      setCurrentNode([]);
+      setPendingNode(null);
+    }
+  };
+
   const handleGoBack = () => {
+    if (showSportQuestion) {
+      // Retour depuis les questions sportives
+      setShowSportQuestion(false);
+      setPendingNode(null);
+      return;
+    }
+
     if (analysis) {
       // From analysis back to selection
       setAnalysis(null);
+      setSportData(undefined);
       setSelectedPath(prev => prev.slice(0, -1));
       const lastNodeChildren = history[history.length - 1];
       setCurrentNode(lastNodeChildren);
@@ -91,9 +142,12 @@ export default function SymptomChecker() {
     setHistory([filteredTree]);
     setSelectedPath([]);
     setAnalysis(null);
+    setShowSportQuestion(false);
+    setPendingNode(null);
+    setSportData(undefined);
   };
 
-  const canGoBack = analysis ? true : history.length > 1;
+  const canGoBack = showSportQuestion || analysis ? true : history.length > 1;
 
   if (isProfileComplete === undefined) {
     return <SymptomCheckerSkeleton />;
@@ -105,7 +159,13 @@ export default function SymptomChecker() {
 
   return (
     <div className="mx-auto w-full max-w-md px-2 sm:px-0">
-      {analysis ? (
+      {showSportQuestion && pendingNode ? (
+        <SportQuestion
+          symptomId={pendingNode.id}
+          symptomLabel={pendingNode.label}
+          onComplete={handleSportQuestionComplete}
+        />
+      ) : analysis ? (
         <SymptomAnalysis
           symptomDescription={analysis}
           onBack={handleGoBack}

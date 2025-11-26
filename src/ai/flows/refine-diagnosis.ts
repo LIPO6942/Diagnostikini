@@ -4,6 +4,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { UserProfileSchema } from '@/lib/types';
 import { z } from 'genkit';
 
 const ClarificationAnswerSchema = z.object({
@@ -15,6 +16,7 @@ const RefineDiagnosisInputSchema = z.object({
     initialSymptoms: z.string().describe("Description initiale des symptômes."),
     initialDiagnosis: z.string().describe("Le diagnostic initial suggéré."),
     clarificationAnswers: z.array(ClarificationAnswerSchema).describe("Les réponses aux questions de clarification."),
+    userProfile: UserProfileSchema.optional().describe("Le profil de l'utilisateur pour affiner le diagnostic."),
 });
 
 export type RefineDiagnosisInput = z.infer<typeof RefineDiagnosisInputSchema>;
@@ -72,9 +74,28 @@ Q: {{this.question}}
 R: {{this.answer}}
 {{/each}}
 
+{{#if userProfile}}
+PROFIL UTILISATEUR :
+{{#if userProfile.age}}
+- Âge : {{userProfile.age}} ans
+{{/if}}
+{{#if userProfile.sex}}
+- Sexe : {{userProfile.sex}}
+{{/if}}
+{{#if userProfile.weight}}
+- Poids : {{userProfile.weight}} kg
+{{/if}}
+{{#if userProfile.bloodGroup}}
+- Groupe sanguin : {{userProfile.bloodGroup}}
+{{/if}}
+{{/if}}
+
 INSTRUCTIONS IMPORTANTES :
 1. **DIAGNOSTIC RAFFINÉ** :
    - Utilisez les réponses pour confirmer, affiner ou modifier le diagnostic initial.
+   - **TENEZ COMPTE DU PROFIL UTILISATEUR** : Si le profil indique que l'utilisateur est une FEMME, adaptez votre diagnostic aux spécificités féminines. Si c'est un HOMME, adaptez aux spécificités masculines.
+   - Analysez les réponses détaillées (fréquence, intensité, durée, localisation) pour affiner la gravité et la spécificité du diagnostic.
+   - Utilisez les réponses quantitatives (ex: échelle 8/10, température 39°C) pour évaluer l'urgence.
    - Si les réponses pointent vers un diagnostic différent, proposez-le en priorité.
    - Justifiez explicitement comment chaque réponse influence votre diagnostic.
    - Augmentez la confiance si les réponses confirment le diagnostic initial.
