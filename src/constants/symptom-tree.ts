@@ -94,6 +94,27 @@ const symptomCharacteristics = (baseId: string): SymptomNode[] => [
   }
 ];
 
+// Helper specifically for Genito-Urinary symptoms with specific context factors
+const genitoUrinaryCharacteristics = (baseId: string): SymptomNode[] => {
+  // Clone the standard structure to avoid mutation references
+  const standardChars = JSON.parse(JSON.stringify(symptomCharacteristics(baseId)));
+
+  // Find the factors node
+  const factorsNode = standardChars.find((n: any) => n.id.endsWith('-facteurs'));
+
+  if (factorsNode && factorsNode.children) {
+    // Add specific GU factors at the beginning
+    factorsNode.children.unshift(
+      { id: `${baseId}-fac-rapport`, label: "Après rapport sexuel", descriptionTunisian: "بعد العلاقة" },
+      { id: `${baseId}-fac-hygiene`, label: "Changement produit hygiène/lessive", descriptionTunisian: "تبديل صابون/دواء غسيل" },
+      { id: `${baseId}-fac-medicament`, label: "Prise de nouveaux médicaments", descriptionTunisian: "دواء جديد" },
+      { id: `${baseId}-fac-hormonal`, label: "Changement hormonal (Grossesse, Ménopause...)", descriptionTunisian: "تغير هرمونات" }
+    );
+  }
+
+  return standardChars;
+};
+
 export const symptomTree: SymptomNode[] = [
   {
     id: "douleur",
@@ -440,13 +461,13 @@ export const symptomTree: SymptomNode[] = [
         label: "Urinaire",
         descriptionTunisian: "البول",
         children: [
-          { id: "uri-douleur", label: "Brûlure / Douleur en urinant", descriptionTunisian: "حرقان", children: symptomCharacteristics("uri-douleur") },
-          { id: "uri-frequence", label: "Besoin fréquent (Pollakiurie)", descriptionTunisian: "تمشي برشا للتوالات" },
-          { id: "uri-urgent", label: "Besoin urgent / Fuites", descriptionTunisian: "ما تنجمش تشد روحك" },
-          { id: "uri-sang", label: "Sang dans les urines", descriptionTunisian: "دم في البول" },
-          { id: "uri-couleur", label: "Urine trouble / odeur forte", descriptionTunisian: "بول خاثر / ريحة قوية" },
-          { id: "uri-retention", label: "Difficulté à uriner / Blocage", descriptionTunisian: "البول محصور" },
-          { id: "uri-nuit", label: "Besoin d'uriner la nuit (Nycturie)", descriptionTunisian: "تقوم في الليل للبول" },
+          { id: "uri-douleur", label: "Brûlure / Douleur en urinant", descriptionTunisian: "حرقان", children: genitoUrinaryCharacteristics("uri-douleur") },
+          { id: "uri-frequence", label: "Besoin fréquent (Pollakiurie)", descriptionTunisian: "تمشي برشا للتوالات", children: genitoUrinaryCharacteristics("uri-frequence") },
+          { id: "uri-urgent", label: "Besoin urgent / Fuites", descriptionTunisian: "ما تنجمش تشد روحك", children: genitoUrinaryCharacteristics("uri-urgent") },
+          { id: "uri-sang", label: "Sang dans les urines", descriptionTunisian: "دم في البول", children: genitoUrinaryCharacteristics("uri-sang") },
+          { id: "uri-couleur", label: "Urine trouble / odeur forte", descriptionTunisian: "بول خاثر / ريحة قوية", children: genitoUrinaryCharacteristics("uri-couleur") },
+          { id: "uri-retention", label: "Difficulté à uriner / Blocage", descriptionTunisian: "البول محصور", children: genitoUrinaryCharacteristics("uri-retention") },
+          { id: "uri-nuit", label: "Besoin d'uriner la nuit (Nycturie)", descriptionTunisian: "تقوم في الليل للبول", children: genitoUrinaryCharacteristics("uri-nuit") },
         ]
       },
       {
@@ -459,10 +480,10 @@ export const symptomTree: SymptomNode[] = [
             label: "Douleurs génitales",
             descriptionTunisian: "وجيعة في المناطق الحساسة",
             children: [
-              { id: "gen-douleur-pelvienne", label: "Douleur pelvienne / Bas ventre", descriptionTunisian: "وجيعة أسفل البطن", children: symptomCharacteristics("gen-douleur-pelvienne") },
-              { id: "gen-douleur-rapport", label: "Douleur pendant/après rapports", descriptionTunisian: "وجيعة وقت العلاقة", children: symptomCharacteristics("gen-douleur-rapport") },
-              { id: "gen-douleur-testiculaire", label: "Douleur testiculaire (Homme)", descriptionTunisian: "وجيعة في الخصitien", sex: 'homme', children: symptomCharacteristics("gen-douleur-testiculaire") },
-              { id: "gen-douleur-vulvaire", label: "Douleur vulvaire/vaginale (Femme)", descriptionTunisian: "وجيعة في المهبل", sex: 'femme', children: symptomCharacteristics("gen-douleur-vulvaire") },
+              { id: "gen-douleur-pelvienne", label: "Douleur pelvienne / Bas ventre", descriptionTunisian: "وجيعة أسفل البطن", children: genitoUrinaryCharacteristics("gen-douleur-pelvienne") },
+              { id: "gen-douleur-rapport", label: "Douleur pendant/après rapports", descriptionTunisian: "وجيعة وقت العلاقة", children: genitoUrinaryCharacteristics("gen-douleur-rapport") },
+              { id: "gen-douleur-testiculaire", label: "Douleur testiculaire (Homme)", descriptionTunisian: "وجيعة في الخصitien", sex: 'homme', children: genitoUrinaryCharacteristics("gen-douleur-testiculaire") },
+              { id: "gen-douleur-vulvaire", label: "Douleur vulvaire/vaginale (Femme)", descriptionTunisian: "وجيعة في المهبل", sex: 'femme', children: genitoUrinaryCharacteristics("gen-douleur-vulvaire") },
             ]
           },
           {
@@ -470,9 +491,9 @@ export const symptomTree: SymptomNode[] = [
             label: "Écoulements & Sécrétions",
             descriptionTunisian: "إفرازات",
             children: [
-              { id: "gen-ecoulement-anormal", label: "Écoulement inhabituel", descriptionTunisian: "إفرازات غريبة" },
-              { id: "gen-ecoulement-sang", label: "Saignement hors règles", descriptionTunisian: "دم في غير وقتو" },
-              { id: "gen-ecoulement-odeur", label: "Mauvaise odeur", descriptionTunisian: "ريحة خايبة" },
+              { id: "gen-ecoulement-anormal", label: "Écoulement inhabituel", descriptionTunisian: "إفرازات غريبة", children: genitoUrinaryCharacteristics("gen-ecoulement-anormal") },
+              { id: "gen-ecoulement-sang", label: "Saignement hors règles", descriptionTunisian: "دم في غير وقتو", children: genitoUrinaryCharacteristics("gen-ecoulement-sang") },
+              { id: "gen-ecoulement-odeur", label: "Mauvaise odeur", descriptionTunisian: "ريحة خايبة", children: genitoUrinaryCharacteristics("gen-ecoulement-odeur") },
             ]
           },
           {
@@ -480,10 +501,10 @@ export const symptomTree: SymptomNode[] = [
             label: "Lésions & Peau",
             descriptionTunisian: "حبوب و جلدة",
             children: [
-              { id: "gen-demangeaison", label: "Démangeaisons intenses", descriptionTunisian: "حكة قوية" },
-              { id: "gen-rougeur", label: "Rougeur / Irritation", descriptionTunisian: "حمرة / طياب" },
-              { id: "gen-boutons", label: "Boutons / Verrues / Ulcères", descriptionTunisian: "حبوب / جروح" },
-              { id: "gen-gonflement", label: "Gonflement / Masse", descriptionTunisian: "نفخ / كعبرة" },
+              { id: "gen-demangeaison", label: "Démangeaisons intenses", descriptionTunisian: "حكة قوية", children: genitoUrinaryCharacteristics("gen-demangeaison") },
+              { id: "gen-rougeur", label: "Rougeur / Irritation", descriptionTunisian: "حمرة / طياب", children: genitoUrinaryCharacteristics("gen-rougeur") },
+              { id: "gen-boutons", label: "Boutons / Verrues / Ulcères", descriptionTunisian: "حبوب / جروح", children: genitoUrinaryCharacteristics("gen-boutons") },
+              { id: "gen-gonflement", label: "Gonflement / Masse", descriptionTunisian: "نفخ / كعبرة", children: genitoUrinaryCharacteristics("gen-gonflement") },
             ]
           }
         ]
@@ -499,11 +520,11 @@ export const symptomTree: SymptomNode[] = [
             descriptionTunisian: "العادة الشهرية",
             sex: 'femme',
             children: [
-              { id: "cycle-retard", label: "Retard de règles / Absence", descriptionTunisian: "تأخر العادة" },
-              { id: "cycle-abondant", label: "Règles très abondantes", descriptionTunisian: "دم قوي برشا" },
-              { id: "cycle-douloureux", label: "Règles très douloureuses", descriptionTunisian: "وجيعة قوية وقت العادة", children: symptomCharacteristics("cycle-douloureux") },
-              { id: "cycle-irregulier", label: "Cycle irrégulier", descriptionTunisian: "عادة مش منظمة" },
-              { id: "cycle-syndrome-premenstruel", label: "Syndrome prémenstruel sévère", descriptionTunisian: "قلق قبل العادة" },
+              { id: "cycle-retard", label: "Retard de règles / Absence", descriptionTunisian: "تأخر العادة", children: genitoUrinaryCharacteristics("cycle-retard") },
+              { id: "cycle-abondant", label: "Règles très abondantes", descriptionTunisian: "دم قوي برشا", children: genitoUrinaryCharacteristics("cycle-abondant") },
+              { id: "cycle-douloureux", label: "Règles très douloureuses", descriptionTunisian: "وجيعة قوية وقت العادة", children: genitoUrinaryCharacteristics("cycle-douloureux") },
+              { id: "cycle-irregulier", label: "Cycle irrégulier", descriptionTunisian: "عادة مش منظمة", children: genitoUrinaryCharacteristics("cycle-irregulier") },
+              { id: "cycle-syndrome-premenstruel", label: "Syndrome prémenstruel sévère", descriptionTunisian: "قلق قبل العادة", children: genitoUrinaryCharacteristics("cycle-syndrome-premenstruel") },
             ]
           },
           {
@@ -511,10 +532,10 @@ export const symptomTree: SymptomNode[] = [
             label: "Fonction Sexuelle",
             descriptionTunisian: "الحياة الجنسية",
             children: [
-              { id: "sex-libido", label: "Baisse de libido", descriptionTunisian: "نقص الرغبة" },
-              { id: "sex-erection", label: "Troubles de l'érection (Homme)", descriptionTunisian: "ضعف الانتصاب", sex: 'homme' },
-              { id: "sex-ejaculation", label: "Troubles de l'éjaculation (Homme)", descriptionTunisian: "مشاكل القذف", sex: 'homme' },
-              { id: "sex-secheresse", label: "Sécheresse vaginale (Femme)", descriptionTunisian: "شياح المهبل", sex: 'femme' },
+              { id: "sex-libido", label: "Baisse de libido", descriptionTunisian: "نقص الرغبة", children: genitoUrinaryCharacteristics("sex-libido") },
+              { id: "sex-erection", label: "Troubles de l'érection (Homme)", descriptionTunisian: "ضعف الانتصاب", sex: 'homme', children: genitoUrinaryCharacteristics("sex-erection") },
+              { id: "sex-ejaculation", label: "Troubles de l'éjaculation (Homme)", descriptionTunisian: "مشاكل القذف", sex: 'homme', children: genitoUrinaryCharacteristics("sex-ejaculation") },
+              { id: "sex-secheresse", label: "Sécheresse vaginale (Femme)", descriptionTunisian: "شياح المهبل", sex: 'femme', children: genitoUrinaryCharacteristics("sex-secheresse") },
             ]
           },
           {
@@ -522,23 +543,12 @@ export const symptomTree: SymptomNode[] = [
             label: "Fertilité",
             descriptionTunisian: "الخصوبة",
             children: [
-              { id: "fert-conception", label: "Difficulté à concevoir", descriptionTunisian: "صعوبة في الحمل" },
+              { id: "fert-conception", label: "Difficulté à concevoir", descriptionTunisian: "صعوبة في الحمل", children: genitoUrinaryCharacteristics("fert-conception") },
             ]
           }
         ]
       },
-      {
-        id: "contexte-declencheur",
-        label: "Contexte & Facteurs",
-        descriptionTunisian: "ظروف و أسباب",
-        children: [
-          { id: "ctx-rapport", label: "Après rapport sexuel", descriptionTunisian: "بعد العلاقة" },
-          { id: "ctx-sport", label: "Après activité sportive", descriptionTunisian: "بعد الرياضة" },
-          { id: "ctx-hygiene", label: "Changement produit hygiène/lessive", descriptionTunisian: "تبديل صابون/دواء غسيل" },
-          { id: "ctx-medicament", label: "Prise de nouveaux médicaments", descriptionTunisian: "دواء جديد" },
-          { id: "ctx-hormonal", label: "Changement hormonal (Grossesse, Ménopause...)", descriptionTunisian: "تغير هرمونات" },
-        ]
-      }
+
     ]
   },
   {
