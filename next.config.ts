@@ -1,5 +1,5 @@
 
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const withPWA = require("next-pwa")({
   dest: "public",
@@ -20,15 +20,15 @@ const withPWA = require("next-pwa")({
     },
     // Stale While Revalidate for pages and documents
     {
-        urlPattern: /\.(?:html|json|js|css)$/i,
-        handler: 'StaleWhileRevalidate',
-        options: {
-            cacheName: 'pages-cache',
-            expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 24 * 60 * 60, // 1 day
-            },
+      urlPattern: /\.(?:html|json|js|css)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60, // 1 day
         },
+      },
     },
     // Network First for everything else
     {
@@ -48,9 +48,6 @@ const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
