@@ -98,12 +98,12 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
               )}
             </div>
 
-            <div className="flex flex-col min-w-0">
-              <span className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate">
+            <div className="flex flex-col min-w-0 py-1">
+              <span className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors leading-tight">
                 {node.label}
               </span>
               {node.descriptionTunisian && (
-                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium font-arabic mt-0.5 line-clamp-1">
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium font-arabic mt-1 leading-tight">
                   {node.descriptionTunisian}
                 </span>
               )}

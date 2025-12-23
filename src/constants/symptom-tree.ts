@@ -27,7 +27,6 @@ const symptomCharacteristics = (baseId: string): SymptomNode[] => [
       { id: `${baseId}-nat-decharge`, label: "Décharge électrique / Choc", descriptionTunisian: "ضو يضرب" },
       { id: `${baseId}-nat-irritation`, label: "Irritation / Sensibilité / Picotement", descriptionTunisian: "حكة / تهييج / تنميل" },
       { id: `${baseId}-nat-sourde`, label: "Douleur sourde / Continue", descriptionTunisian: "وجيعة كاسحة ما تقصش" },
-      { id: `${baseId}-nat-autre`, label: "Autre sensation", descriptionTunisian: "حاجة أخرى" },
     ]
   },
   {
@@ -88,7 +87,6 @@ const symptomCharacteristics = (baseId: string): SymptomNode[] => [
       { id: `${baseId}-fac-alimentation`, label: "Alimentation", descriptionTunisian: "الماكلة" },
       { id: `${baseId}-fac-medicament`, label: "Prise de médicaments", descriptionTunisian: "الدواء" },
       { id: `${baseId}-fac-spontane`, label: "Rien de particulier (Spontané)", descriptionTunisian: "وحدها بلاش سبة" },
-      { id: `${baseId}-fac-autre`, label: "Autre facteur", descriptionTunisian: "حاجة أخرى" },
     ]
   }
 ];
@@ -257,6 +255,7 @@ export const symptomTree: SymptomNode[] = [
             descriptionTunisian: "شايحة",
             children: [
               { id: "toux-seche-nuit", label: "Surtout la nuit", descriptionTunisian: "في الليل", children: symptomCharacteristics("toux-seche-nuit") },
+              { id: "toux-seche-reveil", label: "Au réveil le matin", descriptionTunisian: "كي تقوم من النوم", children: symptomCharacteristics("toux-seche-reveil") },
               { id: "toux-seche-effort", label: "À l'effort / Froid", descriptionTunisian: "بالمجهود / البرد", children: symptomCharacteristics("toux-seche-effort") },
               { id: "toux-seche-quinte", label: "Par quintes (crises)", descriptionTunisian: "نوبات كحة", children: symptomCharacteristics("toux-seche-quinte") },
             ]
@@ -376,7 +375,8 @@ export const symptomTree: SymptomNode[] = [
         children: [
           { id: "palp-rapide", label: "Cœur bat trop vite (Tachycardie)", descriptionTunisian: "دقات سريعة", children: symptomCharacteristics("palp-rapide") },
           { id: "palp-irregulier", label: "Battements irréguliers (Ratés)", descriptionTunisian: "دقات ملخبطة", children: symptomCharacteristics("palp-irregulier") },
-          { id: "palp-fort", label: "Battements forts", descriptionTunisian: "دقات قوية", children: symptomCharacteristics("palp-fort") },
+          { id: "palp-fort", label: "Battements forts / Impression de coup", descriptionTunisian: "دقات قوية / خبطة", children: symptomCharacteristics("palp-fort") },
+          { id: "palp-stress", label: "Palpitations après stress ou café", descriptionTunisian: "بالقهوة ولا التخمام", children: symptomCharacteristics("palp-stress") },
         ]
       },
       {
@@ -428,8 +428,8 @@ export const symptomTree: SymptomNode[] = [
               { id: "diarrhee-sang", label: "Sanglante", descriptionTunisian: "بالدم", children: symptomCharacteristics("diarrhee-sang") },
             ]
           },
-          { id: "dig-constipation", label: "Constipation", descriptionTunisian: "قبض", children: symptomCharacteristics("dig-constipation") },
-          { id: "dig-gaz", label: "Gaz / Ballonnements", descriptionTunisian: "غازات", children: symptomCharacteristics("dig-gaz") },
+          { id: "dig-gaz", label: "Gaz / Ballonnements intestinaux", descriptionTunisian: "غازات", children: symptomCharacteristics("dig-gaz") },
+          { id: "dig-lourd", label: "Sensation d'estomac lourd", descriptionTunisian: "المعدة رزينة", children: symptomCharacteristics("dig-lourd") },
           {
             id: "dig-selles", label: "Anomalie des selles", descriptionTunisian: "لون الخروج", children: [
               { id: "selles-noires", label: "Noires (comme du goudron)", descriptionTunisian: "كحلة", children: symptomCharacteristics("selles-noires") },
@@ -609,7 +609,9 @@ export const symptomTree: SymptomNode[] = [
           { id: "fievre-legere", label: "Légère (38-38.5°C)", descriptionTunisian: "سخانة خفيفة", children: symptomCharacteristics("fievre-legere") },
           { id: "fievre-elevee", label: "Élevée (> 38.5°C)", descriptionTunisian: "سخانة قوية", children: symptomCharacteristics("fievre-elevee") },
           { id: "fievre-frissons", label: "Avec frissons / Tremblements", descriptionTunisian: "رعشة", children: symptomCharacteristics("fievre-frissons") },
-          { id: "fievre-sueurs", label: "Avec sueurs profuses", descriptionTunisian: "عرق", children: symptomCharacteristics("fievre-sueurs") },
+          { id: "fievre-frissons-sans", label: "Frissons SANS fièvre", descriptionTunisian: "ترعيش بلاش سخانة", children: symptomCharacteristics("fievre-frissons-sans") },
+          { id: "fievre-sueurs", label: "Avec sueurs profuses", descriptionTunisian: "عرق برشا", children: symptomCharacteristics("fievre-sueurs") },
+          { id: "fievre-froides", label: "Sueurs froides nocturnes", descriptionTunisian: "عرق بارد في الليل", children: symptomCharacteristics("fievre-froides") },
         ]
       },
       {
