@@ -187,5 +187,3 @@ export function SportQuestion({ symptomId, symptomLabel, onComplete }: SportQues
         </div>
     );
 }
-    );
-}
