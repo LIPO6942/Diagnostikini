@@ -4,7 +4,7 @@
 import type { SymptomNode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 
-import { ArrowLeft, Home, ChevronRight, RotateCcw } from "lucide-react";
+import { ArrowLeft, Home, ChevronRight, RotateCcw, Activity } from "lucide-react";
 import Link from 'next/link';
 
 interface SymptomSelectionProps {
@@ -83,40 +83,30 @@ export function SymptomSelection({ nodes, path, onSelect, onBack, onReset, canGo
       </div>
 
       {/* Grille de choix modernisée */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {nodes.map((node) => (
           <button
             key={node.id}
             onClick={() => onSelect(node)}
-            className="group relative flex flex-col items-center sm:items-start text-center sm:text-left p-6 
-                       bg-card hover:bg-accent/50 border border-border/60 hover:border-primary/30 
-                       rounded-xl transition-all duration-300 ease-out shadow-sm hover:shadow-md
-                       active:scale-[0.98]"
+            className="group relative flex items-center gap-3 p-3 sm:p-4 bg-card hover:bg-primary/5 border border-border/50 hover:border-primary/40 rounded-xl transition-all duration-200 shadow-sm active:scale-[0.97] text-left overflow-hidden h-full"
           >
-            {/* Icône avec fond subtil */}
-            {node.icon ? (
-              <div className="mb-4 p-3 rounded-full bg-primary/5 group-hover:bg-primary/10 text-primary transition-colors">
-                <node.icon className="size-6 sm:size-7" />
-              </div>
-            ) : (
-              // Placeholder visuel si pas d'icône pour garder l'alignement
-              <div className="mb-4 size-12" />
-            )}
-
-            <div className="space-y-1 w-full">
-              <span className="block font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                {node.label}
-              </span>
-              {node.descriptionTunisian && (
-                <span className="block text-sm text-muted-foreground font-medium font-arabic mt-1.5">
-                  {node.descriptionTunisian}
-                </span>
+            <div className="flex-shrink-0 size-10 rounded-lg bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center text-primary transition-colors">
+              {node.icon ? (
+                <node.icon className="size-5" />
+              ) : (
+                <Activity className="size-5 opacity-40" />
               )}
             </div>
 
-            {/* Indicateur visuel "Flèche" mobile sur le côté (optionnel, pour l'affordance) */}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden sm:block">
-              <ChevronRight className="size-5 text-muted-foreground/50" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate">
+                {node.label}
+              </span>
+              {node.descriptionTunisian && (
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium font-arabic mt-0.5 line-clamp-1">
+                  {node.descriptionTunisian}
+                </span>
+              )}
             </div>
           </button>
         ))}

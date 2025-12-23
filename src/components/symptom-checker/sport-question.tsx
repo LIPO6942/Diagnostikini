@@ -85,41 +85,46 @@ export function SportQuestion({ symptomId, symptomLabel, onComplete }: SportQues
             </div>
 
             <div className="space-y-6">
-                {/* Question principale : Pratique sportive */}
+                {/* Question principale : Pratique sportive condensée */}
                 {practicesSport === null && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => handleSportPracticeAnswer(true)}
-                            className="group flex flex-col items-center justify-center p-8 bg-card hover:bg-accent/50 border border-border/60 hover:border-primary/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98]"
+                            className="group flex flex-col items-center justify-center p-4 bg-card hover:bg-primary/5 border border-border/50 hover:border-primary/40 rounded-xl transition-all duration-300 shadow-sm active:scale-[0.97]"
                         >
-                            <span className="text-xl font-bold text-foreground mb-1">Oui</span>
-                            <span className="text-sm text-muted-foreground">Je fais du sport</span>
+                            <span className="text-lg font-bold text-foreground mb-0.5">Oui</span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Sportif</span>
                         </button>
                         <button
                             onClick={() => handleSportPracticeAnswer(false)}
-                            className="group flex flex-col items-center justify-center p-8 bg-card hover:bg-accent/50 border border-border/60 hover:border-destructive/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98]"
+                            className="group flex flex-col items-center justify-center p-4 bg-card hover:bg-destructive/5 border border-border/50 hover:border-destructive/40 rounded-xl transition-all duration-300 shadow-sm active:scale-[0.97]"
                         >
-                            <span className="text-xl font-bold text-foreground mb-1">Non</span>
-                            <span className="text-sm text-muted-foreground">Pas de sport régulier</span>
+                            <span className="text-lg font-bold text-foreground mb-0.5">Non</span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Sédentaire</span>
                         </button>
                     </div>
                 )}
 
-                {/* Sélection du sport */}
+                {/* Sélection du sport compacte */}
                 {practicesSport === true && !selectedSport && (
-                    <div className="space-y-6">
-                        <Label className="text-lg font-semibold block px-1">
+                    <div className="space-y-4">
+                        <Label className="text-lg font-bold block px-1">
                             Quel sport pratiquez-vous ?
                         </Label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3">
                             {relevantSports.map(sport => (
                                 <button
                                     key={sport.id}
                                     onClick={() => handleSportSelection(sport.id)}
-                                    className="flex flex-col items-start p-4 bg-card hover:bg-accent/50 border border-border/60 hover:border-primary/30 rounded-xl transition-all duration-200 text-left group"
+                                    className="flex items-center gap-3 p-3 bg-card hover:bg-primary/5 border border-border/50 hover:border-primary/40 rounded-xl transition-all duration-200 text-left group overflow-hidden"
                                 >
-                                    <span className="font-bold text-foreground group-hover:text-primary transition-colors">{sport.name}</span>
-                                    <span className="text-xs text-muted-foreground mt-1 font-arabic">{sport.nameTunisian}</span>
+                                    <div className="flex-shrink-0 size-8 rounded-lg bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center text-primary transition-colors">
+                                        <Activity className="size-4" />
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">{sport.name}</span>
+                                        <span className="text-[10px] text-muted-foreground font-arabic truncate">{sport.nameTunisian}</span>
+                                    </div>
                                 </button>
                             ))}
                         </div>
