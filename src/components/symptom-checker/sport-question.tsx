@@ -5,8 +5,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Activity, ChevronRight } from 'lucide-react';
@@ -32,7 +30,6 @@ export function SportQuestion({ symptomId, symptomLabel, onComplete }: SportQues
     const handleSportPracticeAnswer = (answer: boolean) => {
         setPracticesSport(answer);
         if (!answer) {
-            // Si l'utilisateur ne pratique pas de sport, terminer
             onComplete({ practicesSport: false });
         }
     };
@@ -67,113 +64,128 @@ export function SportQuestion({ symptomId, symptomLabel, onComplete }: SportQues
     };
 
     return (
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-primary" />
-                    Pratique sportive
-                </CardTitle>
-                <CardDescription>
-                    Pour affiner le diagnostic de "{symptomLabel}", nous avons besoin d'informations sur votre activité physique
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+            {/* Header épuré */}
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary">
+                    <div className="p-2 rounded-full bg-primary/10">
+                        <Activity className="size-5" />
+                    </div>
+                    <span className="text-sm font-semibold tracking-wider uppercase">Contexte sportif</span>
+                </div>
+
+                <div className="space-y-2">
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                        Affiner le diagnostic
+                    </h2>
+                    <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
+                        Pour "{symptomLabel}", nous analysons l'impact de votre activité physique.
+                    </p>
+                </div>
+            </div>
+
+            <div className="space-y-6">
                 {/* Question principale : Pratique sportive */}
                 {practicesSport === null && (
-                    <div className="space-y-4">
-                        <Label className="text-base font-semibold">
-                            Pratiquez-vous une activité sportive ?
-                        </Label>
-                        <div className="flex gap-4">
-                            <Button
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => handleSportPracticeAnswer(true)}
-                            >
-                                Oui
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => handleSportPracticeAnswer(false)}
-                            >
-                                Non
-                            </Button>
-                        </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button
+                            onClick={() => handleSportPracticeAnswer(true)}
+                            className="group flex flex-col items-center justify-center p-8 bg-card hover:bg-accent/50 border border-border/60 hover:border-primary/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98]"
+                        >
+                            <span className="text-xl font-bold text-foreground mb-1">Oui</span>
+                            <span className="text-sm text-muted-foreground">Je fais du sport</span>
+                        </button>
+                        <button
+                            onClick={() => handleSportPracticeAnswer(false)}
+                            className="group flex flex-col items-center justify-center p-8 bg-card hover:bg-accent/50 border border-border/60 hover:border-destructive/30 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98]"
+                        >
+                            <span className="text-xl font-bold text-foreground mb-1">Non</span>
+                            <span className="text-sm text-muted-foreground">Pas de sport régulier</span>
+                        </button>
                     </div>
                 )}
 
                 {/* Sélection du sport */}
                 {practicesSport === true && !selectedSport && (
-                    <div className="space-y-4">
-                        <Label className="text-base font-semibold">
-                            Quel(s) sport(s) pratiquez-vous ?
+                    <div className="space-y-6">
+                        <Label className="text-lg font-semibold block px-1">
+                            Quel sport pratiquez-vous ?
                         </Label>
-                        <RadioGroup onValueChange={handleSportSelection}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {relevantSports.map(sport => (
-                                    <div key={sport.id} className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-muted/50 cursor-pointer">
-                                        <RadioGroupItem value={sport.id} id={sport.id} />
-                                        <Label htmlFor={sport.id} className="flex-1 cursor-pointer">
-                                            <div className="font-medium">{sport.name}</div>
-                                            <div className="text-xs text-muted-foreground">{sport.nameTunisian}</div>
-                                        </Label>
-                                    </div>
-                                ))}
-                            </div>
-                        </RadioGroup>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {relevantSports.map(sport => (
+                                <button
+                                    key={sport.id}
+                                    onClick={() => handleSportSelection(sport.id)}
+                                    className="flex flex-col items-start p-4 bg-card hover:bg-accent/50 border border-border/60 hover:border-primary/30 rounded-xl transition-all duration-200 text-left group"
+                                >
+                                    <span className="font-bold text-foreground group-hover:text-primary transition-colors">{sport.name}</span>
+                                    <span className="text-xs text-muted-foreground mt-1 font-arabic">{sport.nameTunisian}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 )}
 
                 {/* Questions adaptatives */}
                 {selectedSport && selectedSport.adaptiveQuestions.length > 0 && (
-                    <div className="space-y-6">
-                        <div className="text-sm font-medium text-primary">
-                            Questions spécifiques pour {selectedSport.name}
+                    <div className="space-y-8">
+                        <div className="flex items-center gap-3 pb-2 border-b">
+                            <span className="text-sm font-bold text-primary px-3 py-1 bg-primary/10 rounded-full">
+                                {selectedSport.name}
+                            </span>
                         </div>
+
                         {selectedSport.adaptiveQuestions.map(question => (
-                            <div key={question.id} className="space-y-3">
-                                <Label className="text-base">
+                            <div key={question.id} className="space-y-4">
+                                <Label className="text-lg font-medium leading-normal block px-1">
                                     {question.question}
-                                    <span className="text-sm text-muted-foreground ml-2">
-                                        ({question.questionTunisian})
+                                    <span className="block text-sm text-muted-foreground mt-1 font-arabic">
+                                        {question.questionTunisian}
                                     </span>
                                 </Label>
-                                <RadioGroup
-                                    value={adaptiveAnswers[question.id]}
-                                    onValueChange={(value) => handleAdaptiveAnswer(question.id, value)}
-                                >
-                                    <div className="space-y-2">
-                                        {question.options.map(option => (
-                                            <div key={option.id} className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-muted/50">
-                                                <RadioGroupItem value={option.id} id={`${question.id}-${option.id}`} />
-                                                <Label htmlFor={`${question.id}-${option.id}`} className="flex-1 cursor-pointer">
+
+                                <div className="grid grid-cols-1 gap-2">
+                                    {question.options.map(option => (
+                                        <button
+                                            key={option.id}
+                                            onClick={() => handleAdaptiveAnswer(question.id, option.id)}
+                                            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 text-left ${adaptiveAnswers[question.id] === option.id
+                                                ? 'bg-primary/5 border-primary ring-1 ring-primary/20'
+                                                : 'bg-card border-border/60 hover:border-primary/40'
+                                                }`}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className={`font-semibold ${adaptiveAnswers[question.id] === option.id ? 'text-primary' : 'text-foreground'}`}>
                                                     {option.label}
-                                                    <span className="text-sm text-muted-foreground ml-2">
-                                                        ({option.labelTunisian})
-                                                    </span>
-                                                </Label>
+                                                </span>
+                                                <span className="text-xs text-muted-foreground mt-1 font-arabic">
+                                                    {option.labelTunisian}
+                                                </span>
                                             </div>
-                                        ))}
-                                    </div>
-                                </RadioGroup>
+                                            {adaptiveAnswers[question.id] === option.id && (
+                                                <div className="size-5 rounded-full bg-primary flex items-center justify-center">
+                                                    <div className="size-2 rounded-full bg-background" />
+                                                </div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         ))}
+
+                        <Button
+                            onClick={handleComplete}
+                            disabled={!isComplete()}
+                            className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20"
+                        >
+                            Continuer
+                            <ChevronRight className="ml-2 w-5 h-5" />
+                        </Button>
                     </div>
                 )}
-
-                {/* Bouton de validation */}
-                {selectedSport && (
-                    <Button
-                        onClick={handleComplete}
-                        disabled={!isComplete()}
-                        className="w-full"
-                    >
-                        Continuer
-                        <ChevronRight className="ml-2 w-4 h-4" />
-                    </Button>
-                )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
+    );
+}
     );
 }

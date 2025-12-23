@@ -8,19 +8,6 @@ import { analyzeSymptoms, type AnalyzeSymptomsOutput } from "@/ai/flows/analyze-
 import { useToast } from "@/hooks/use-toast";
 import type { HealthRecord } from "@/lib/types";
 import { saveHealthRecord } from "@/services/health-record-service";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AssistantResponse } from "@/components/assistant/assistant-response";
-import { ArrowLeft, RotateCcw, BrainCircuit } from "lucide-react";
-import { useProfile } from "@/contexts/profile-context";
-import { recordConsultation } from "@/ai/flows/record-consultation";
-
-interface SymptomAnalysisProps {
-  symptomDescription: string;
-  onBack: () => void;
-  onReset: () => void;
-}
-
 export function SymptomAnalysis({ symptomDescription, onBack, onReset }: SymptomAnalysisProps) {
   const [analysisResult, setAnalysisResult] = useState<AnalyzeSymptomsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +32,6 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
 
         if (!isMounted) return;
 
-        // Vérifier si la réponse contient des erreurs
         if (analysisOutput.clarifyingQuestions &&
           analysisOutput.clarifyingQuestions.length > 0 &&
           analysisOutput.clarifyingQuestions[0].includes('erreur')) {
@@ -60,7 +46,6 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
         const errorMessage = e instanceof Error ? e.message : "Une erreur inattendue s'est produite";
         setError(`Désolé, une erreur s'est produite : ${errorMessage}`);
 
-        // Afficher une notification d'erreur
         toast({
           variant: "destructive",
           title: "Erreur d'analyse",
@@ -77,51 +62,79 @@ export function SymptomAnalysis({ symptomDescription, onBack, onReset }: Symptom
       getAnalysis();
     }
 
-    // Nettoyage en cas de démontage du composant
     return () => {
       isMounted = false;
     };
   }, [symptomDescription, profile, isProfileComplete, toast]);
 
   return (
-    <Card className="animate-fade-in-up">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BrainCircuit className="text-primary" />
-          Résultat de l'analyse
-        </CardTitle>
-        <CardDescription>Basé sur votre sélection : "{symptomDescription}"</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="w-full max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+
+      {/* Header de l'analyse */}
+      <div className="text-center space-y-4 pt-4">
+        <div className="mx-auto flex items-center justify-center size-16 rounded-2xl bg-primary/10 text-primary shadow-inner">
+          <BrainCircuit className={`size-10 ${isLoading ? 'animate-pulse' : ''}`} />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Analyse en cours
+          </h2>
+          <p className="text-muted-foreground max-w-md mx-auto italic px-4">
+            "{symptomDescription}"
+          </p>
+        </div>
+      </div>
+
+      <div className="relative">
         {isLoading && (
-          <div className="flex flex-col items-center justify-center p-8 gap-4 text-muted-foreground">
-            <BrainCircuit className="animate-pulse text-primary w-12 h-12" />
-            <span className="font-semibold text-lg">On analyse tes symptômes...</span>
+          <div className="flex flex-col items-center justify-center py-16 gap-6 text-center animate-in fade-in">
+            <div className="relative size-20">
+              <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+              <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+              <BrainCircuit className="absolute inset-0 m-auto size-8 text-primary animate-pulse" />
+            </div>
+            <div className="space-y-2">
+              <span className="block font-semibold text-xl text-foreground">Diagnostic IA en préparation</span>
+              <p className="text-sm text-muted-foreground animate-pulse">Nous croisons vos symptômes avec notre base médicale...</p>
+            </div>
           </div>
         )}
-        {error && <p className="text-destructive p-8 text-center">{error}</p>}
-        {analysisResult && (
-          <AssistantResponse
-            symptoms={symptomDescription}
-            diagnosisSuggestions={analysisResult.diagnosisSuggestions}
-            clarifyingQuestions={analysisResult.clarifyingQuestions}
-            medicationSuggestions={analysisResult.medicationSuggestions}
-            traditionalRemedies={analysisResult.traditionalRemedies}
-            fullAnalysis={analysisResult}
-            userProfile={isProfileComplete ? profile ?? undefined : undefined}
-          />
+
+        {error && (
+          <div className="p-8 bg-destructive/5 border border-destructive/20 rounded-2xl text-center space-y-4">
+            <p className="text-destructive font-medium">{error}</p>
+            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>Réessayer</Button>
+          </div>
         )}
-      </CardContent>
-      <CardFooter className="flex justify-between border-t pt-6">
-        <Button variant="outline" onClick={onBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour
-        </Button>
-        <Button variant="ghost" onClick={onReset}>
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Recommencer
-        </Button>
-      </CardFooter>
-    </Card>
+
+        {analysisResult && (
+          <div className="animate-in fade-in slide-in-from-top-4 duration-700">
+            <AssistantResponse
+              symptoms={symptomDescription}
+              diagnosisSuggestions={analysisResult.diagnosisSuggestions}
+              clarifyingQuestions={analysisResult.clarifyingQuestions}
+              medicationSuggestions={analysisResult.medicationSuggestions}
+              traditionalRemedies={analysisResult.traditionalRemedies}
+              fullAnalysis={analysisResult}
+              userProfile={isProfileComplete ? profile ?? undefined : undefined}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Footer sticky-like ou discret */}
+      {!isLoading && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-8 border-t">
+          <Button variant="outline" onClick={onBack} className="w-full sm:w-auto px-8 rounded-xl">
+            <ArrowLeft className="mr-2 size-4" />
+            Modifier mes réponses
+          </Button>
+          <Button variant="ghost" onClick={onReset} className="w-full sm:w-auto px-8 rounded-xl text-muted-foreground">
+            <RotateCcw className="mr-2 size-4" />
+            Nouveau diagnostic
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
