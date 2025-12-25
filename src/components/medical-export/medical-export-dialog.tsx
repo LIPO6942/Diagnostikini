@@ -98,28 +98,32 @@ export function MedicalExportDialog() {
                 });
             };
 
-            // Try to load and add logo
+            // Header Background: Draw green starting AFTER the logo area (first 40mm)
+            doc.setFillColor(17, 94, 89); // Emerald-900 (Primary)
+            doc.rect(40, 0, pageWidth - 40, 40, 'F');
+
+            // Try to load and add logo in the white area (0 to 40mm)
             try {
+                // Using relative path for the image
                 const logoImg = await loadImage("/icons/icon-192x192.png");
-                doc.addImage(logoImg, 'PNG', 15, 8, 24, 24);
+                // Place logo in the white space on the left
+                doc.addImage(logoImg, 'PNG', 8, 8, 24, 24);
             } catch (e) {
                 console.error("Could not load logo for PDF", e);
+                // Fallback: fill the entire header if logo fails
+                doc.rect(0, 0, 40, 40, 'F');
             }
-
-            // Header Background
-            doc.setFillColor(17, 94, 89); // Emerald-900 (Primary)
-            doc.rect(0, 0, pageWidth, 40, 'F');
 
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(22);
             doc.setFont("helvetica", "bold");
-            // Move text to the right to clear logo space if logo exists
-            doc.text("DIAGNOSTIKINI", 45, 20);
+            // Text stays in the green area starting at x=50
+            doc.text("DIAGNOSTIKINI", 50, 20);
 
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text("Exportation du Dossier Médical Personnel", 45, 28);
-            doc.text(`Généré le: ${format(new Date(), "PPpp", { locale: fr })}`, 45, 34);
+            doc.text("Exportation du Dossier Médical Personnel", 50, 28);
+            doc.text(`Généré le: ${format(new Date(), "PPpp", { locale: fr })}`, 50, 34);
 
             // Profile Section
             doc.setTextColor(0, 0, 0);
