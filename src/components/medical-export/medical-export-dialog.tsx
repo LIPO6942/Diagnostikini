@@ -87,19 +87,39 @@ export function MedicalExportDialog() {
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
 
-            // Header
+            // Function to load image
+            const loadImage = (url: string): Promise<HTMLImageElement> => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.src = url;
+                    img.onload = () => resolve(img);
+                    img.onerror = (e) => reject(e);
+                });
+            };
+
+            // Try to load and add logo
+            try {
+                const logoImg = await loadImage("/icons/icon-192x192.png");
+                doc.addImage(logoImg, 'PNG', 15, 8, 24, 24);
+            } catch (e) {
+                console.error("Could not load logo for PDF", e);
+            }
+
+            // Header Background
             doc.setFillColor(17, 94, 89); // Emerald-900 (Primary)
             doc.rect(0, 0, pageWidth, 40, 'F');
 
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(22);
             doc.setFont("helvetica", "bold");
-            doc.text("DIAGNOSTIKINI", 15, 20);
+            // Move text to the right to clear logo space if logo exists
+            doc.text("DIAGNOSTIKINI", 45, 20);
 
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text("Exportation du Dossier Médical Personnel", 15, 28);
-            doc.text(`Généré le: ${format(new Date(), "PPpp", { locale: fr })}`, 15, 34);
+            doc.text("Exportation du Dossier Médical Personnel", 45, 28);
+            doc.text(`Généré le: ${format(new Date(), "PPpp", { locale: fr })}`, 45, 34);
 
             // Profile Section
             doc.setTextColor(0, 0, 0);
@@ -225,11 +245,11 @@ export function MedicalExportDialog() {
                                 level="H"
                                 includeMargin={true}
                                 imageSettings={{
-                                    src: "/favicon.ico",
+                                    src: "/icons/icon-192x192.png",
                                     x: undefined,
                                     y: undefined,
-                                    height: 40,
-                                    width: 40,
+                                    height: 36,
+                                    width: 36,
                                     excavate: true,
                                 }}
                             />
