@@ -50,28 +50,28 @@ export function MedicalExportDialog() {
 
         if (profile.allergies?.items?.length || profile.allergies?.other) {
             text += "--- ALLERGIES ---\n";
-            profile.allergies.items?.forEach(a => text += `- ${a}\n`);
+            profile.allergies.items?.forEach((a: string) => text += `- ${a}\n`);
             if (profile.allergies.other) text += `- Autre: ${profile.allergies.other}\n`;
             text += "\n";
         }
 
         if (profile.medicalHistory?.conditions?.length || profile.medicalHistory?.other) {
             text += "--- ANTÉCÉDENTS ---\n";
-            profile.medicalHistory.conditions?.forEach(c => text += `- ${c}\n`);
+            profile.medicalHistory.conditions?.forEach((c: string) => text += `- ${c}\n`);
             if (profile.medicalHistory.other) text += `- Autre: ${profile.medicalHistory.other}\n`;
             text += "\n";
         }
 
         if (profile.currentTreatments?.medications?.length || profile.currentTreatments?.other) {
             text += "--- TRAITEMENTS EN COURS ---\n";
-            profile.currentTreatments.medications?.forEach(m => text += `- ${m}\n`);
+            profile.currentTreatments.medications?.forEach((m: string) => text += `- ${m}\n`);
             if (profile.currentTreatments.other) text += `- Autre: ${profile.currentTreatments.other}\n`;
             text += "\n";
         }
 
         if (records.length > 0) {
             text += "--- HISTORIQUE RÉCENT ---\n";
-            records.slice(0, 5).forEach(r => {
+            records.slice(0, 5).forEach((r: any) => {
                 text += `[${format(new Date(r.date), "dd/MM/yyyy")}] ${r.title}\n`;
                 if (r.diagnosis) text += `  Diag: ${r.diagnosis}\n`;
                 if (r.doctorName) text += `  Médecin: ${r.doctorName}\n`;
