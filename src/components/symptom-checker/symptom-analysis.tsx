@@ -6,8 +6,17 @@
 import { useEffect, useState } from "react";
 import { analyzeSymptoms, type AnalyzeSymptomsOutput } from "@/ai/flows/analyze-symptoms";
 import { useToast } from "@/hooks/use-toast";
-import type { HealthRecord } from "@/lib/types";
-import { saveHealthRecord } from "@/services/health-record-service";
+import { useProfile } from "@/contexts/profile-context";
+import { BrainCircuit, ArrowLeft, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AssistantResponse } from "@/components/assistant/assistant-response";
+
+interface SymptomAnalysisProps {
+  symptomDescription: string;
+  onBack: () => void;
+  onReset: () => void;
+}
+
 export function SymptomAnalysis({ symptomDescription, onBack, onReset }: SymptomAnalysisProps) {
   const [analysisResult, setAnalysisResult] = useState<AnalyzeSymptomsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
