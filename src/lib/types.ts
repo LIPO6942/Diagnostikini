@@ -22,6 +22,10 @@ export const UserProfileSchema = z.object({
     symptoms: z.array(z.string()).optional(),
     other: z.string().optional(),
   }).optional().nullable(),
+  familyHistory: z.array(z.object({
+    disease: z.string(),
+    relatives: z.array(z.string()),
+  })).optional().nullable(),
 });
 
 

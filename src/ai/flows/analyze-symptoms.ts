@@ -141,6 +141,7 @@ DIRECTIVES IMPORTANTES :
    - Adaptez vos explications et recommandations en fonction du profil complet de l'utilisateur.
    - Signalez clairement quand un symptôme pourrait être plus ou moins préoccupant en fonction de l'âge, du sexe ou du groupe sanguin.
    - Prenez en compte le groupe sanguin pour identifier d'éventuelles conditions spécifiques ou risques particuliers.
+   - **ANTÉCÉDENTS FAMILIAUX** : Analysez les maladies héréditaires signalées dans la famille. Si un utilisateur présente des symptômes liés à une maladie présente dans sa famille, augmentez la vigilance et mentionnez explicitement ce lien dans votre justification.
 
 2. ANALYSE DES SYMPTÔMES :
    - Identifiez les diagnostics différentiels pertinents en fonction des symptômes décrits.
@@ -230,6 +231,13 @@ SYMPTÔMES SUPPLÉMENTAIRES :
 {{#if userProfile.additionalSymptoms.other}}
 - {{userProfile.additionalSymptoms.other}}
 {{/if}}
+
+{{#if userProfile.familyHistory}}
+ANTÉCÉDENTS FAMILIAUX (Maladies Héréditaires) :
+  {{#each userProfile.familyHistory}}
+  - {{this.disease}} : affecte {{#each this.relatives}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+  {{/each}}
+{{/if}}
 {{/if}}
 
 CONSIGNES FINALES :
@@ -259,7 +267,8 @@ const analyzeSymptomsFlow = ai.defineFlow(
           medicalHistory: input.userProfile.medicalHistory || { conditions: [], other: '' },
           allergies: input.userProfile.allergies || { items: [], other: '' },
           currentTreatments: input.userProfile.currentTreatments || { medications: [], other: '' },
-          additionalSymptoms: input.userProfile.additionalSymptoms || { symptoms: [], other: '' }
+          additionalSymptoms: input.userProfile.additionalSymptoms || { symptoms: [], other: '' },
+          familyHistory: input.userProfile.familyHistory || []
         } : undefined
       };
 

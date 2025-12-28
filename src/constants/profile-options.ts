@@ -398,3 +398,34 @@ export const analysisTypeOptions = [
     "Autre document médical",
     "Consultation IA",
 ];
+
+export const hereditaryDiseaseOptions = [
+    "Diabète (Type 1 ou 2)",
+    "Hypertension Artérielle",
+    "Maladies Cardiaques",
+    "Cancers (Sein, Colon, Prostate, etc.)",
+    "Asthme / Allergies",
+    "Maladies Rénales",
+    "Hémochromatose",
+    "Mucoviscidose",
+    "Drépanocytose",
+    "Thalassémie",
+    "Maladie de Huntington",
+    "Maladie d'Alzheimer (précoce)",
+    "Maladie de Parkinson",
+    "Troubles Psychiatriques (Bipolarité, Schizophrénie)",
+];
+
+export const relationshipOptions = [
+    "Père",
+    "Mère",
+    "Frère",
+    "Sœur",
+    "Grand-père maternel",
+    "Grand-mère maternelle",
+    "Grand-père paternel",
+    "Grand-mère paternelle",
+    "Oncle",
+    "Tante",
+    "Cousin(e) germain(e)",
+];

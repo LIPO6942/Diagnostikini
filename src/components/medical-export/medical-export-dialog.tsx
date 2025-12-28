@@ -69,6 +69,14 @@ export function MedicalExportDialog() {
             text += "\n";
         }
 
+        if (profile.familyHistory?.length) {
+            text += "--- ANTÉCÉDENTS FAMILIAUX ---\n";
+            profile.familyHistory.forEach((f: any) => {
+                text += `- ${f.disease}: ${f.relatives.join(", ")}\n`;
+            });
+            text += "\n";
+        }
+
         if (records.length > 0) {
             text += "--- HISTORIQUE RÉCENT ---\n";
             records.slice(0, 5).forEach((r: any) => {
@@ -168,12 +176,33 @@ export function MedicalExportDialog() {
                 columnStyles: { 0: { fontStyle: 'bold', width: 40 } }
             });
 
-            // History Section
+            // Family History Section
             currentY = (doc as any).lastAutoTable.finalY + 15;
+            if (profile?.familyHistory?.length) {
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text("3. Antécédents Familiaux", 15, currentY);
+
+                const familyData = profile.familyHistory.map((f: any) => [
+                    f.disease,
+                    f.relatives.join(", ")
+                ]);
+
+                (doc as any).autoTable({
+                    startY: currentY + 5,
+                    head: [['Maladie', 'Membres concernés']],
+                    body: familyData,
+                    theme: 'striped',
+                    headStyles: { fillColor: [17, 94, 89] }
+                });
+                currentY = (doc as any).lastAutoTable.finalY + 15;
+            }
+
+            // History Section
             if (records.length > 0) {
                 doc.setFontSize(16);
                 doc.setFont("helvetica", "bold");
-                doc.text("3. Historique des Consultations", 15, currentY);
+                doc.text(`${profile?.familyHistory?.length ? '4' : '3'}. Historique des Consultations`, 15, currentY);
 
                 const recordData = records.map(r => [
                     format(new Date(r.date), "dd/MM/yyyy"),
@@ -305,6 +334,9 @@ export function MedicalExportDialog() {
                                 </li>
                                 <li className="flex items-center gap-2 text-destructive font-medium">
                                     <AlertTriangle className="h-3 w-3 text-destructive" /> Allergies & Antécédents
+                                </li>
+                                <li className="flex items-center gap-2 text-indigo-600 font-medium">
+                                    <Activity className="h-3 w-3 text-indigo-600" /> Maladies Héréditaires
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <Calendar className="h-3 w-3" /> Historique des consultations

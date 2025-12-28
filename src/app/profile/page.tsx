@@ -37,6 +37,8 @@ import {
   allergyOptions,
   treatmentOptions,
   additionalSymptomOptions,
+  hereditaryDiseaseOptions,
+  relationshipOptions,
 } from "@/constants/profile-options";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -101,6 +103,7 @@ export default function ProfilePage() {
       allergies: { items: [], other: "" },
       currentTreatments: { medications: [], other: "" },
       additionalSymptoms: { symptoms: [], other: "" },
+      familyHistory: [],
     },
   });
 
@@ -333,6 +336,84 @@ export default function ProfilePage() {
                   )}
                 />
               ))}
+
+              {/* Family History Section */}
+              <FormItem className="space-y-4">
+                <FormLabel className="text-xl font-bold">Maladies Héréditaires / Antécédents Familiaux</FormLabel>
+                <FormDescription>
+                  Sélectionnez les maladies présentes dans votre famille et précisez le lien de parenté.
+                </FormDescription>
+                <div className="space-y-6 pt-4">
+                  {hereditaryDiseaseOptions.map((disease) => {
+                    const familyHistoryValue = form.watch("familyHistory");
+                    const entry = Array.isArray(familyHistoryValue)
+                      ? familyHistoryValue.find((f: any) => f.disease === disease)
+                      : undefined;
+                    const isChecked = !!entry;
+
+                    return (
+                      <div key={disease} className="p-4 border rounded-xl bg-card/50 space-y-4">
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id={`disease-${disease}`}
+                            checked={isChecked}
+                            onCheckedChange={(checked) => {
+                              const current = form.getValues("familyHistory") || [];
+                              if (checked) {
+                                form.setValue("familyHistory", [...current, { disease, relatives: [] }]);
+                              } else {
+                                form.setValue("familyHistory", current.filter((f: any) => f.disease !== disease));
+                              }
+                            }}
+                          />
+                          <FormLabel htmlFor={`disease-${disease}`} className="text-base font-semibold cursor-pointer">
+                            {disease}
+                          </FormLabel>
+                        </div>
+
+                        {isChecked && (
+                          <div className="pl-8 space-y-3 animate-in fade-in slide-in-from-left-2 duration-300">
+                            <FormLabel className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                              Membres de la famille concernés :
+                            </FormLabel>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                              {relationshipOptions.map((rel) => (
+                                <div key={rel} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`rel-${disease}-${rel}`}
+                                    checked={entry.relatives.includes(rel)}
+                                    onCheckedChange={(checked) => {
+                                      const current = form.getValues("familyHistory") || [];
+                                      const updated = current.map((f: any) => {
+                                        if (f.disease === disease) {
+                                          return {
+                                            ...f,
+                                            relatives: checked
+                                              ? [...f.relatives, rel]
+                                              : f.relatives.filter((r: string) => r !== rel),
+                                          };
+                                        }
+                                        return f;
+                                      });
+                                      form.setValue("familyHistory", updated);
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor={`rel-${disease}-${rel}`}
+                                    className="text-sm font-normal cursor-pointer"
+                                  >
+                                    {rel}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </FormItem>
 
               <Button type="submit">Sauvegarder et continuer</Button>
             </form>
